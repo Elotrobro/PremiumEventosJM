@@ -1,0 +1,333 @@
+.cotizacion-header {
+    text-align: center;
+    padding: 3rem 0 2rem 0;
+    background: #ffffff;
+}
+
+.cotizacion-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 0.5rem;
+}
+
+.cotizacion-sub {
+    font-size: 1rem;
+    color: #7a6856;
+    margin-top: 0.5rem;
+}
+
+.modal-footer .btn-cotizar-modal,
+.btn-cotizar-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    background: linear-gradient(135deg, #d68b47 0%, #c17b3c 55%, #a5632a 100%);
+    padding: 0.95rem 2.4rem;
+    border-radius: 50px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: 0.2px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(193, 123, 60, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn-cotizar-modal i {
+    font-size: 0.95em;
+    transition: transform 0.2s ease;
+}
+
+.btn-cotizar-modal:hover {
+    background: linear-gradient(135deg, #e0954f 0%, #c17b3c 55%, #8f5623 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(193, 123, 60, 0.45);
+}
+
+.btn-cotizar-modal:hover i {
+    transform: translateX(3px);
+}
+
+.btn-cotizar-modal:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(193, 123, 60, 0.35);
+}
+
+.btn-cotizar-modal:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(193, 123, 60, 0.35), 0 4px 14px rgba(193, 123, 60, 0.35);
+}
+
+.btn-cotizar-modal:disabled {
+    background: #d9c4ad;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-vinotinto {
+    background: #8b1a1a;
+    padding: 0.8rem 2rem;
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-vinotinto:hover {
+    background: #6b1414;
+    transform: translateY(-1px);
+}
+
+.modal-footer .btn-cerrar,
+.btn-cerrar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #ffffff;
+    padding: 0.9rem 1.8rem;
+    border-radius: 50px;
+    color: #6c5b4b;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid #d9cabb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cerrar i {
+    font-size: 0.9em;
+}
+
+.btn-cerrar:hover {
+    background: #f5ede4;
+    border-color: #6c5b4b;
+    color: #4a3a2c;
+}
+
+.btn-cerrar:active {
+    background: #ece0d3;
+}
+
+.btn-cerrar:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 91, 75, 0.25);
+}
+
+dialog {
+    border: none;
+    border-radius: 24px;
+    padding: 0;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    background: transparent;
+    animation: fadeIn 0.3s ease;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-contenido {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: #c17b3c;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.modal-header .close-x {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.modal-header .close-x:hover {
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 1.8rem;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2c2a29;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.form-group label .required {
+    color: #c17b3c;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group datalist, 
+.form-group textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e0d6cc;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    outline: none;
+    border-color: #c17b3c;
+    box-shadow: 0 0 0 3px rgba(193,123,60,0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+    width: auto;
+    margin: 0;
+}
+
+.check-group {
+    margin-top: 0.4rem;
+}
+
+.check-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.check-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.modal-footer {
+    padding: 1.2rem 1.8rem;
+    background: #f5ede4;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (max-width: 576px) {
+    .modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .modal-footer .btn-cerrar,
+    .modal-footer .btn-cotizar-modal {
+        width: 100%;
+    }
+}
+
+#cotizacionModal{
+    display: flex;
+    margin: auto;
+}
+/* Estimado de precio en vivo (calculado según cantidad de invitados) */
+.estimado-precio-box {
+    background: #fff7ec;
+    border: 1px solid #e9c99a;
+    border-radius: 12px;
+    padding: 0.9rem 1.2rem;
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.estimado-precio-box.d-none {
+    display: none;
+}
+
+.estimado-titulo {
+    margin: 0 0 0.3rem 0;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #6c4a23;
+}
+
+.estimado-titulo span {
+    color: #c17b3c;
+}
+
+.estimado-aviso {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #8a6d2f;
+}
+
+.estimado-aviso i {
+    margin-right: 0.3rem;
+}

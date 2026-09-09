@@ -1,0 +1,251 @@
+/* login.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ── Overlay de fondo + contenedor de la modal ─────────────────────────
+   El formulario ya no es una página aparte: es una ventana modal que
+   vive en base.html y se muestra/oculta con la clase .is-open (ver
+   login-modal.js). La transición es un "zoom": la tarjeta arranca más
+   chica y transparente, y crece hasta su tamaño normal en 0.5s. */
+.login-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 20, 15, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 2000;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+}
+
+.login-modal-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.5s ease, visibility 0s linear 0s;
+}
+
+.login-modal-box {
+    position: relative;
+    transform: scale(0.5);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.login-modal-overlay.is-open .login-modal-box {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.login-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f5ede4;
+    color: #7a6856;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.login-modal-close:hover {
+    background: #c17b3c;
+    color: #fff;
+}
+
+.login-container {
+    max-width: 420px;
+    width: 100%;
+    margin: 2rem auto;
+}
+
+.login-card {
+    background: white;
+    border-radius: 28px;
+    padding: 2.2rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+/* Dentro de la modal, la tarjeta ya no necesita el margen/ancho de
+   página completa que usaba .login-container; el overlay se encarga
+   de centrarla. */
+.login-modal-box.login-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 1.8rem;
+}
+
+.logo h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.logo .premium {
+    color: #c17b3c;
+}
+
+.logo .eventos {
+    color: #2c2a29;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 1.8rem;
+}
+
+.login-title h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 0.3rem;
+}
+
+.login-title p {
+    font-size: 0.85rem;
+    color: #7a6856;
+}
+
+.login-alert {
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+
+.login-alert-error {
+    background: #fbe4e4;
+    color: #a33a3a;
+    border: 1px solid #f2b8b8;
+}
+
+.login-alert-success {
+    background: #e6f4ea;
+    color: #2c7a44;
+    border: 1px solid #b7e0c3;
+}
+
+.form-group {
+    margin-bottom: 1.3rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2c2a29;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #e0d6cc;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    background: #fefefe;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #c17b3c;
+    box-shadow: 0 0 0 3px rgba(193,123,60,0.1);
+}
+
+.form-group input::placeholder {
+    color: #b8aa9a;
+    font-size: 0.85rem;
+}
+
+.btn-login {
+    width: 100%;
+    background: #c17b3c;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 40px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.3rem;
+}
+
+.btn-login:hover {
+    background: #a5632a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(193,123,60,0.3);
+}
+
+.forgot-link {
+    text-align: center;
+    margin-top: 1.2rem;
+}
+
+.forgot-link a {
+    color: #c17b3c;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.2s;
+}
+
+.forgot-link a:hover {
+    color: #a5632a;
+    text-decoration: underline;
+}
+
+.back-home {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0e6db;
+}
+
+.back-home a {
+    color: #7a6856;
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+}
+
+.back-home a:hover {
+    color: #c17b3c;
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 1.6rem;
+    }
+    .logo h1 {
+        font-size: 1.4rem;
+    }
+    .login-title h2 {
+        font-size: 1.4rem;
+    }
+}

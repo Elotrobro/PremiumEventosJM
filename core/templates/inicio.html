@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+<section class="admin-login-access py-3">
+  <div class="container d-flex justify-content-end">
+  </div>
+</section>
+
+<section class="carousel-section">
+  <div class="container">
+    <div id="eventosCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="carousel-placeholder" style="background-color: #c9b8a4;">
+            <img src="{% static 'images/Carrusel11.png' %}" alt="Carrusel 1">
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="carousel-placeholder" style="background-color: #d4c5b5;">
+            <img src="{% static 'images/Carrusel2.png' %}" alt="Carrusel 2">
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="carousel-placeholder" style="background-color: #e0cebc;">
+            <img class="imagencarru1" src="{% static 'images/Trono2.png' %}" alt="Carrusel 3">
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#eventosCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+      </button>
+
+      <button class="carousel-control-next" type="button" data-bs-target="#eventosCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Siguiente</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="momentos">
+  <div class="container text-center">
+    <h2>Momentos Únicos</h2>
+    <p>Celebraciones Inolvidables</p>
+
+    <button type="button" class="btn btn-dark mt-3" onclick="abrirModalCotizacion()">
+      Cotizar mi evento
+    </button>
+  </div>
+</section>
+
+<!-- Ventana modal con dialog -->
+<dialog id="modalCotizacion" class="modal-cotizacion" style="display: 1; left: 300px;">
+  <div class="modal-header-custom">
+    <h3>Solicita tu cotización</h3>
+    <button type="button" class="btn-cerrar-modal" onclick="cerrarModalCotizacion()">×</button>
+  </div>
+
+  <form method="post" action="/cotizacion/" class="modal-formulario" id="formCotizacion">
+    {% csrf_token %}
+
+
+<fieldset class="border rounded p-3 mb-4">
+    <legend class="float-none w-auto px-2">Datos básicos de contacto</legend>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre completo</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="telefono" class="form-label">Número de celular / WhatsApp</label>
+            <input type="tel" class="form-control" id="telefono" name="telefono" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="correo" name="correo" required>
+        </div>
+    </div>
+</fieldset>
+
+
+<fieldset class="border rounded p-3">
+    <legend class="float-none w-auto px-2">Datos del evento</legend>
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label for="tipo_evento" class="form-label">Tipo de evento</label>
+            <select class="form-select" id="tipo_evento" name="tipo_evento" required>
+                <option value="">Selecciona una opción</option>
+                <option value="15 años">15 años</option>
+                <option value="matrimonio">Matrimonio</option>
+                <option value="grado">Grado</option>
+                <option value="cumpleaños">Cumpleaños</option>
+                <option value="empresarial">Empresarial</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="fecha_evento" class="form-label">Fecha del evento</label>
+            <input type="date" class="form-control" id="fecha_evento" name="fecha_evento" min="{% now 'Y-m-d' %}" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="hora_evento" class="form-label">Hora estimada del evento</label>
+            <input type="time" class="form-control" id="hora_evento" name="hora_evento" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="invitados" class="form-label">Cantidad de invitados o asistentes</label>
+            <input type="number" class="form-control" id="invitados" name="invitados" min="1" required>
+        </div>
+
+        <div class="col-12">
+            <div id="cotizacionEstimada" class="estimado-precio-box d-none">
+                <p class="estimado-titulo">Estimado para tu evento: <span id="precioEstimadoTexto">$0</span></p>
+                <p class="estimado-aviso">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Atención, esta es una cotización aproximada de lo que puede costar el evento.
+                </p>
+            </div>
+            <input type="hidden" name="precio_estimado" id="precio_estimado_input" value="0">
+        </div>
+
+        <div class="col-md-6">
+            <label for="lugar_evento" class="form-label">Lugar del evento / ciudad</label>
+            <input type="text" class="form-control" id="lugar_evento" name="lugar_evento" placeholder="Ej: Medellín, Antioquia">
+        </div>
+
+        <div class="col-md-6">
+            <label for="salon" class="form-label">¿Ya cuenta con salón?</label>
+            <select class="form-select" id="salon" name="salon" required>
+                <option value="">Selecciona una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="sugerencias_sede" class="form-label">¿Desea sugerencias de sede?</label>
+            <select class="form-select" id="sugerencias_sede" name="sugerencias_sede">
+                <option value="">Selecciona una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Servicio que desea cotizar</label>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="decoracion" name="servicios" id="servicio_decoracion">
+                <label class="form-check-label" for="servicio_decoracion">Decoración</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="mobiliario" name="servicios" id="servicio_mobiliario">
+                <label class="form-check-label" for="servicio_mobiliario">Mobiliario</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="organizacion_completa" name="servicios" id="servicio_organizacion_completa">
+                <label class="form-check-label" for="servicio_organizacion_completa">Organización completa</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="miniteca" name="servicios" id="servicio_miniteca">
+                <label class="form-check-label" for="servicio_miniteca">Miniteca</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="bar" name="servicios" id="servicio_bar">
+                <label class="form-check-label" for="servicio_bar">Bar</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="banquete" name="servicios" id="servicio_banquete">
+                <label class="form-check-label" for="servicio_banquete">Banquete</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="alquiler" name="servicios" id="servicio_alquiler">
+                <label class="form-check-label" for="servicio_alquiler">Alquiler</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Otros Servicios</label>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="fotografia" name="servicios" id="servicio_fotografia">
+                <label class="form-check-label" for="servicio_fotografia">Fotografia</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="camara_360" name="servicios" id="servicio_camara_360">
+                <label class="form-check-label" for="servicio_camara_360">Camara 360</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="ceremonias_privadas" name="servicios" id="servicio_ceremonias_privadas">
+                <label class="form-check-label" for="servicio_ceremonias_privadas">Ceremonia Privadas</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="inflables_magos_titeres" name="servicios" id="servicio_inflables_magos_titeres">
+                <label class="form-check-label" for="servicio_inflables_magos_titeres">Inflables. Magos y títeres</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="pistas_de_baile" name="servicios" id="servicio_pistas_de_baile">
+                <label class="form-check-label" for="servicio_pistas_de_baile">Pistas de Baile</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="edecanes" name="servicios" id="servicio_edecanes">
+                <label class="form-check-label" for="servicio_edecanes">Edecanes</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="granizados" name="servicios" id="servicio_granizados">
+                <label class="form-check-label" for="servicio_granizados">Granizados</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="polvora_fria" name="servicios" id="servicio_polvora_fria">
+                <label class="form-check-label" for="servicio_polvora_fria">Pólvora fría</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="musica_en_vivo" name="servicios" id="servicio_musica_en_vivo">
+                <label class="form-check-label" for="servicio_musica_en_vivo">Musica en vivo</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="servicio_audio_visual" name="servicios" id="servicio_audio_visual">
+                <label class="form-check-label" for="servicio_audio_visual">Servicio audio visual</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label for="presupuesto" class="form-label">Presupuesto aproximado</label>
+            <input type="number" class="form-control" id="presupuesto" name="presupuesto" min="0" placeholder="Ej: 3000000">
+        </div>
+
+        <div class="col-md-6">
+            <label for="tema_evento" class="form-label">Tema o estilo del evento</label>
+            <input type="text" class="form-control" id="tema_evento" name="tema_evento" placeholder="Ej: elegante, vintage, moderno">
+        </div>
+
+        <div class="col-12">
+            <label for="mensaje" class="form-label">Observaciones adicionales</label>
+            <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Cuéntanos cómo imaginas tu evento"></textarea>
+        </div>
+
+    </div>
+</fieldset>
+
+    
+<div class="modal-footer d-flex justify-content-end gap-2">
+    <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold" 
+            onclick="cerrarModalCotizacion()">
+        <i class="fas fa-times me-1"></i> Cancelar
+    </button>
+
+    <button type="submit" class="btn btn-dark px-4 py-2 rounded-pill fw-semibold shadow-sm" 
+            id="btnCotizar">
+        <i class="far fa-paper-plane me-1"></i> Cotizar
+    </button>
+</div>
+
+    </form>
+</dialog>
+
+<script src="{% static 'js/modal.js' %}"></script>
+
+
+
+{% endblock %}

@@ -1,0 +1,218 @@
+.convenios-header {
+    text-align: center;
+    padding: 3rem 0 2rem 0;
+    background: #ffffff;
+}
+
+.convenios-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 0.5rem;
+}
+
+.convenios-sub {
+    font-size: 1rem;
+    color: #7a6856;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+}
+
+.convenios-descripcion {
+    background: #f5ede4;
+    padding: 3rem 0;
+}
+
+.descripcion-texto {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #4a3a2c;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.proveedores-section {
+    padding: 4rem 0;
+    background: #ffffff;
+}
+
+.proveedores-section h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 2rem;
+}
+
+.proveedores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.proveedor-card {
+    background: #f5ede4;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.proveedor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.proveedor-icono {
+    width: 80px;
+    height: 80px;
+    background: #c17b3c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+}
+
+.proveedor-icono i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.proveedor-card h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-bottom: 0.8rem;
+}
+
+.proveedor-card p {
+    font-size: 0.9rem;
+    color: #7a6856;
+    line-height: 1.6;
+}
+
+/* ---- Nuevo contenido: sección de Salones ---- */
+
+.salones-section {
+    padding: 1rem 0 4rem 0;
+    background: #f5ede4;
+}
+
+.salon-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.salon-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.salon-card-top {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #c9b8a4 0%, #d4c5b5 100%);
+}
+
+.salon-card-top i {
+    font-size: 3rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.salon-card .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2c2a29;
+}
+
+.salon-badge {
+    background: #f5ede4;
+    color: #a5632a;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.salon-ubicacion {
+    font-size: 0.8rem;
+    color: #9a897a;
+    margin-bottom: 0.75rem;
+}
+
+.salon-ubicacion i {
+    color: #c17b3c;
+    margin-right: 0.3rem;
+}
+
+.salon-card .card-text {
+    font-size: 0.9rem;
+    color: #7a6856;
+    margin-bottom: 1rem;
+}
+
+.salon-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem 0;
+}
+
+.salon-lista li {
+    font-size: 0.85rem;
+    color: #4a3a2c;
+    margin-bottom: 0.5rem;
+}
+
+.salon-lista i {
+    color: #c17b3c;
+    width: 18px;
+    margin-right: 0.4rem;
+}
+
+.btn-salon {
+    display: inline-block;
+    background: #c17b3c;
+    padding: 0.5rem 1.5rem;
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-salon:hover {
+    background: #a5632a;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.aviso-login-salones {
+    background: #fdf3e7;
+    color: #a5632a;
+    border: 1px solid #eadcc7;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.aviso-login-salones a {
+    color: #a5632a;
+    font-weight: 700;
+    text-decoration: underline;
+}
+

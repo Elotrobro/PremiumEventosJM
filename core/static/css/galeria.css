@@ -1,0 +1,188 @@
+.galeria-header {
+    text-align: center;
+    padding: 3rem 0 2rem 0;
+    background: #ffffff;
+}
+
+.galeria-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-bottom: 0.5rem;
+}
+
+.carrusel-section {
+    padding: 2rem 0;
+    background: #f5ede4;
+}
+
+.carrusel-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.carousel-item {
+    height: 500px;
+}
+
+.carousel-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.carousel-placeholder i {
+    font-size: 4rem;
+    color: #9b8e80;
+}
+
+.carousel-placeholder span {
+    font-size: 1.2rem;
+    color: #6c5b4b;
+    margin-left: 1rem;
+}
+
+.eventos-realizados {
+    padding: 4rem 0;
+    background: #ffffff;
+}
+
+.eventos-realizados h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 2rem;
+}
+
+.galeria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.galeria-item {
+    background: #f5ede4;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.galeria-item:hover {
+    transform: translateY(-5px);
+}
+
+.galeria-imagen {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #d4c5b5;
+}
+
+.galeria-imagen i {
+    font-size: 3rem;
+    color: #9b8e80;
+}
+
+.galeria-imagen span {
+    font-size: 1rem;
+    color: #6c5b4b;
+    margin-left: 0.8rem;
+}
+
+.galeria-info {
+    padding: 1rem;
+    text-align: center;
+}
+
+.galeria-info p {
+    margin: 0;
+    font-weight: 500;
+    color: #2c2a29;
+}
+
+.imagenescarruga{
+    width: 500px;
+    height: 450px;
+    border-radius: 14px;
+}
+/* Tarjetas clicables que abren el modal de cada evento */
+.galeria-item {
+    cursor: pointer;
+}
+
+.galeria-item:focus-visible {
+    outline: 3px solid #c17b3c;
+    outline-offset: 2px;
+}
+
+/* Modal con el carrusel de imágenes de cada evento */
+.evento-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+}
+
+/* Espacio vacío del carrusel, listo para que se agreguen las imágenes reales */
+.evento-modal-placeholder {
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    background: repeating-linear-gradient(
+        45deg,
+        #f0e6d8,
+        #f0e6d8 12px,
+        #ede1d0 12px,
+        #ede1d0 24px
+    );
+    color: #a3907a;
+}
+
+.evento-modal-placeholder i {
+    font-size: 2.5rem;
+}
+
+.evento-modal-placeholder span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.evento-modal-img {
+    height: 420px;
+    object-fit: cover;
+    background: #d4c5b5;
+}
+
+.evento-modal-ubicacion {
+    padding: 1rem 1.5rem;
+    background: #f5ede4;
+    color: #6c5b4b;
+    font-weight: 500;
+    text-align: center;
+}
+
+.evento-modal-ubicacion i {
+    color: #c17b3c;
+    margin-right: 0.4rem;
+}
+
+/* Permite seguir navegando/scrolleando la página aunque el modal de un
+   evento esté abierto (por defecto Bootstrap bloquea el scroll del body
+   mientras el modal está visible). El modal se mantiene visible en
+   pantalla (position: fixed, comportamiento por defecto de Bootstrap)
+   mientras el contenido de fondo puede seguir desplazándose. */
+body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}

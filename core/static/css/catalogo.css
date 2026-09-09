@@ -1,0 +1,286 @@
+.catalogo-header {
+    text-align: center;
+    padding: 3rem 0 2rem 0;
+    background: #ffffff;
+}
+
+.catalogo-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c17b3c;
+    margin-bottom: 0.5rem;
+}
+
+.catalogo-sub {
+    font-size: 1rem;
+    color: #7a6856;
+    letter-spacing: 2px;
+}
+
+.catalogo-section {
+    padding: 3rem 0 5rem 0;
+    background: #f5ede4;
+}
+
+.card-catalogo {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+}
+
+.card-catalogo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.card-img-top {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #c9b8a4 0%, #d4c5b5 100%);
+}
+
+.card-img-top i {
+    font-size: 3.5rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #7a6856;
+    margin-bottom: 1rem;
+}
+
+.btn-solicitar {
+    background: #c17b3c;
+    padding: 0.5rem 1.5rem;
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.btn-solicitar:hover {
+    background: #a5632a;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-solicitar:active {
+    transform: translateY(0);
+}
+
+/* ---- Nuevo contenido: sección de Alquiler ---- */
+
+.catalogo-intro {
+    max-width: 650px;
+    margin: 0.5rem auto 0 auto;
+    color: #7a6856;
+    font-size: 0.95rem;
+}
+
+.filtro-categorias {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+}
+
+.btn-filtro {
+    border: 1px solid #c17b3c;
+    background: transparent;
+    color: #c17b3c;
+    padding: 0.45rem 1.4rem;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+}
+
+.btn-filtro:hover {
+    background: #c17b3c;
+    color: #fff;
+}
+
+.btn-filtro.active {
+    background: #c17b3c;
+    color: #fff;
+}
+
+.categoria-bloque {
+    margin-bottom: 3.5rem;
+}
+
+.categoria-titulo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c2a29;
+    border-bottom: 2px solid #c9b8a4;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1.75rem;
+}
+
+.categoria-titulo i {
+    color: #c17b3c;
+    margin-right: 0.5rem;
+}
+
+.item-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.item-icono {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1rem auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #c9b8a4 0%, #d4c5b5 100%);
+}
+
+.item-icono i {
+    font-size: 1.4rem;
+    color: #fff;
+}
+
+.item-icono-blanco { background: linear-gradient(135deg, #e9e2d8 0%, #ffffff 100%); }
+.item-icono-blanco i { color: #b7a892; }
+.item-icono-lila    { background: linear-gradient(135deg, #c9a6e0 0%, #dcc4ec 100%); }
+.item-icono-negro   { background: linear-gradient(135deg, #3a3a3a 0%, #1c1c1c 100%); }
+.item-icono-rojo    { background: linear-gradient(135deg, #c0392b 0%, #922b21 100%); }
+.item-icono-verde   { background: linear-gradient(135deg, #2e8b57 0%, #1f6b40 100%); }
+
+/* Espacio para la foto real de cada producto del catálogo */
+.item-imagen {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #ede1d0 0%, #f5ede4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Si a futuro falta la foto de algún producto, este ícono queda de respaldo
+   (se usa junto con onerror en el <img>, ver catalogo.html) */
+.item-imagen .item-imagen-fallback {
+    font-size: 1.8rem;
+    color: #b7a892;
+}
+
+/* Pastilla de color junto al nombre, para identificar rápido cada tapete
+   (reutiliza la paleta .item-icono-blanco/lila/negro/rojo/verde ya definida) */
+.tapete-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+.item-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-bottom: 0.6rem;
+    min-height: 2.4em;
+}
+
+.item-precio {
+    display: inline-block;
+    background: #f5ede4;
+    color: #a5632a;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.25rem 0.9rem;
+    border-radius: 30px;
+    margin-bottom: 0.5rem;
+}
+
+.item-unidad {
+    font-size: 0.78rem;
+    color: #9a897a;
+    letter-spacing: 0.3px;
+    margin-bottom: 0;
+}
+
+.btn-cotizar {
+    display: inline-block;
+    background: #c17b3c;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.7rem 2.2rem;
+    border-radius: 40px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-cotizar:hover {
+    background: #a5632a;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ---- Panel de cotización (carrito lateral) ---- */
+
+.panel-cotizacion {
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.panel-cotizacion .card-header {
+    border-bottom: none;
+}
+
+.aviso-login-cotizacion {
+    background: #fdf3e7;
+    color: #a5632a;
+    border: 1px solid #eadcc7;
+    border-radius: 12px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Testimonios{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/testimonios.css' %}">
+
+<div class="testimonios-header">
+    <div class="container">
+        <h2>Testimonios</h2>
+        <p class="reseñas">Reseñas De Google</p>
+    </div>
+</div>
+
+<div class="testimonios-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="testimonio-card">
+                    <div class="estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonio-texto">
+                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+                        when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                    </p>
+                    <p class="testimonio-autor">JEAN PAUL</p>
+                    <p class="testimonio-fecha">Cliente Satisfecho</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="testimonio-card">
+                    <div class="estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonio-texto">
+                        "Excelente servicio, atención personalizada y calidad en cada detalle. 
+                        Hicieron realidad el evento de mis sueños. Totalmente recomendados."
+                    </p>
+                    <p class="testimonio-autor">SANTIAGO GONZALES</p>
+                    <p class="testimonio-fecha">Boda - Marzo 2025</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="testimonio-card">
+                    <div class="estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonio-texto">
+                        "Contratamos Premium Eventos JM para un evento corporativo y fue todo un éxito. 
+                        Profesionales, puntuales y con una creatividad impresionante. Superaron nuestras expectativas."
+                    </p>
+                    <p class="testimonio-autor">CARLOS RODRÍGUEZ</p>
+                    <p class="testimonio-fecha">Evento Corporativo - Enero 2026</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-ver-todos">
+            <a href="#">Ver más reseñas</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

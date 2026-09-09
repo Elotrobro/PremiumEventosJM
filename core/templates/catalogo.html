@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Alquiler y Cotizador - Premium Eventos JM{% endblock %}
+{% block content %}
+
+{# ⚠️ PENDIENTE: cada tarjeta de producto de abajo (data-id, data-nombre,   #}
+{# data-precio, data-categoria) está escrita a mano en este archivo HTML.  #}
+{# El modelo ItemDecoracion (Bd_PremiumEventos/models.py) existe para      #}
+{# guardar estos mismos datos en la base de datos, pero hoy solo se       #}
+{# gestiona desde el admin de Django y no se usa aquí. Para conectar el   #}
+{# catálogo a la base de datos: la vista `catalogo` (core/views.py)       #}
+{# tendría que consultar ItemDecoracion.objects.filter(estado=True) y     #}
+{# pasarlo al template con un {% for item in items %} en vez de tarjetas  #}
+{# fijas. Si se cambia un precio o se agrega un producto hoy, hay que     #}
+{# editar directamente este archivo Y core/static/js/catalogo.js lee     #}
+{# esos mismos atributos data-* al armar el carrito.                     #}
+
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+
+<!-- Header -->
+<div class="catalogo-header py-5 bg-dark text-white text-center">
+    <div class="container">
+        <h1 class="fw-bold tracking-wide">PREMIUM EVENTOS JM</h1>
+        <p class="catalogo-sub text-uppercase text-warning fs-5">Catálogo de Alquiler</p>
+        <p class="catalogo-intro lead text-light mx-auto" style="max-width: 700px;">
+            Todo lo que necesitas para ambientar tu evento, por unidad o por metro. Selecciona tus elementos, arma tu combo ideal y cotiza al instante.
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Catálogo Principal (Columna Izquierda / Ancha) -->
+        <div class="col-lg-8">
+            <!-- Filtros -->
+            <div class="filtro-categorias mb-4 d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+                <button type="button" class="btn btn-outline-dark active btn-filtro" data-filtro="todos">Todos</button>
+                <button type="button" class="btn btn-outline-dark btn-filtro" data-filtro="mobiliario">Mobiliario</button>
+                <button type="button" class="btn btn-outline-dark btn-filtro" data-filtro="textiles">Textiles y Mantelería</button>
+                <button type="button" class="btn btn-outline-dark btn-filtro" data-filtro="decoracion">Decoración y Ambientación</button>
+            </div>
+
+            <!-- GRILLA DE PRODUCTOS -->
+            <div class="row g-4" id="catalogo-productos">
+
+                <!-- MOBILIARIO -->
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="silla" data-nombre="Silla" data-precio="1500" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/silla.png' %}" alt="Silla"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Silla</h5>
+                        <span class="item-precio text-success fw-bold">$1.500</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="silla-trono" data-nombre="Silla Trono" data-precio="100000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/silla_trono.png' %}" alt="Silla Trono"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Silla Trono</h5>
+                        <span class="item-precio text-success fw-bold">$100.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="mesas" data-nombre="Mesas" data-precio="8000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/mesas.png' %}" alt="Mesas"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Mesas</h5>
+                        <span class="item-precio text-success fw-bold">$8.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="mesa-ruedas" data-nombre="Mesa de Ruedas" data-precio="35000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/mesa_de_ruedas.png' %}" alt="Mesa de Ruedas"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Mesa de Ruedas</h5>
+                        <span class="item-precio text-success fw-bold">$35.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="mesas-entorchadas" data-nombre="Mesas Entorchadas" data-precio="30000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/mesas_entorchadas.png' %}" alt="Mesas Entorchadas"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Mesas Entorchadas</h5>
+                        <span class="item-precio text-success fw-bold">$30.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="base-cuadra" data-nombre="Base Cuadra" data-precio="5000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/base_cuadra.png' %}" alt="Base Cuadra"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Base Cuadra</h5>
+                        <span class="item-precio text-success fw-bold">$5.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="mobiliario" data-id="caballete" data-nombre="Caballete" data-precio="10000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/caballete.png' %}" alt="Caballete"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Caballete</h5>
+                        <span class="item-precio text-success fw-bold">$10.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <!-- TEXTILES Y MANTELERÍA -->
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="mantel-blanco" data-nombre="Mantel Blanco" data-precio="8000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/mantel_blanco.png' %}" alt="Mantel Blanco"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Mantel Blanco</h5>
+                        <span class="item-precio text-success fw-bold">$8.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="sobre-mantel" data-nombre="Sobre Mantel" data-precio="5000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/sobre_mantel.png' %}" alt="Sobre Mantel"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Sobre Mantel</h5>
+                        <span class="item-precio text-success fw-bold">$5.000</span>
+                        <p class="item-unidad text-muted small">Variedad de colores</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="camino-yute" data-nombre="Camino de Yute" data-precio="3000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/camino_de_yute.png' %}" alt="Camino de Yute"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Camino de Yute</h5>
+                        <span class="item-precio text-success fw-bold">$3.000</span>
+                        <p class="item-unidad text-muted small">Por unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="velos-techo" data-nombre="Velos para Techo" data-precio="20000" data-unidad="75cm x 25mtrs">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/velos_para_techo.png' %}" alt="Velos para Techo"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Velos para Techo</h5>
+                        <span class="item-precio text-success fw-bold">$20.000</span>
+                        <p class="item-unidad text-muted small">75cm x 25mtrs</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <!-- Nuevos: tapetes por color, pañoleta y vestido de silla -->
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="tapete-blanco" data-nombre="Tapete Blanco" data-precio="10000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/tapete_blanco.png' %}" alt="Tapete Blanco"></div>
+                        <h5 class="item-nombre fs-6 fw-bold"><span class="tapete-swatch item-icono-blanco"></span> Tapete Blanco</h5>
+                        <span class="item-precio text-success fw-bold">$10.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="tapete-lila" data-nombre="Tapete Lila" data-precio="10000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/tapete_lila.png' %}" alt="Tapete Lila"></div>
+                        <h5 class="item-nombre fs-6 fw-bold"><span class="tapete-swatch item-icono-lila"></span> Tapete Lila</h5>
+                        <span class="item-precio text-success fw-bold">$10.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="tapete-negro" data-nombre="Tapete Negro" data-precio="10000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/tapete_negro.png' %}" alt="Tapete Negro"></div>
+                        <h5 class="item-nombre fs-6 fw-bold"><span class="tapete-swatch item-icono-negro"></span> Tapete Negro</h5>
+                        <span class="item-precio text-success fw-bold">$10.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="tapete-rojo" data-nombre="Tapete Rojo" data-precio="12000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/tapete_rojo.png' %}" alt="Tapete Rojo"></div>
+                        <h5 class="item-nombre fs-6 fw-bold"><span class="tapete-swatch item-icono-rojo"></span> Tapete Rojo</h5>
+                        <span class="item-precio text-success fw-bold">$12.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="tapete-verde" data-nombre="Tapete Verde" data-precio="10000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/tapete_verde.png' %}" alt="Tapete Verde"></div>
+                        <h5 class="item-nombre fs-6 fw-bold"><span class="tapete-swatch item-icono-verde"></span> Tapete Verde</h5>
+                        <span class="item-precio text-success fw-bold">$10.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="panoleta" data-nombre="Pañoleta Decorativa" data-precio="1500" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/panoleta.png' %}" alt="Pañoleta Decorativa"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Pañoleta Decorativa</h5>
+                        <span class="item-precio text-success fw-bold">$1.500</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="textiles" data-id="vestido-silla" data-nombre="Vestido de Silla" data-precio="6000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/vestido_de_silla.png' %}" alt="Vestido de Silla"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Vestido de Silla</h5>
+                        <span class="item-precio text-success fw-bold">$6.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <!-- DECORACIÓN Y AMBIENTACIÓN -->
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="cilindros-vidrio" data-nombre="Cilindros de Vidrio" data-precio="3000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/cilindros_vidrio.png' %}" alt="Cilindros de Vidrio"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Cilindros de Vidrio</h5>
+                        <span class="item-precio text-success fw-bold">$3.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="torre-eiffel" data-nombre="Torre Eiffel (160cm)" data-precio="40000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/torre_eiffel.png' %}" alt="Torre Eiffel"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Torre Eiffel</h5>
+                        <span class="item-precio text-success fw-bold">$40.000</span>
+                        <p class="item-unidad text-muted small">Alto 160cms</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="aro-decorativo" data-nombre="Aro Decorativo (1.50x1.50)" data-precio="40000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/aro.png' %}"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Aro</h5>
+                        <span class="item-precio text-success fw-bold">$40.000</span>
+                        <p class="item-unidad text-muted small">1.50 x 1.50 cm</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <!-- Nuevos: piezas de decoración adicionales -->
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="baking-puerta-marco" data-nombre="Backing Puerta y Marco" data-precio="150000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/baking_puerta_y_marco.png' %}" alt="Backing Puerta y Marco"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Backing Puerta y Marco</h5>
+                        <span class="item-precio text-success fw-bold">$150.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="baul" data-nombre="Baúl Decorativo" data-precio="25000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"> <img src="{% static 'images/catalogo_productos/baul.png' %}" alt="Baúl Decorativo"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Baúl Decorativo</h5>
+                        <span class="item-precio text-success fw-bold">$25.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="bola-tejida-madera" data-nombre="Bola Tejida de Madera" data-precio="8000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/bola_tejida_madera.png' %}" alt="Bola Tejida de Madera"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Bola Tejida de Madera</h5>
+                        <span class="item-precio text-success fw-bold">$8.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="cilindros-blancos" data-nombre="Cilindros Blancos" data-precio="3000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/cilindros_blancos.png' %}" alt="Cilindros Blancos"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Cilindros Blancos</h5>
+                        <span class="item-precio text-success fw-bold">$3.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="hiedra" data-nombre="Hiedra" data-precio="5000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"> <img src="{% static 'images/catalogo_productos/hiedra.png' %}" alt="Hiedra"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Hiedra</h5>
+                        <span class="item-precio text-success fw-bold">$5.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="hiedra-blanca" data-nombre="Hiedra Blanca" data-precio="6000" data-unidad="Metro lineal">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/hiedra_blanca.png' %}" alt="Hiedra Blanca"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Hiedra Blanca</h5>
+                        <span class="item-precio text-success fw-bold">$6.000</span>
+                        <p class="item-unidad text-muted small">Metro lineal</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="letras" data-nombre="Letras Decorativas" data-precio="15000" data-unidad="Por letra">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"> <img src="{% static 'images/catalogo_productos/letras.png' %}" alt="Letras Decorativas"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Letras Decorativas</h5>
+                        <span class="item-precio text-success fw-bold">$15.000</span>
+                        <p class="item-unidad text-muted small">Por letra</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="mariposas" data-nombre="Mariposas Decorativas" data-precio="2000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/mariposa.png' %}" alt="Mariposas Decorativas"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Mariposas Decorativas</h5>
+                        <span class="item-precio text-success fw-bold">$2.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="numeros" data-nombre="Números Decorativos" data-precio="15000" data-unidad="Por número">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/numeros.png' %}" alt="Números Decorativos"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Números Decorativos</h5>
+                        <span class="item-precio text-success fw-bold">$15.000</span>
+                        <p class="item-unidad text-muted small">Por número</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="kit-quinceanero" data-nombre="Kit Quinceañero" data-precio="180000" data-unidad="Kit completo">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/quinceanero.png' %}" alt="Kit Quinceañero"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Caldero</h5>
+                        <span class="item-precio text-success fw-bold">$180.000</span>
+                        <p class="item-unidad text-muted small">Kit completo</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 item-card-wrapper" data-categoria="decoracion" data-id="rodajas-madera" data-nombre="Rodajas de Madera" data-precio="4000" data-unidad="Unidad">
+                    <div class="card item-card h-100 shadow-sm border-0 p-3 text-center">
+                        <div class="item-imagen"><img src="{% static 'images/catalogo_productos/rodajas_madera.png' %}" alt="Rodajas de Madera"></div>
+                        <h5 class="item-nombre fs-6 fw-bold">Rodajas de Madera</h5>
+                        <span class="item-precio text-success fw-bold">$4.000</span>
+                        <p class="item-unidad text-muted small">Unidad</p>
+                        <button class="btn btn-sm btn-dark mt-auto agregar-item"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Panel de Cotización / Carrito (Columna Derecha / Sticky) -->
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="card panel-cotizacion shadow border-0 sticky-top" style="top: 2rem;">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i> Tu Cotización</h5>
+                    <span class="badge bg-warning text-dark" id="contador-items">0 ítems</span>
+                </div>
+                <div class="card-body p-3">
+                    <div id="lista-carrito" class="mb-3" style="max-height: 350px; overflow-y: auto;">
+                        <p class="text-muted text-center py-4 my-0" id="carrito-vacio">No has seleccionado ningún elemento todavía.</p>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fs-5 fw-bold mb-3">
+                        <span>Total estimado:</span>
+                        <span id="total-cotizacion" class="text-success">$0</span>
+                    </div>
+
+                    {% if not request.session.usuario_id %}
+                    <div class="aviso-login-cotizacion">
+                        <i class="fas fa-lock"></i>
+                        <span>Debes <a href="{% url 'login' %}">iniciar sesión</a> para poder enviar tu cotización.</span>
+                    </div>
+                    {% endif %}
+
+                    <button class="btn btn-success w-100 mb-2" id="btn-enviar-cotizacion" disabled>
+                        <i class="fab fa-whatsapp me-2"></i> Solicitar Cotización por WhatsApp
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm w-100" id="btn-vaciar-carrito" disabled>
+                        <i class="fas fa-trash-alt me-1"></i> Vaciar Cotización
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script del Carrito y Filtros -->
+<script src="{% static 'js/catalogo.js' %}"></script>
+{% endblock %}

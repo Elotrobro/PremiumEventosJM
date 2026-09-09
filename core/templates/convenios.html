@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Salones y Espacios - Premium Eventos JM{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/convenios.css' %}">
+
+<div class="salones-header py-5 bg-dark text-white text-center">
+    <div class="container">
+        <h1 class="fw-bold">SALONES Y ESPACIOS</h1>
+        <p class="text-uppercase text-warning fs-5">Convenios y Locaciones Exclusivas</p>
+        <p class="lead text-light mx-auto" style="max-width: 700px;">
+            Descubre nuestra selección de salones ideales para bodas, quince años, grados y eventos corporativos. Espacios con todo incluido y máxima comodidad.
+        </p>
+    </div>
+</div>
+
+<div class="container salones-section">
+    {% if not request.session.usuario_id %}
+    <div class="aviso-login-salones">
+        <i class="fas fa-lock"></i>
+        <span>Debes <a href="#" class="abrir-login-modal-link">iniciar sesión</a> para poder solicitar la cotización de un salón.</span>
+    </div>
+    {% endif %}
+    <div class="row g-4">
+        
+        <!-- Salón 1 -->
+        <div class="col-md-4">
+            <div class="card salon-card h-100 shadow-sm border-0">
+                <div class="salon-card-top bg-secondary text-white text-center">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title fw-bold">Salón Imperial JM</h3>
+                    <p class="salon-ubicacion"><i class="fas fa-map-marker-alt"></i> Sede Principal</p>
+                    <p class="card-text">Amplio salón con iluminación arquitectónica, aire acondicionado y capacidad flexible para grandes celebraciones.</p>
+                    <ul class="salon-lista mb-4">
+                        <li><i class="fas fa-users"></i> Capacidad: Hasta 150 personas</li>
+                        <li><i class="fas fa-parking"></i> Parqueadero disponible</li>
+                        <li><i class="fas fa-music"></i> Sonido y Luces integradas</li>
+                    </ul>
+                    <a href="https://wa.me/573000000000?text=Hola,%20me%20interesa%20cotizar%20el%20Salón%20Imperial%20JM"
+                       target="_blank" class="btn-salon cotizar-salon-link mt-auto">
+                        <i class="fab fa-whatsapp me-2"></i> Cotizar Salón
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salón 2 -->
+        <div class="col-md-4">
+            <div class="card salon-card h-100 shadow-sm border-0">
+                <div class="salon-card-top bg-secondary text-white text-center">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title fw-bold">Terraza Campestre</h3>
+                    <p class="salon-ubicacion"><i class="fas fa-map-marker-alt"></i> Zona Sur</p>
+                    <p class="card-text">Hermoso espacio al aire libre rodeado de naturaleza, ideal para ceremonias diurnas y recepciones románticas.</p>
+                    <ul class="salon-lista mb-4">
+                        <li><i class="fas fa-users"></i> Capacidad: Hasta 100 personas</li>
+                        <li><i class="fas fa-sun"></i> Zona verde y pérgolas</li>
+                        <li><i class="fas fa-camera"></i> Excelentes escenarios fotográficos</li>
+                    </ul>
+                    <a href="https://wa.me/573000000000?text=Hola,%20me%20interesa%20cotizar%20la%20Terraza%20Campestre"
+                       target="_blank" class="btn-salon cotizar-salon-link mt-auto">
+                        <i class="fab fa-whatsapp me-2"></i> Cotizar Salón
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salón 3 -->
+        <div class="col-md-4">
+            <div class="card salon-card h-100 shadow-sm border-0">
+                <div class="salon-card-top bg-secondary text-white text-center">
+                    <i class="fas fa-glass-cheers"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title fw-bold">Salón Lounge Ejecutiva</h3>
+                    <p class="salon-ubicacion"><i class="fas fa-map-marker-alt"></i> Centro de la Ciudad</p>
+                    <p class="card-text">Ambiente moderno y sofisticado perfecto para eventos empresariales, lanzamientos de marca y cócteles exclusivos.</p>
+                    <ul class="salon-lista mb-4">
+                        <li><i class="fas fa-users"></i> Capacidad: Hasta 80 personas</li>
+                        <li><i class="fas fa-wifi"></i> Conectividad y proyector</li>
+                        <li><i class="fas fa-cocktail"></i> Barra de bar integrada</li>
+                    </ul>
+                    <a href="https://wa.me/573000000000?text=Hola,%20me%20interesa%20cotizar%20el%20Salón%20Lounge%20Ejecutiva"
+                       target="_blank" class="btn-salon cotizar-salon-link mt-auto">
+                        <i class="fab fa-whatsapp me-2"></i> Cotizar Salón
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Mismo patrón que catalogo.js / modal.js: la sesión se lee del
+        // atributo data-logged-in de <body> (ver base.html), no con
+        // etiquetas de Django dentro del script.
+        const usuarioLogueado = document.body.dataset.loggedIn === "true";
+
+        function abrirLogin(e) {
+            if (e) e.preventDefault();
+            alert("Debes iniciar sesión para poder solicitar una cotización.");
+            // La modal de login vive en base.html (visible en toda página);
+            // se abre directamente en vez de navegar a otra URL.
+            if (window.abrirLoginModal) {
+                window.abrirLoginModal();
+            } else {
+                window.location.href = "/?login=1";
+            }
+        }
+
+        // Enlace "iniciar sesión" del aviso de arriba
+        document.querySelectorAll(".abrir-login-modal-link").forEach(function (link) {
+            link.addEventListener("click", abrirLogin);
+        });
+
+        // Validación: no se puede solicitar la cotización de un salón sin iniciar sesión
+        document.querySelectorAll(".cotizar-salon-link").forEach(function (link) {
+            link.addEventListener("click", function (e) {
+                if (!usuarioLogueado) {
+                    abrirLogin(e);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

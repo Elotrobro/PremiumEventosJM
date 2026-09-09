@@ -1,0 +1,97 @@
+.testimonios-header {
+    text-align: center;
+    padding: 4rem 0 2rem 0;
+    background: #ffffff;
+}
+
+.testimonios-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-bottom: 0.5rem;
+}
+
+.testimonios-header .reseñas {
+    font-size: 1rem;
+    color: #c17b3c;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+}
+
+.testimonios-section {
+    padding: 2rem 0 4rem 0;
+    background: #f5ede4;
+}
+
+.testimonio-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.testimonio-card .calificacion {
+    color: #ffc107;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.testimonio-card .testimonio-texto {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #4a3a2c;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+
+.testimonio-card .testimonio-autor {
+    font-weight: 700;
+    color: #c17b3c;
+    font-size: 1.1rem;
+}
+
+.testimonio-card .testimonio-fecha {
+    font-size: 0.8rem;
+    color: #9b8e80;
+    margin-top: 0.3rem;
+}
+
+.estrellas {
+    color: #ffc107;
+    margin-bottom: 1rem;
+}
+
+.estrellas i {
+    margin-right: 3px;
+}
+
+.btn-ver-todos {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-ver-todos a {
+    background: #c17b3c;
+    padding: 0.8rem 2rem;
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.btn-ver-todos a:hover {
+    background: #a5632a;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .testimonios-header h2 {
+        font-size: 1.8rem;
+    }
+    .testimonio-card {
+        padding: 1.5rem;
+    }
+}
