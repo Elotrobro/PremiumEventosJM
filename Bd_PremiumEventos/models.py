@@ -164,6 +164,22 @@ class Cotizacion(models.Model):
     hora_fin = models.TimeField()  # calculada automáticamente en el backend: hora_inicio + 4 horas (ver cotizacion_view)
     ubicacion = models.CharField(max_length=100)
 
+    ESTADO_PENDIENTE = 'pendiente'
+    ESTADO_APROBADA = 'aprobada'
+    ESTADO_RECHAZADA = 'rechazada'
+    ESTADO_COMPLETADA = 'completada'
+    ESTADO_CHOICES = [
+        (ESTADO_PENDIENTE, 'Pendiente'),
+        (ESTADO_APROBADA, 'Aprobada'),
+        (ESTADO_RECHAZADA, 'Rechazada'),
+        (ESTADO_COMPLETADA, 'Completada'),
+    ]
+    # Estado de gestión de la cotización dentro del panel de administrador
+    # (no lo llena el cliente; lo cambia el admin al revisar la solicitud).
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=ESTADO_PENDIENTE)
+    # Notas internas del administrador sobre esta cotización (no se muestran al cliente).
+    notas_admin = models.TextField(blank=True, default='')
+
     def __str__(self):
         return f"Cotización #{self.id_cotizacion} - {self.cliente.nombre_completo}"
 

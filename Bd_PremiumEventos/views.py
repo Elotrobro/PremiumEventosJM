@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 import json
 
-from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion
+from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -289,3 +289,34 @@ def cotizacion_view(request):
         '. Esta es una cotización aproximada; te contactaremos pronto para confirmar los detalles.'
     )
     return redirect('inicio')
+
+
+def guardar_contacto(request):
+    """
+    Procesa el formulario público de contacto.html y lo guarda en
+    ContactoSimple. No requiere sesión iniciada (a diferencia de la
+    cotización): cualquier visitante puede dejar sus datos de contacto.
+    """
+    if request.method != 'POST':
+        return redirect('contacto')
+
+    nombre = request.POST.get('nombre', '').strip()
+    apellidos = request.POST.get('apellidos', '').strip()
+    email = request.POST.get('email', '').strip()
+    telefono = request.POST.get('telefono', '').strip()
+    mensaje = request.POST.get('mensaje', '').strip()
+
+    if not nombre or not apellidos or not email or not mensaje:
+        messages.error(request, 'Por favor completa los campos obligatorios del formulario.')
+        return redirect('contacto')
+
+    ContactoSimple.objects.create(
+        nombre=nombre,
+        apellidos=apellidos,
+        email=email,
+        telefono=telefono,
+        mensaje=mensaje,
+    )
+
+    messages.success(request, f'¡Gracias, {nombre}! Hemos recibido tu mensaje y te contactaremos pronto.')
+    return redirect('contacto')

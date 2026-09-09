@@ -21,40 +21,28 @@
                     <p style="font-size: 0.9rem; color: #7a6856; margin-bottom: 1.5rem;">
                         A continuación puedes dejarnos tus datos de contacto para que te brindemos más información o para realizar una cotización
                     </p>
-                    <!--
-                        ⚠️ PENDIENTE: este formulario todavía no está conectado
-                        al backend. action="#" hace que al enviarlo solo se
-                        recargue esta misma página, sin guardar nada.
-                        Para conectarlo: crear una vista (ej. en
-                        Bd_PremiumEventos/views.py) que reciba este POST,
-                        guarde los datos en el modelo ContactoSimple
-                        (ver Bd_PremiumEventos/models.py) y agregar su
-                        ruta en PremiumEventosJM/urls.py, similar a como
-                        está hecho cotizacion_view para el formulario de
-                        inicio.html.
-                    -->
-                    <form method="post" action="#">
+                    <form method="post" action="{% url 'guardar_contacto' %}">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nombre <span class="required">*</span></label>
-                                <input type="text" class="form-control" placeholder="Nombre" required>
+                                <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Apellidos <span class="required">*</span></label>
-                                <input type="text" class="form-control" placeholder="Apellidos" required>
+                                <input type="text" name="apellidos" class="form-control" placeholder="Apellidos" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">E-mail <span class="required">*</span></label>
-                                <input type="email" class="form-control" placeholder="yourmail@gmail.com" required>
+                                <input type="email" name="email" class="form-control" placeholder="yourmail@gmail.com" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" placeholder="Número de contacto">
+                                <input type="tel" name="telefono" class="form-control" placeholder="Número de contacto">
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Mensaje <span class="required">*</span></label>
-                                <textarea class="form-control" placeholder="Your message" required></textarea>
+                                <textarea name="mensaje" class="form-control" placeholder="Your message" required></textarea>
                             </div>
                             <div class="col-md-12">
                                 <button type="submit" class="btn-enviar">Enviar</button>

@@ -1,0 +1,38 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Cotización #{{ cotizacion.id_cotizacion }}{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-file-invoice-dollar"></i> Cotización #{{ cotizacion.id_cotizacion }}</h1>
+</div>
+
+<div class="pa-card" style="max-width: 700px;">
+  <h5 class="mb-3">Datos de la solicitud</h5>
+  <p><strong>Cliente:</strong> {{ cotizacion.nombre_cliente }} — {{ cotizacion.correo_cliente }} — {{ cotizacion.telefono_cliente }}</p>
+  <p><strong>Evento:</strong> {{ cotizacion.tema_estilo }} — {{ cotizacion.fecha_evento|date:'Y-m-d' }}, {{ cotizacion.hora_inicio|time:'H:i' }} a {{ cotizacion.hora_fin|time:'H:i' }}</p>
+  <p><strong>Invitados:</strong> {{ cotizacion.cantidad_invitados }} · <strong>Ubicación:</strong> {{ cotizacion.ubicacion }}</p>
+  {% with detalle=cotizacion.detallecotizacion_set.first %}
+    {% if detalle %}
+      <p><strong>Presupuesto del cliente:</strong> ${{ detalle.presupuesto|floatformat:0 }} · <strong>Precio cotizado:</strong> ${{ detalle.precio_cotizado|floatformat:0 }}</p>
+    {% endif %}
+  {% endwith %}
+
+  <hr>
+
+  <h5 class="mb-3">Gestión del administrador</h5>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="pa-form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
+    <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

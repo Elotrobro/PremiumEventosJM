@@ -1,0 +1,39 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Catálogo de decoración{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-gift"></i> Catálogo de decoración</h1>
+  <a href="{% url 'panel_admin:catalogo_create' %}" class="pa-btn"><i class="fas fa-plus"></i> Nuevo ítem</a>
+</div>
+
+<div class="pa-card" style="padding:0; overflow-x:auto;">
+  {% if items %}
+  <table class="pa-table">
+    <thead>
+      <tr><th>#</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Disponible</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.id_item }}</td>
+        <td>{{ item.nombre }}</td>
+        <td>{{ item.descripcion|truncatechars:60 }}</td>
+        <td>${{ item.precio|floatformat:0 }}</td>
+        <td>
+          {% if item.estado %}<span class="pa-badge pa-badge-aprobada">Sí</span>{% else %}<span class="pa-badge pa-badge-rechazada">No</span>{% endif %}
+        </td>
+        <td>
+          <a href="{% url 'panel_admin:catalogo_edit' item.pk %}" class="pa-btn pa-btn-sm"><i class="fas fa-pen"></i></a>
+          <a href="{% url 'panel_admin:catalogo_delete' item.pk %}" class="pa-btn pa-btn-sm pa-btn-danger"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="pa-empty">No hay ítems en el catálogo todavía.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

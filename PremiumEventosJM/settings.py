@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # funcionamiento, pero por convención suelen listarse primero).
     'core',              # vistas de páginas estáticas (inicio, galería, catálogo, etc.)
     'Bd_PremiumEventos',  # modelos, autenticación y lógica de cotización
+    'panel_admin',        # panel de administración a medida (CRUD, historial y reportes PDF)
     # Apps internas de Django
     'django.contrib.admin',        # panel de administración
     'django.contrib.auth',         # sistema de usuarios/permisos de Django (no se usa para el login del sitio, ver Bd_PremiumEventos.views)

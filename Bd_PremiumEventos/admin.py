@@ -108,7 +108,7 @@ class DetalleCotizacionInline(admin.StackedInline):
 class CotizacionAdmin(admin.ModelAdmin):
     # Listado con todos los datos clave de la cotización de un vistazo,
     # sin tener que entrar a cada registro.
-    list_display = ('id_cotizacion', 'cliente','nombre_cliente','correo_cliente','telefono_cliente', 'fecha_evento','cantidad_invitados','tema_estilo','hora_inicio','hora_fin', 'ubicacion')
+    list_display = ('id_cotizacion', 'cliente','nombre_cliente','correo_cliente','telefono_cliente', 'fecha_evento','cantidad_invitados','tema_estilo','hora_inicio','hora_fin', 'ubicacion', 'estado')
     search_fields = ('cliente__nombre_completo',)  # búsqueda a través de la relación con Cliente
-    list_filter = ('fecha_evento',)
+    list_filter = ('fecha_evento', 'estado')
     inlines = [DetalleCotizacionInline]  # muestra presupuesto, precio cotizado y servicios solicitados en la misma pantalla

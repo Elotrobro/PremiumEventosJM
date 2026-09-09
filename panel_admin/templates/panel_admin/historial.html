@@ -1,0 +1,84 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Historial de cotizaciones{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-clock-rotate-left"></i> Historial de cotizaciones</h1>
+  <a href="{% url 'panel_admin:historial_pdf' %}?filtro={{ filtro }}&fecha={{ fecha }}" class="pa-btn">
+    <i class="fas fa-file-pdf"></i> Descargar PDF
+  </a>
+</div>
+
+<form method="get" class="pa-filtros pa-card">
+  <div>
+    <label for="filtroSelect">Filtrar por</label>
+    <select name="filtro" id="filtroSelect" class="form-control" onchange="document.getElementById('fechaWrap').hidden = (this.value !== 'fecha')">
+      <option value="siempre" {% if filtro == 'siempre' %}selected{% endif %}>Siempre</option>
+      <option value="anio" {% if filtro == 'anio' %}selected{% endif %}>Este año</option>
+      <option value="fecha" {% if filtro == 'fecha' %}selected{% endif %}>Fecha específica</option>
+    </select>
+  </div>
+  <div id="fechaWrap" {% if filtro != 'fecha' %}hidden{% endif %}>
+    <label for="fechaInput">Fecha</label>
+    <input type="date" name="fecha" id="fechaInput" class="form-control" value="{{ fecha }}">
+  </div>
+  <div>
+    <button type="submit" class="pa-btn"><i class="fas fa-filter"></i> Aplicar</button>
+  </div>
+</form>
+
+<div class="pa-totales">
+  <span>Cotizaciones: <strong>{{ totales.cantidad|default:0 }}</strong></span>
+  <span>Suma presupuestos: <strong>${{ totales.suma_presupuesto|default:0|floatformat:0 }}</strong></span>
+  <span>Suma cotizado: <strong>${{ totales.suma_cotizado|default:0|floatformat:0 }}</strong></span>
+</div>
+
+<div class="pa-card" style="padding:0; overflow-x:auto;">
+  {% if pagina.object_list %}
+  <table class="pa-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Cliente</th><th>Evento</th><th>Fecha evento</th><th>Invitados</th>
+        <th>Presupuesto</th><th>Cotizado</th><th>Estado</th><th>Fecha cotización</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle in pagina.object_list %}
+      <tr>
+        <td>{{ detalle.cotizacion.id_cotizacion }}</td>
+        <td>{{ detalle.cotizacion.nombre_cliente }}</td>
+        <td>{{ detalle.evento }}</td>
+        <td>{{ detalle.cotizacion.fecha_evento|date:'Y-m-d' }}</td>
+        <td>{{ detalle.cotizacion.cantidad_invitados }}</td>
+        <td>${{ detalle.presupuesto|floatformat:0 }}</td>
+        <td>${{ detalle.precio_cotizado|floatformat:0 }}</td>
+        <td><span class="pa-badge pa-badge-{{ detalle.cotizacion.estado }}">{{ detalle.cotizacion.get_estado_display }}</span></td>
+        <td>{{ detalle.fecha_cotizacion|date:'Y-m-d H:i' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="pa-empty">No hay cotizaciones para el filtro seleccionado.</p>
+  {% endif %}
+</div>
+
+{% if pagina.paginator.num_pages > 1 %}
+<div class="pa-pagination">
+  {% if pagina.has_previous %}
+    <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ pagina.previous_page_number }}">« Anterior</a>
+  {% endif %}
+  {% for numero in pagina.paginator.page_range %}
+    {% if numero == pagina.number %}
+      <span class="pa-page-current">{{ numero }}</span>
+    {% else %}
+      <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ numero }}">{{ numero }}</a>
+    {% endif %}
+  {% endfor %}
+  {% if pagina.has_next %}
+    <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ pagina.next_page_number }}">Siguiente »</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
