@@ -1,0 +1,272 @@
+/* Estilo del panel de administrador, usando la misma paleta del sitio
+   público (dorado/marrón cálido) definida en core/static/css/base.css. */
+
+:root {
+    --pa-oro: #c17b3c;
+    --pa-oro-fuerte: #c79a40;
+    --pa-marron: #3c2e23;
+    --pa-fondo: #fffaf5;
+    --pa-fondo-suave: #f5ece0;
+    --pa-borde: #e3d3bd;
+}
+
+body.panel-admin-body {
+    font-family: sans-serif;
+    background: var(--pa-fondo-suave);
+    min-height: 100vh;
+}
+
+.pa-topbar {
+    background: var(--pa-marron);
+    color: #fff;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pa-topbar a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.pa-topbar .pa-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.pa-topbar .pa-brand i {
+    color: var(--pa-oro-fuerte);
+    margin-right: 0.4rem;
+}
+
+.pa-layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+}
+
+.pa-sidebar {
+    width: 240px;
+    background: #fff;
+    border-right: 1px solid var(--pa-borde);
+    padding: 1.25rem 0;
+    flex-shrink: 0;
+}
+
+.pa-sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.5rem;
+    color: var(--pa-marron);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.pa-sidebar a i { width: 18px; text-align: center; color: var(--pa-oro); }
+
+.pa-sidebar a:hover, .pa-sidebar a.active {
+    background: var(--pa-fondo-suave);
+    border-right: 3px solid var(--pa-oro);
+}
+
+.pa-content {
+    flex: 1;
+    padding: 1.75rem 2rem;
+}
+
+.pa-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.pa-page-header h1 {
+    font-size: 1.4rem;
+    color: var(--pa-marron);
+    font-weight: 700;
+    margin: 0;
+}
+
+.pa-card {
+    background: #fff;
+    border: 1px solid var(--pa-borde);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.pa-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pa-stat {
+    background: #fff;
+    border: 1px solid var(--pa-borde);
+    border-left: 4px solid var(--pa-oro);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+
+.pa-stat .pa-stat-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--pa-marron);
+}
+
+.pa-stat .pa-stat-label {
+    color: #7a6856;
+    font-size: 0.85rem;
+}
+
+.pa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--pa-oro);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pa-btn:hover { background: var(--pa-marron); color: #fff; }
+
+.pa-btn-secondary { background: #8a8378; }
+.pa-btn-secondary:hover { background: #5f594f; }
+
+.pa-btn-danger { background: #b3423b; }
+.pa-btn-danger:hover { background: #8a2f2a; }
+
+.pa-btn-sm { padding: 0.3rem 0.7rem; font-size: 0.82rem; }
+
+.pa-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.pa-table th, .pa-table td {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--pa-borde);
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.pa-table th {
+    background: var(--pa-fondo-suave);
+    color: var(--pa-marron);
+    font-weight: 700;
+}
+
+.pa-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.pa-badge-pendiente { background: #b58a2c; }
+.pa-badge-aprobada { background: #3f8f57; }
+.pa-badge-rechazada { background: #b3423b; }
+.pa-badge-completada { background: #3c6ea5; }
+
+.pa-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.pa-filtros label {
+    display: block;
+    font-size: 0.82rem;
+    color: #7a6856;
+    margin-bottom: 0.25rem;
+}
+
+.pa-form-group { margin-bottom: 1rem; }
+
+.pa-form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--pa-marron);
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.pa-help {
+    color: #8a8378;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.pa-alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.pa-alert-success { background: #e4f4e8; color: #1f6b38; border: 1px solid #bfe6ca; }
+.pa-alert-error { background: #fbe7e5; color: #8a2f2a; border: 1px solid #f0c3bd; }
+
+.pa-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #8a8378;
+}
+
+.pa-totales {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    background: var(--pa-fondo-suave);
+    border-radius: 8px;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.92rem;
+}
+
+.pa-totales strong { color: var(--pa-marron); }
+
+.pa-pagination {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.pa-pagination a, .pa-pagination span {
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--pa-borde);
+    text-decoration: none;
+    color: var(--pa-marron);
+    font-size: 0.85rem;
+}
+
+.pa-pagination .pa-page-current {
+    background: var(--pa-oro);
+    color: #fff;
+    border-color: var(--pa-oro);
+}
+
+@media (max-width: 768px) {
+    .pa-layout { flex-direction: column; }
+    .pa-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }
+    .pa-sidebar a { padding: 0.5rem 0.9rem; white-space: nowrap; }
+    .pa-sidebar a.active, .pa-sidebar a:hover { border-right: none; border-bottom: 3px solid var(--pa-oro); }
+}

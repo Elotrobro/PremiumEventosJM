@@ -1,0 +1,26 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}{% if modo == 'crear' %}Nuevo usuario{% else %}Editar usuario{% endif %}{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-user"></i> {% if modo == 'crear' %}Nuevo usuario{% else %}Editar usuario{% endif %}</h1>
+</div>
+
+<div class="pa-card" style="max-width: 520px;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="pa-form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="pa-help">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
+    <a href="{% url 'panel_admin:usuarios_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

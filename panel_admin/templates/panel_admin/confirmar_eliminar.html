@@ -1,0 +1,21 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Eliminar{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-triangle-exclamation"></i> Eliminar {{ titulo }}</h1>
+</div>
+
+<div class="pa-card">
+  <p>¿Seguro que deseas eliminar este {{ titulo }}?</p>
+  <p><strong>{{ objeto }}</strong></p>
+  <p class="pa-help">Esta acción no se puede deshacer.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="pa-btn pa-btn-danger"><i class="fas fa-trash"></i> Sí, eliminar</button>
+    <a href="{% url cancelar_url %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Cotizaciones{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</h1>
+  <a href="{% url 'panel_admin:historial_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-clock-rotate-left"></i> Ver historial</a>
+</div>
+
+<div class="pa-card" style="padding:0; overflow-x:auto;">
+  {% if cotizaciones %}
+  <table class="pa-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Cliente</th><th>Correo</th><th>Fecha evento</th><th>Invitados</th><th>Tema</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cotizacion in cotizaciones %}
+      <tr>
+        <td>{{ cotizacion.id_cotizacion }}</td>
+        <td>{{ cotizacion.nombre_cliente }}</td>
+        <td>{{ cotizacion.correo_cliente }}</td>
+        <td>{{ cotizacion.fecha_evento|date:'Y-m-d' }}</td>
+        <td>{{ cotizacion.cantidad_invitados }}</td>
+        <td>{{ cotizacion.tema_estilo }}</td>
+        <td><span class="pa-badge pa-badge-{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></td>
+        <td>
+          <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" class="pa-btn pa-btn-sm"><i class="fas fa-pen"></i></a>
+          <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}" class="pa-btn pa-btn-sm pa-btn-danger"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="pa-empty">No hay cotizaciones registradas todavía.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

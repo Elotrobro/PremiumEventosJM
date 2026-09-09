@@ -1,0 +1,32 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}{% if modo == 'crear' %}Nuevo ítem{% else %}Editar ítem{% endif %}{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-gift"></i> {% if modo == 'crear' %}Nuevo ítem de decoración{% else %}Editar ítem de decoración{% endif %}</h1>
+</div>
+
+<div class="pa-card" style="max-width: 560px;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="pa-form-group">
+        {% if field.name == 'estado' %}
+          <div class="form-check">
+            {{ field }}
+            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          </div>
+        {% else %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
+    <a href="{% url 'panel_admin:catalogo_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

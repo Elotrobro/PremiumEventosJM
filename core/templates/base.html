@@ -39,6 +39,10 @@
 <li class="nav-item">
     <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
 </li>    {% endif %}
+        {% if request.session.usuario_rol == 'admin' %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Panel Admin</a>
+</li>    {% endif %}
     </ul>
 
     {% if request.session.usuario_id %}

@@ -1,0 +1,35 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Mensajes de contacto{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-envelope"></i> Mensajes de contacto</h1>
+</div>
+
+<div class="pa-card" style="padding:0; overflow-x:auto;">
+  {% if mensajes %}
+  <table class="pa-table">
+    <thead>
+      <tr><th>Fecha</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Mensaje</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for mensaje in mensajes %}
+      <tr>
+        <td>{{ mensaje.fecha_contacto|date:'Y-m-d H:i' }}</td>
+        <td>{{ mensaje.nombre }} {{ mensaje.apellidos }}</td>
+        <td>{{ mensaje.email }}</td>
+        <td>{{ mensaje.telefono|default:'—' }}</td>
+        <td>{{ mensaje.mensaje|truncatechars:80 }}</td>
+        <td>
+          <a href="{% url 'panel_admin:mensaje_delete' mensaje.pk %}" class="pa-btn pa-btn-sm pa-btn-danger"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="pa-empty">No se han recibido mensajes de contacto todavía.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

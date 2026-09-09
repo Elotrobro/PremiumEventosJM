@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from core import views
 from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que sí tocan la base de datos (login/cotización)
 
@@ -24,6 +24,10 @@ urlpatterns = [
 
     # ---- Rutas que sí acceden a la base de datos (app Bd_PremiumEventos) ----
     path('cotizacion/', auth_views.cotizacion_view, name='cotizacion'),  # procesa el formulario modal de inicio.html (requiere sesión)
+    path('contacto/enviar/', auth_views.guardar_contacto, name='guardar_contacto'),  # procesa el formulario de contacto.html
     path('login/', auth_views.login_view, name='login'),
     path('logout/', auth_views.logout_view, name='logout'),
+
+    # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----
+    path('panel-admin/', include('panel_admin.urls')),
 ]

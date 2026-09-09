@@ -1,0 +1,39 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-house"></i> Panel de administrador</h1>
+</div>
+
+<div class="pa-stats">
+  <div class="pa-stat">
+    <div class="pa-stat-num">{{ total_usuarios }}</div>
+    <div class="pa-stat-label">Usuarios registrados</div>
+  </div>
+  <div class="pa-stat">
+    <div class="pa-stat-num">{{ total_cotizaciones }}</div>
+    <div class="pa-stat-label">Cotizaciones totales</div>
+  </div>
+  <div class="pa-stat">
+    <div class="pa-stat-num">{{ cotizaciones_pendientes }}</div>
+    <div class="pa-stat-label">Cotizaciones pendientes</div>
+  </div>
+  <div class="pa-stat">
+    <div class="pa-stat-num">{{ total_mensajes }}</div>
+    <div class="pa-stat-label">Mensajes de contacto</div>
+  </div>
+  <div class="pa-stat">
+    <div class="pa-stat-num">{{ total_items }}</div>
+    <div class="pa-stat-label">Ítems en catálogo</div>
+  </div>
+</div>
+
+<div class="pa-card">
+  <p class="mb-2">Accesos rápidos:</p>
+  <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-sm mb-2"><i class="fas fa-file-invoice-dollar"></i> Gestionar cotizaciones</a>
+  <a href="{% url 'panel_admin:historial_list' %}" class="pa-btn pa-btn-sm pa-btn-secondary mb-2"><i class="fas fa-clock-rotate-left"></i> Ver historial</a>
+  <a href="{% url 'panel_admin:mensajes_list' %}" class="pa-btn pa-btn-sm pa-btn-secondary mb-2"><i class="fas fa-envelope"></i> Ver mensajes</a>
+</div>
+
+{% endblock %}
