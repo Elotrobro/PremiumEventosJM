@@ -17,6 +17,7 @@ urlpatterns = [
     path('', views.inicio, name='inicio'),
     path('informacion/', views.informacion, name='informacion'),
     path('galeria/', views.galeria, name='galeria'),
+    path('galeria/<slug:slug>/', views.galeria_categoria, name='galeria_categoria'),  # galería de un tipo de evento
     path('testimonios/', views.testimonios, name='testimonios'),
     path('convenios/', views.convenios, name='convenios'),
     path('catalogo/', views.catalogo, name='catalogo'),

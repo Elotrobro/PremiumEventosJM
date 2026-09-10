@@ -1,4 +1,10 @@
+from django.http import Http404
 from django.shortcuts import render
+
+from .galeria_data import (
+    CATEGORIAS, categorias_por_grupo, fotos_de_categoria, mosaico_general,
+    obtener_categoria,
+)
 
 # ═══════════════════════════════════════════════════════════════════════
 # Vistas de la app `core`
@@ -31,8 +37,34 @@ def testimonios(request):
 
 
 def galeria(request):
-    # Galería de fotos de eventos anteriores, con modales de detalle.
-    return render(request, 'galeria.html')
+    # Índice de la galería: el acordeón con los tipos de evento (menú de
+    # navegación entre galerías) y un mosaico que mezcla fotos de todas
+    # las categorías. Las fotos se leen de core/static/images/galeria/
+    # (ver core/galeria_data.py), no de la base de datos.
+    return render(request, 'galeria.html', {
+        'grupos': categorias_por_grupo(),
+        'total_categorias': len(CATEGORIAS),
+        'fotos': mosaico_general(),
+    })
+
+
+def galeria_categoria(request, slug):
+    # Galería de un solo tipo de evento (ej. /galeria/15-anos/): cabecera
+    # con la foto de portada, mosaico completo y el acordeón al final para
+    # saltar a otra galería.
+    categoria = obtener_categoria(slug)
+    if categoria is None:
+        raise Http404('Esa galería no existe.')
+
+    fotos, es_demo = fotos_de_categoria(slug)
+    return render(request, 'galeria_categoria.html', {
+        'categoria': categoria,
+        'fotos': fotos,
+        'total_fotos': len(fotos),
+        'es_demo': es_demo,
+        'portada': fotos[0]['url'] if fotos else '',
+        'grupos': categorias_por_grupo(),
+    })
 
 
 def catalogo(request):

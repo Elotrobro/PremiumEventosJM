@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Galería: {{ categoria.nombre }}{% endblock %}
+{% block content %}
+
+{# Galería de un solo tipo de evento (ej. /galeria/15-anos/).             #}
+{# Las fotos se leen de core/static/images/galeria/<slug>/ y van          #}
+{# apareciendo a medida que se baja por la página (core/static/js/        #}
+{# galeria.js). El acordeón del final permite saltar a otra galería.      #}
+
+<link rel="stylesheet" href="{% static 'css/galeria.css' %}">
+
+<div class="ga">
+
+  <header class="ga-hero" {% if portada %}style="background-image: url('{{ portada }}')"{% endif %}>
+    <div class="container">
+      <span class="ga-hero-tag"><i class="fas {{ categoria.icono }}"></i> Galería</span>
+      <h1>{{ categoria.nombre }}</h1>
+      <div class="ga-hero-linea"></div>
+      <p>{{ categoria.descripcion }}</p>
+    </div>
+  </header>
+
+  <section class="ga-barra">
+    <div class="container">
+      <h2>Galería: {{ categoria.nombre }}</h2>
+      <span class="ga-conteo">{{ total_fotos }} foto{{ total_fotos|pluralize:"s" }}</span>
+    </div>
+    {% if es_demo %}
+      <div class="container">
+        <p class="ga-aviso">
+          <i class="fas fa-info-circle"></i>
+          <span>
+            Vista previa con fotos de muestra del sitio. Para publicar las fotos reales de
+            esta galería, copia las imágenes en
+            <code>core/static/images/galeria/{{ categoria.slug }}/</code> y aparecerán aquí automáticamente.
+          </span>
+        </p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="ga-mosaico-wrap">
+    <div class="container">
+      {% include 'partials/galeria_mosaico.html' %}
+    </div>
+  </section>
+
+  <section class="ga-selector">
+    <div class="container">
+      <div class="ga-selector-titulo">
+        <span>Más de nuestra galería</span>
+        <h2>Explora otro tipo de evento</h2>
+      </div>
+      {% include 'partials/galeria_acordeon.html' with actual=categoria.slug %}
+    </div>
+  </section>
+
+  <section class="ga-cta">
+    <div class="container">
+      <h3>Hagamos realidad tu {{ categoria.nombre|lower }}</h3>
+      <p>Cuéntanos tu idea y te enviamos una propuesta con decoración, montaje y servicios.</p>
+      <a class="ga-cta-btn" href="{% url 'inicio' %}">Cotizar mi evento</a>
+    </div>
+  </section>
+
+  {% include 'partials/galeria_visor.html' %}
+</div>
+
+<script src="{% static 'js/galeria.js' %}"></script>
+
+{% endblock %}

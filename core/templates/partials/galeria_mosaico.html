@@ -1,0 +1,22 @@
+{# Mosaico de fotos tipo masonry.                                        #}
+{# Recibe `fotos` (lista de {url, proporcion, categoria?}).              #}
+{#                                                                       #}
+{# Cada foto reserva su espacio con `--ga-proporcion` ANTES de bajarse,  #}
+{# así el mosaico no salta mientras carga. La animación de aparición y   #}
+{# el apagado del esqueleto los maneja core/static/js/galeria.js.        #}
+<div class="ga-mosaico">
+  {% for foto in fotos %}
+    <figure class="ga-foto" style="--ga-proporcion: {{ foto.proporcion }}"
+            role="button" tabindex="0"
+            aria-label="Ampliar foto{% if foto.categoria %} de {{ foto.categoria }}{% endif %}">
+      <div class="ga-foto-media">
+        <img src="{{ foto.url }}"
+             alt="{% if foto.categoria %}{{ foto.categoria }}{% else %}Foto de evento{% endif %} - Premium Eventos JM"
+             loading="lazy" decoding="async">
+      </div>
+      {% if foto.categoria %}
+        <figcaption class="ga-foto-etiqueta">{{ foto.categoria }}</figcaption>
+      {% endif %}
+    </figure>
+  {% endfor %}
+</div>
