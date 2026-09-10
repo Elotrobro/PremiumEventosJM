@@ -1,0 +1,15 @@
+{# Visor a pantalla completa que se abre al hacer clic en una foto del   #}
+{# mosaico. Se navega con las flechas del teclado y se cierra con Esc.   #}
+<div class="ga-visor" id="gaVisor" role="dialog" aria-modal="true" aria-label="Visor de fotos">
+  <button type="button" class="ga-visor-btn ga-visor-cerrar" aria-label="Cerrar visor">
+    <i class="fas fa-times"></i>
+  </button>
+  <button type="button" class="ga-visor-btn ga-visor-prev" aria-label="Foto anterior">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <img src="" alt="Foto ampliada">
+  <button type="button" class="ga-visor-btn ga-visor-next" aria-label="Foto siguiente">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+  <span class="ga-visor-contador"></span>
+</div>

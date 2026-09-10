@@ -1,0 +1,28 @@
+{# Acordeón que hace de menú entre las galerías de cada tipo de evento.  #}
+{# Recibe `grupos` ({nombre_grupo: [categorias]}) y, opcionalmente,      #}
+{# `actual` con el slug de la galería que se está viendo para resaltarla.#}
+{# Los paneles arrancan abiertos y se pliegan al hacer clic en su título #}
+{# (ver core/static/js/galeria.js).                                      #}
+<div class="ga-acordeon">
+  {% for nombre_grupo, categorias in grupos.items %}
+    <div class="ga-grupo is-open">
+      <button type="button" class="ga-grupo-head" aria-expanded="true">
+        <span>{{ nombre_grupo }}</span>
+        <i class="fas fa-chevron-down ga-chevron"></i>
+      </button>
+      <div class="ga-grupo-panel">
+        <ul>
+          {% for categoria in categorias %}
+            <li>
+              <a href="{% url 'galeria_categoria' categoria.slug %}"
+                 class="{% if categoria.slug == actual %}is-actual{% endif %}">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ categoria.nombre }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endfor %}
+</div>
