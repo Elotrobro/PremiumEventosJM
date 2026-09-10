@@ -15,18 +15,18 @@
 <body data-logged-in="{% if request.session.usuario_id %}true{% else %}false{% endif %}"
       data-open-login="{% if request.GET.login %}true{% else %}false{% endif %}">
 
-<nav class="navbar navbar-expand-lg bg-white py-3">
+<nav class="navbar navbar-expand-lg bg-white py-3 ms-auto">
   <div class="container">
     <div class="logo">
       <h1>
-        <img src="{% static 'images/Logo.png' %}" alt="" style="width: 250px; height: 200px; display: block;">
+        <img src="{% static 'images/Logo.png' %}" alt="" style="width: 300px; height: 250px; display: block;">
       </h1>
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav" style="display: 1; right: 100px;">
     <ul class="navbar-nav mb-2 mb-lg-0 align-items-center gap-lg-3" style="margin-left: 100px;">
         <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="/informacion">Información</a></li>
@@ -35,18 +35,24 @@
         <li class="nav-item"><a class="nav-link" href="/catalogo">Alquiler</a></li>
         <li class="nav-item"><a class="nav-link" href="/convenios">Salones</a></li>
         <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
+        
         {% if not request.session.usuario_id %}
-<li class="nav-item">
-    <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
-</li>    {% endif %}
+        <!-- Blindaje aplicado aquí -->
+        <li class="nav-item" style="position: relative; z-index: 9999;">
+            <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
+        </li>    
+        {% endif %}
+        
         {% if request.session.usuario_rol == 'admin' %}
-<li class="nav-item">
-    <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Panel Admin</a>
-</li>    {% endif %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Panel Admin</a>
+        </li>    
+        {% endif %}
     </ul>
 
     {% if request.session.usuario_id %}
-      <div class="user-chip dropdown">
+      <!-- Blindaje aplicado aquí -->
+      <div class="user-chip dropdown" style="position: relative; z-index: 9999;">
         <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fas fa-circle-user"></i>
           <span class="user-chip-nombre">{{ request.session.usuario_nombre }}</span>
@@ -58,7 +64,7 @@
       </div>
     {% endif %}
     </div>
-</div>
+  </div>
 </nav>
 
 <div class="hero">
