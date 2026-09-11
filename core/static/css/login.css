@@ -13,7 +13,11 @@
 .login-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(30, 20, 15, 0.55);
+    /* Fondo bien oscuro y con desenfoque: la tarjeta es blanca y varias
+       páginas del sitio tienen fondo claro, así que sin esto la modal se
+       confundía con la página y el título costaba leerlo. */
+    background: rgba(26, 18, 12, 0.78);
+    backdrop-filter: blur(3px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,8 +81,10 @@
 .login-card {
     background: white;
     border-radius: 28px;
-    padding: 2.2rem;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    /* Más espacio arriba para que el botón de cerrar no quede pegado al
+       título, y sombra marcada para despegar la tarjeta del fondo. */
+    padding: 3rem 2.2rem 2.2rem;
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.35);
 }
 
 /* Dentro de la modal, la tarjeta ya no necesita el margen/ancho de
@@ -88,6 +94,10 @@
     width: 100%;
     max-width: 420px;
     margin: 0;
+    /* El formulario de registro es más alto que el de login: en pantallas
+       bajas la tarjeta se desplaza por dentro en vez de desbordarse. */
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
 }
 
 .logo {
@@ -111,19 +121,102 @@
 
 .login-title {
     text-align: center;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.4rem;
 }
 
+/* El título va en el marrón oscuro corporativo (no en dorado) porque
+   sobre la tarjeta blanca el dorado quedaba lavado y se leía mal. El
+   dorado se mantiene como acento en la línea de abajo. */
 .login-title h2 {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #c17b3c;
+    color: #2c2a29;
     margin-bottom: 0.3rem;
+}
+
+.login-title h2::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 3px;
+    margin: 0.6rem auto 0;
+    border-radius: 3px;
+    background: #c17b3c;
 }
 
 .login-title p {
     font-size: 0.85rem;
     color: #7a6856;
+    margin-top: 0.5rem;
+}
+
+/* ── Pestañas: iniciar sesión / crear cuenta ──────────────────────────
+   Las dos viven en la misma modal; solo se muestra el panel activo. */
+.auth-tabs {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.3rem;
+    margin-bottom: 1.4rem;
+    border-radius: 40px;
+    background: #f5ede4;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    border: none;
+    border-radius: 40px;
+    background: transparent;
+    color: #7a6856;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.auth-tab:hover {
+    color: #a5632a;
+}
+
+.auth-tab.is-active {
+    background: #c17b3c;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(193, 123, 60, 0.3);
+}
+
+.auth-panel {
+    display: none;
+}
+
+.auth-panel.is-active {
+    display: block;
+}
+
+/* Enlace de texto para saltar de una pestaña a la otra */
+.auth-cambio {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0e6db;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #7a6856;
+}
+
+.auth-enlace {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #c17b3c;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.auth-enlace:hover {
+    color: #a5632a;
+    text-decoration: underline;
 }
 
 .login-alert {
@@ -147,7 +240,7 @@
 }
 
 .form-group {
-    margin-bottom: 1.3rem;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
