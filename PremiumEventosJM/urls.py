@@ -27,6 +27,7 @@ urlpatterns = [
     path('cotizacion/', auth_views.cotizacion_view, name='cotizacion'),  # procesa el formulario modal de inicio.html (requiere sesión)
     path('contacto/enviar/', auth_views.guardar_contacto, name='guardar_contacto'),  # procesa el formulario de contacto.html
     path('login/', auth_views.login_view, name='login'),
+    path('registro/', auth_views.registro_view, name='registro'),  # crea cuentas de cliente desde la modal
     path('logout/', auth_views.logout_view, name='logout'),
 
     # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----

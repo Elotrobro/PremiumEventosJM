@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password, is_password_usable
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.utils import timezone
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -141,6 +143,88 @@ def login_view(request):
     messages.error(request, 'Correo electrónico o contraseña incorrectos.', extra_tags='login-error')
     request.session['login_correo_prefill'] = correo
     return redirect(url_inicio_con_modal)
+
+
+def registro_view(request):
+    """
+    Crea una cuenta nueva desde la pestaña "Crear cuenta" de la misma
+    modal del login (ver base.html). Todas las cuentas que salen de aquí
+    quedan con rol 'cliente': el rol 'admin' solo se asigna desde el
+    panel de administrador o con el comando `manage.py crear_admin`, así
+    que nadie puede darse permisos de administrador registrándose.
+
+    Igual que login_view, esta vista nunca hace render(): siempre
+    redirige a inicio, y agrega `?registro=1` cuando la modal debe
+    reabrirse en la pestaña de registro para mostrar los errores.
+    """
+    url_con_modal = f"{reverse('inicio')}?registro=1"
+
+    # Con una sesión activa no tiene sentido crear otra cuenta
+    if request.session.get('usuario_id'):
+        return redirect('inicio')
+
+    if request.method != 'POST':
+        return redirect(url_con_modal)
+
+    nombre = request.POST.get('nombre_completo', '').strip()
+    correo = request.POST.get('correo_electronico', '').strip().lower()
+    contrasena = request.POST.get('contrasena', '')
+    confirmacion = request.POST.get('contrasena_confirmacion', '')
+
+    # Se guardan los datos ya escritos (menos las contraseñas) para
+    # devolverlos al formulario si algo falla y no tener que retecleárlos.
+    request.session['registro_prefill'] = {'nombre': nombre, 'correo': correo}
+
+    errores = []
+
+    if not nombre or not correo or not contrasena:
+        errores.append('Completa todos los campos obligatorios.')
+
+    if correo:
+        try:
+            validate_email(correo)
+        except ValidationError:
+            errores.append('El correo electrónico no tiene un formato válido.')
+        else:
+            # Validación clave: el correo es el identificador con el que se
+            # inicia sesión, así que no puede estar en dos cuentas. Se
+            # compara sin distinguir mayúsculas para que "Ana@x.com" y
+            # "ana@x.com" cuenten como el mismo correo.
+            if Usuario.objects.filter(correo_electronico__iexact=correo).exists():
+                errores.append('Ya existe una cuenta registrada con ese correo electrónico.')
+
+    if contrasena:
+        if len(contrasena) < 8:
+            errores.append('La contraseña debe tener al menos 8 caracteres.')
+        elif contrasena.isdigit():
+            errores.append('La contraseña no puede ser solo números.')
+        if contrasena != confirmacion:
+            errores.append('Las contraseñas no coinciden.')
+
+    if errores:
+        for error in errores:
+            messages.error(request, error, extra_tags='registro-error')
+        return redirect(url_con_modal)
+
+    # La contraseña se guarda siempre hasheada, igual que en el admin y en
+    # el comando crear_admin (nunca en texto plano).
+    usuario = Usuario.objects.create(
+        nombre_completo=nombre,
+        correo_electronico=correo,
+        contrasena=make_password(contrasena),
+        rol='cliente',
+        ultimo_acceso=timezone.now(),
+    )
+
+    # Se deja la sesión iniciada de una vez: quien se registra normalmente
+    # viene de intentar cotizar, así que puede seguir sin volver a entrar.
+    request.session['usuario_id'] = usuario.id_usuario
+    request.session['usuario_nombre'] = usuario.nombre_completo
+    request.session['usuario_rol'] = usuario.rol
+    request.session.pop('registro_prefill', None)
+
+    messages.success(request, f'¡Bienvenido, {usuario.nombre_completo}! Tu cuenta fue creada correctamente.')
+    return redirect('inicio')
 
 
 def logout_view(request):
