@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password, make_password, is_password_usable
+from django.contrib.auth.hashers import check_password, make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
@@ -110,13 +110,11 @@ def login_view(request):
 
     credenciales_validas = False
     if usuario is not None:
-        # Los passwords se guardan hasheados (ver admin.py). Si por alguna
-        # razón existiera un valor sin hashear en la BD, se compara en
-        # texto plano como último recurso para no romper cuentas antiguas.
-        if is_password_usable(usuario.contrasena):
-            credenciales_validas = check_password(contrasena, usuario.contrasena)
-        else:
-            credenciales_validas = (contrasena == usuario.contrasena)
+        # Todas las contraseñas se guardan hasheadas (ver registro_view,
+        # panel_admin/forms.py, admin.py y el comando crear_admin), así que
+        # check_password es la única comparación válida: rehashea lo que
+        # escribió la persona con la sal guardada y compara los resultados.
+        credenciales_validas = check_password(contrasena, usuario.contrasena)
 
     if credenciales_validas:
         # Se registra la hora del último acceso exitoso. `update_fields`
