@@ -16,7 +16,7 @@
       data-open-login="{% if request.GET.login or request.GET.registro %}true{% else %}false{% endif %}"
       data-open-tab="{% if request.GET.registro %}registro{% else %}login{% endif %}">
 
-<nav class="navbar navbar-expand-lg bg-white py-3 ms-auto" style="position:relative ; z-index: 9999;">
+<nav class="navbar navbar-expand-lg bg-white py-3 ms-auto" style="position:relative; z-index: 1000;">
   <div class="container">
     <div class="logo">
       <h1>
@@ -68,19 +68,13 @@
   </div>
 </nav>
 
-<div class="hero">
-<div class="container">
-    <h2>Diseñamos Y Hacemos Realidad Tu Evento Soñado</h2>
-    <p class="text-muted mt-2">Con La Exclusividad Que Mereces</p>
-</div>
-</div>
 
 <main>
     {% if messages %}
       <div class="container">
         {% for message in messages %}
-          {# Los errores de login y de registro no se muestran aquí: van
-             dentro de su pestaña en la modal, junto al formulario. #}
+           <!-- Los errores de login y de registro no se muestran aquí: van
+             dentro de su pestaña en la modal, junto al formulario. -->
           {% if 'login-error' not in message.tags and 'registro-error' not in message.tags %}
             <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
               {{ message }}
@@ -169,7 +163,7 @@
       </button>
     </div>
 
-    {# ── Pestaña: iniciar sesión ───────────────────────────────── #}
+    <!-- Pestaña: iniciar sesión  -->
     <div class="auth-panel is-active" id="authPanelLogin" role="tabpanel">
       {% for message in messages %}
         {% if 'login-error' in message.tags %}
@@ -215,14 +209,14 @@
       </p>
     </div>
 
-    {# ── Pestaña: crear cuenta ─────────────────────────────────── #}
+    <!-- Pestaña: crear cuenta  -->
     <div class="auth-panel" id="authPanelRegistro" role="tabpanel">
       {% for message in messages %}
         {% if 'registro-error' in message.tags %}
           <div class="login-alert login-alert-error">{{ message }}</div>
         {% endif %}
       {% endfor %}
-
+      
       <form id="registroForm" method="post" action="{% url 'registro' %}">
         {% csrf_token %}
         <div class="form-group">
