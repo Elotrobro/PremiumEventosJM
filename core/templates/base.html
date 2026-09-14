@@ -16,18 +16,18 @@
       data-open-login="{% if request.GET.login or request.GET.registro %}true{% else %}false{% endif %}"
       data-open-tab="{% if request.GET.registro %}registro{% else %}login{% endif %}">
 
-<nav class="navbar navbar-expand-lg bg-white py-3">
+<nav class="navbar navbar-expand-lg bg-white py-3 ms-auto" style="position:relative; z-index: 1000;">
   <div class="container">
     <div class="logo">
       <h1>
-        <img src="{% static 'images/Logo.png' %}" alt="" style="width: 250px; height: 200px; display: block;">
+        <img src="{% static 'images/Logo.png' %}" alt="" style="width: 300px; height: 250px; display: block;">
       </h1>
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav" style="display: 1; right: 100px;">
     <ul class="navbar-nav mb-2 mb-lg-0 align-items-center gap-lg-3" style="margin-left: 100px;">
         <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="/informacion">Información</a></li>
@@ -36,18 +36,24 @@
         <li class="nav-item"><a class="nav-link" href="/catalogo">Alquiler</a></li>
         <li class="nav-item"><a class="nav-link" href="/convenios">Salones</a></li>
         <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
+        
         {% if not request.session.usuario_id %}
-<li class="nav-item">
-    <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
-</li>    {% endif %}
+        <!-- Blindaje aplicado aquí -->
+        <li class="nav-item" style="position: relative; z-index: 9999;">
+            <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
+        </li>    
+        {% endif %}
+        
         {% if request.session.usuario_rol == 'admin' %}
-<li class="nav-item">
-    <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Panel Admin</a>
-</li>    {% endif %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Panel Admin</a>
+        </li>    
+        {% endif %}
     </ul>
 
     {% if request.session.usuario_id %}
-      <div class="user-chip dropdown">
+      <!-- Blindaje aplicado aquí -->
+      <div class="user-chip dropdown" style="position: relative; z-index: 9999;">
         <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fas fa-circle-user"></i>
           <span class="user-chip-nombre">{{ request.session.usuario_nombre }}</span>
@@ -59,22 +65,16 @@
       </div>
     {% endif %}
     </div>
-</div>
+  </div>
 </nav>
 
-<div class="hero">
-<div class="container">
-    <h2>Diseñamos Y Hacemos Realidad Tu Evento Soñado</h2>
-    <p class="text-muted mt-2">Con La Exclusividad Que Mereces</p>
-</div>
-</div>
 
 <main>
     {% if messages %}
       <div class="container">
         {% for message in messages %}
-          {# Los errores de login y de registro no se muestran aquí: van
-             dentro de su pestaña en la modal, junto al formulario. #}
+           <!-- Los errores de login y de registro no se muestran aquí: van
+             dentro de su pestaña en la modal, junto al formulario. -->
           {% if 'login-error' not in message.tags and 'registro-error' not in message.tags %}
             <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
               {{ message }}
@@ -163,7 +163,7 @@
       </button>
     </div>
 
-    {# ── Pestaña: iniciar sesión ───────────────────────────────── #}
+    <!-- Pestaña: iniciar sesión  -->
     <div class="auth-panel is-active" id="authPanelLogin" role="tabpanel">
       {% for message in messages %}
         {% if 'login-error' in message.tags %}
@@ -209,14 +209,14 @@
       </p>
     </div>
 
-    {# ── Pestaña: crear cuenta ─────────────────────────────────── #}
+    <!-- Pestaña: crear cuenta  -->
     <div class="auth-panel" id="authPanelRegistro" role="tabpanel">
       {% for message in messages %}
         {% if 'registro-error' in message.tags %}
           <div class="login-alert login-alert-error">{{ message }}</div>
         {% endif %}
       {% endfor %}
-
+      
       <form id="registroForm" method="post" action="{% url 'registro' %}">
         {% csrf_token %}
         <div class="form-group">

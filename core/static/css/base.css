@@ -194,6 +194,18 @@
         box-shadow: 0 8px 20px rgba(193,123,60,0.3);
     }
 
+.btn-style{
+    display: inline-block;
+    padding: 0.85rem 2.2rem;
+    border-radius: 999px;
+    background: #C17B3C;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+    border: none;
+}
+
 
 .carousel-section {
         padding: 4rem 0;
