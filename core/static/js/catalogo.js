@@ -181,6 +181,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // ⚠️ Este número de WhatsApp (573000000000) parece un placeholder
             // de prueba; conviene confirmar que sea el número real de la
             // empresa antes de publicar el sitio.
-            window.open(`https://wa.me/573000000000?text=${mensaje}`, '_blank');
+            window.open(`https://wa.me/573226513598?text=${mensaje}`, '_blank');
         });
     });
