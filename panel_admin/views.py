@@ -273,6 +273,19 @@ def cotizacion_edit(request, pk):
 @admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
 def cotizacion_delete(request, pk):
     cotizacion = get_object_or_404(Cotizacion, pk=pk)
+
+    # Una cotización en estado "Pagado" no se puede eliminar, ni
+    # siquiera un admin: a esta altura es un registro de que el cliente
+    # ya pagó, y borrarla perdería ese rastro. Si "Pagado" se marcó por
+    # error, la solución es entrar a "Validar" y cambiarle el estado
+    # (eso sigue permitido) antes de intentar eliminarla.
+    #
+    # Para desactivar esta restricción manualmente, borra o comenta las
+    # siguientes 3 líneas (el `if` de abajo hasta el `return` incluido).
+    if cotizacion.estado == Cotizacion.ESTADO_PAGADO:
+        messages.error(request, 'No se puede eliminar una cotización con estado "Pagado". Si fue un error, cámbiale primero el estado desde "Validar".')
+        return redirect('panel_admin:cotizaciones_list')
+
     if request.method == 'POST':
         cotizacion.delete()
         messages.success(request, 'Cotización eliminada correctamente.')
