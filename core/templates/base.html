@@ -44,7 +44,7 @@
         </li>    
         {% endif %}
         
-        {% if request.session.usuario_rol == 'admin' %}
+        {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Admin</a>
         </li>    

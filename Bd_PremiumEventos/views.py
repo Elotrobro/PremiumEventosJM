@@ -368,7 +368,8 @@ def cotizacion_view(request):
         request,
         f'¡Gracias, {nombre}! Tu solicitud de cotización fue registrada con un estimado de '
         f'${precio_estimado:,.0f}'.replace(',', '.') +
-        '. Esta es una cotización aproximada; te contactaremos pronto para confirmar los detalles.'
+        '. Esta es una cotización aproximada; te contactaremos pronto para confirmar los detalles. '
+        f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} — consérvalo para futuras consultas.'
     )
     return redirect('inicio')
 

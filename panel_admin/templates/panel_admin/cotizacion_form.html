@@ -1,38 +1,81 @@
 {% extends 'panel_admin/base_admin.html' %}
-{% block title %}Cotización #{{ cotizacion.id_cotizacion }}{% endblock %}
+{% load panel_extras %}
+{% block title %}Cotización {{ cotizacion.codigo_seguimiento }}{% endblock %}
 {% block content %}
 
 <div class="pa-page-header">
-  <h1><i class="fas fa-file-invoice-dollar"></i> Cotización #{{ cotizacion.id_cotizacion }}</h1>
+  <h1><i class="fas fa-file-invoice-dollar"></i> Cotización <span class="pa-codigo">{{ cotizacion.codigo_seguimiento }}</span></h1>
+  <span class="pa-badge pa-badge-{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span>
 </div>
 
-<div class="pa-card" style="max-width: 700px;">
-  <h5 class="mb-3">Datos de la solicitud</h5>
-  <p><strong>Cliente:</strong> {{ cotizacion.nombre_cliente }} — {{ cotizacion.correo_cliente }} — {{ cotizacion.telefono_cliente }}</p>
-  <p><strong>Evento:</strong> {{ cotizacion.tema_estilo }} — {{ cotizacion.fecha_evento|date:'Y-m-d' }}, {{ cotizacion.hora_inicio|time:'H:i' }} a {{ cotizacion.hora_fin|time:'H:i' }}</p>
-  <p><strong>Invitados:</strong> {{ cotizacion.cantidad_invitados }} · <strong>Ubicación:</strong> {{ cotizacion.ubicacion }}</p>
-  {% with detalle=cotizacion.detallecotizacion_set.first %}
-    {% if detalle %}
-      <p><strong>Presupuesto del cliente:</strong> ${{ detalle.presupuesto|floatformat:0 }} · <strong>Precio cotizado:</strong> ${{ detalle.precio_cotizado|floatformat:0 }}</p>
+<div class="pa-card" style="max-width: 760px;">
+  <h5 class="mb-3">Cliente</h5>
+  <p><strong>Nombre:</strong> {{ cotizacion.nombre_cliente }}</p>
+  <p><strong>Correo:</strong> {{ cotizacion.correo_cliente }} · <strong>Teléfono:</strong> {{ cotizacion.telefono_cliente }}</p>
+
+  <hr>
+
+  <h5 class="mb-3">Evento</h5>
+  <p><strong>Tipo:</strong> {{ detalle.evento|default:cotizacion.tema_estilo }} · <strong>Tema/estilo:</strong> {{ cotizacion.tema_estilo }}</p>
+  <p><strong>Fecha:</strong> {{ cotizacion.fecha_evento|date:'Y-m-d' }}, de {{ cotizacion.hora_inicio|time:'H:i' }} a {{ cotizacion.hora_fin|time:'H:i' }}</p>
+  <p><strong>Invitados:</strong> {{ cotizacion.cantidad_invitados|miles }} · <strong>Ubicación:</strong> {{ cotizacion.ubicacion }}</p>
+  {% if detalle %}
+    <p><strong>¿Ya tiene salón propio?</strong> {% if detalle.salon %}Sí{% else %}No — busca sugerencias de sede{% endif %}</p>
+  {% endif %}
+
+  {% if detalle %}
+    <hr>
+    <h5 class="mb-3">Presupuesto y servicios</h5>
+    <p><strong>Presupuesto del cliente:</strong> ${{ detalle.presupuesto|miles }} · <strong>Precio cotizado:</strong> ${{ detalle.precio_cotizado|miles }}</p>
+
+    {% with servicios=detalles_extra.servicios_solicitados %}
+      <p><strong>Servicios solicitados:</strong>
+        {% if servicios %}
+          {{ servicios|join:", " }}
+        {% else %}
+          Ninguno marcado
+        {% endif %}
+      </p>
+    {% endwith %}
+
+    {% if detalles_extra.desea_sugerencias_sede %}
+      <p><strong>¿Desea sugerencias de sede?</strong> {{ detalles_extra.desea_sugerencias_sede }}</p>
     {% endif %}
-  {% endwith %}
+
+    {% if detalles_extra.observaciones %}
+      <p><strong>Observaciones del cliente:</strong> {{ detalles_extra.observaciones }}</p>
+    {% endif %}
+
+    <p class="pa-help">Cotización realizada el {{ detalle.fecha_cotizacion|date:'Y-m-d H:i' }}.</p>
+  {% else %}
+    <p class="pa-help">Esta cotización no tiene un detalle asociado.</p>
+  {% endif %}
 
   <hr>
 
   <h5 class="mb-3">Gestión del administrador</h5>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% for field in form %}
-      <div class="pa-form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
-      </div>
-    {% endfor %}
+  {% if puede_validar %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="pa-form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
 
-    <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
-    <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
-  </form>
+      <button type="submit" class="pa-btn"><i class="fas fa-check"></i> Validar</button>
+      <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+    </form>
+  {% else %}
+    <p class="pa-help">
+      <i class="fas fa-lock"></i>
+      Solo un administrador puede cambiar el estado o las notas internas de una cotización.
+      Notas actuales: {{ cotizacion.notas_admin|default:'(sin notas)' }}
+    </p>
+    <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+  {% endif %}
 </div>
 
 {% endblock %}

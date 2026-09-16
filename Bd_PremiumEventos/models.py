@@ -1,4 +1,8 @@
+import random
+import string
+
 from django.db import models
+from django.utils import timezone
 
 # ═══════════════════════════════════════════════════════════════════════
 # Modelos de la app Bd_PremiumEventos
@@ -17,11 +21,24 @@ class Usuario(models.Model):
     (django.contrib.auth.User); es una tabla propia, autenticada
     manualmente en Bd_PremiumEventos/views.py (login_view).
     """
+    ROL_ADMIN = 'admin'
+    ROL_EMPLEADO = 'empleado'
+    ROL_CLIENTE = 'cliente'
+    ROL_CHOICES = [
+        (ROL_ADMIN, 'Administrador'),
+        (ROL_EMPLEADO, 'Empleado'),
+        (ROL_CLIENTE, 'Cliente'),
+    ]
+
     id_usuario = models.AutoField(primary_key=True)
     nombre_completo = models.CharField(max_length=150)
     correo_electronico = models.EmailField(max_length=100, unique=True)  # único: se usa para buscar el usuario al iniciar sesión
     contrasena = models.CharField(max_length=255, db_column='contraseña')  # Evitamos la 'ñ' en el nombre de variable Python
-    rol = models.CharField(max_length=50)  # texto libre (ej. "admin", "cliente"); no hay choices definidos
+    # Aunque ahora hay ROL_CHOICES, el campo sigue siendo texto libre a
+    # nivel de base de datos (sin CHECK constraint): los choices solo
+    # afectan los formularios y el admin, para no arriesgar una migración
+    # que falle si por alguna razón ya existiera un valor distinto guardado.
+    rol = models.CharField(max_length=50, choices=ROL_CHOICES, default=ROL_CLIENTE)
     ultimo_acceso = models.DateTimeField(null=True, blank=True)  # se actualiza cada vez que el login es exitoso (ver login_view)
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # se llena automáticamente al crear el registro, no editable después
 
@@ -142,6 +159,19 @@ class DetalleCarrito(models.Model):
         db_table = 'detalle_carrito'
 
 
+def generar_codigo_seguimiento():
+    """
+    Genera un código de seguimiento al estilo de los que usan las
+    empresas de envíos para rastrear un paquete (ej. "PJM-20260916-8K3QZF"):
+    prefijo de la empresa + fecha + 6 caracteres al azar. No se basa en el
+    id_cotizacion a propósito, para que no sea adivinable ni revele cuántas
+    cotizaciones existen en total con solo mirar el código.
+    """
+    fecha = timezone.localdate().strftime('%Y%m%d')
+    sufijo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f'PJM-{fecha}-{sufijo}'
+
+
 class Cotizacion(models.Model):
     """
     Solicitud de cotización de un evento, generada desde el formulario
@@ -153,6 +183,11 @@ class Cotizacion(models.Model):
     formulario, aunque después actualice sus datos de contacto generales.
     """
     id_cotizacion = models.AutoField(primary_key=True)
+    # Código único para que el cliente y el administrador puedan hacer
+    # seguimiento a la cotización (ver generar_codigo_seguimiento y el
+    # save() de abajo). blank=True porque se autogenera en el primer
+    # guardado; nunca queda vacío en la práctica.
+    codigo_seguimiento = models.CharField(max_length=30, unique=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
     nombre_cliente = models.CharField(max_length=150)
     correo_cliente = models.EmailField(max_length=100)
@@ -168,17 +203,32 @@ class Cotizacion(models.Model):
     ESTADO_APROBADA = 'aprobada'
     ESTADO_RECHAZADA = 'rechazada'
     ESTADO_COMPLETADA = 'completada'
+    ESTADO_PAGADO = 'pagado'
     ESTADO_CHOICES = [
         (ESTADO_PENDIENTE, 'Pendiente'),
         (ESTADO_APROBADA, 'Aprobada'),
         (ESTADO_RECHAZADA, 'Rechazada'),
         (ESTADO_COMPLETADA, 'Completada'),
+        (ESTADO_PAGADO, 'Pagado'),
     ]
     # Estado de gestión de la cotización dentro del panel de administrador
     # (no lo llena el cliente; lo cambia el admin al revisar la solicitud).
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=ESTADO_PENDIENTE)
     # Notas internas del administrador sobre esta cotización (no se muestran al cliente).
     notas_admin = models.TextField(blank=True, default='')
+
+    def save(self, *args, **kwargs):
+        # Se genera el código de seguimiento antes del primer guardado
+        # (nunca se reemplaza uno que ya exista). Se comprueba que no
+        # choque con uno ya guardado; con 6 caracteres al azar la
+        # probabilidad de choque es mínima, pero el bucle es la única
+        # forma de *garantizar* que quede único.
+        if not self.codigo_seguimiento:
+            codigo = generar_codigo_seguimiento()
+            while Cotizacion.objects.filter(codigo_seguimiento=codigo).exists():
+                codigo = generar_codigo_seguimiento()
+            self.codigo_seguimiento = codigo
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Cotización #{self.id_cotizacion} - {self.cliente.nombre_completo}"
