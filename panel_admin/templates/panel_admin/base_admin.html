@@ -15,6 +15,9 @@
 <div class="pa-topbar">
   <a href="{% url 'panel_admin:dashboard' %}" class="pa-brand"><i class="fas fa-gauge"></i> Premium Eventos JM · Panel Admin</a>
   <div>
+    <span class="pa-rol-tag">
+      {% if request.session.usuario_rol == 'admin' %}Administrador{% else %}Empleado{% endif %}
+    </span>
     <a href="{% url 'inicio' %}" class="me-3"><i class="fas fa-globe"></i> Ver sitio</a>
     <a href="{% url 'logout' %}"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
   </div>

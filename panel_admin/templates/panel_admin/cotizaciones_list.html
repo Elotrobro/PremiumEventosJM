@@ -1,4 +1,5 @@
 {% extends 'panel_admin/base_admin.html' %}
+{% load panel_extras %}
 {% block title %}Cotizaciones{% endblock %}
 {% block content %}
 
@@ -12,22 +13,26 @@
   <table class="pa-table">
     <thead>
       <tr>
-        <th>#</th><th>Cliente</th><th>Correo</th><th>Fecha evento</th><th>Invitados</th><th>Tema</th><th>Estado</th><th></th>
+        <th>Código</th><th>Cliente</th><th>Correo</th><th>Fecha evento</th><th>Invitados</th><th>Tema</th><th>Estado</th><th></th>
       </tr>
     </thead>
     <tbody>
       {% for cotizacion in cotizaciones %}
       <tr>
-        <td>{{ cotizacion.id_cotizacion }}</td>
+        <td class="pa-codigo">{{ cotizacion.codigo_seguimiento }}</td>
         <td>{{ cotizacion.nombre_cliente }}</td>
         <td>{{ cotizacion.correo_cliente }}</td>
         <td>{{ cotizacion.fecha_evento|date:'Y-m-d' }}</td>
-        <td>{{ cotizacion.cantidad_invitados }}</td>
+        <td>{{ cotizacion.cantidad_invitados|miles }}</td>
         <td>{{ cotizacion.tema_estilo }}</td>
         <td><span class="pa-badge pa-badge-{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></td>
         <td>
-          <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" class="pa-btn pa-btn-sm"><i class="fas fa-pen"></i></a>
-          <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}" class="pa-btn pa-btn-sm pa-btn-danger"><i class="fas fa-trash"></i></a>
+          {% if request.session.usuario_rol == 'admin' %}
+            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" class="pa-btn pa-btn-sm" title="Editar"><i class="fas fa-pen"></i></a>
+            <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}" class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar"><i class="fas fa-trash"></i></a>
+          {% else %}
+            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" class="pa-btn pa-btn-sm pa-btn-secondary" title="Ver detalle"><i class="fas fa-eye"></i></a>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}

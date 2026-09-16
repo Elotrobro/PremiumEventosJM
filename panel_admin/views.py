@@ -1,78 +1,146 @@
-from datetime import datetime
+import json
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Sum, Count
-from django.http import HttpResponse
+from django.db.models import Sum, Count, Exists, OuterRef
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from Bd_PremiumEventos.models import (
     Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion,
 )
-from .decorators import admin_required
+from .decorators import admin_required, staff_required, es_admin
 from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm
+from .utils import formatear_miles
 
 # ═══════════════════════════════════════════════════════════════════════
 # Panel de administrador a medida (no es el admin genérico de Django).
 #
-# Todas las vistas de este módulo están protegidas con @admin_required
-# (solo entra quien tenga request.session['usuario_rol'] == 'admin') y
-# usan plantillas propias que extienden panel_admin/base_admin.html para
-# mantener el estilo del sitio.
+# Todas las vistas están protegidas con @staff_required (rol 'admin' o
+# 'empleado') o, en las acciones que 'empleado' tiene prohibidas, con
+# @admin_required. Usan plantillas propias que extienden
+# panel_admin/base_admin.html para mantener el estilo del sitio.
+#
+# Resumen de lo que NO puede hacer un 'empleado' (ver es_admin() y los
+# comentarios en cada vista):
+#   - Eliminar nada, EXCEPTO usuarios con rol 'cliente' que todavía no
+#     hayan hecho ninguna cotización.
+#   - Editar una cotización (solo puede verla completa) ni editar
+#     ningún usuario (ni clientes ni otras cuentas de staff).
+#   - Crear un usuario con rol 'admin' o 'empleado' (solo 'cliente'; ver
+#     UsuarioAdminForm.__init__).
 # ═══════════════════════════════════════════════════════════════════════
 
+# Ventana de "Novedades" del dashboard: por defecto y como máximo
+# sugerido, 14 días (2 semanas), pero se puede pedir otra con ?dias=N
+# (ver _dias_novedades). DIAS_NOVEDADES_OPCIONES son los atajos que se
+# muestran como botones en la plantilla.
+DIAS_NOVEDADES_DEFECTO = 14
+DIAS_NOVEDADES_OPCIONES = [7, 14, 30]
+DIAS_NOVEDADES_MINIMO = 1
+DIAS_NOVEDADES_MAXIMO = 90
 
-@admin_required
+
+def _dias_novedades(request):
+    """Lee y valida el ?dias= de la querystring, con el tope 1-90 días."""
+    try:
+        dias = int(request.GET.get('dias', DIAS_NOVEDADES_DEFECTO))
+    except (TypeError, ValueError):
+        dias = DIAS_NOVEDADES_DEFECTO
+    return max(DIAS_NOVEDADES_MINIMO, min(dias, DIAS_NOVEDADES_MAXIMO))
+
+
+@staff_required
 def dashboard(request):
+    dias = _dias_novedades(request)
+    ahora = timezone.now()
+    hoy = timezone.localdate()
+
     contexto = {
         'total_usuarios': Usuario.objects.count(),
         'total_cotizaciones': Cotizacion.objects.count(),
         'cotizaciones_pendientes': Cotizacion.objects.filter(estado=Cotizacion.ESTADO_PENDIENTE).count(),
         'total_mensajes': ContactoSimple.objects.count(),
         'total_items': ItemDecoracion.objects.count(),
+
+        # ── Novedades: recuerdan al admin/empleado lo que pasó recientemente
+        # y lo que se viene, cada vez que entra al panel (ver dashboard.html).
+        'dias_novedades': dias,
+        'dias_opciones': DIAS_NOVEDADES_OPCIONES,
+        'cotizaciones_recientes': DetalleCotizacion.objects.select_related('cotizacion', 'cotizacion__cliente')
+            .filter(fecha_cotizacion__gte=ahora - timedelta(days=dias))
+            .order_by('-fecha_cotizacion')[:8],
+        'eventos_proximos': Cotizacion.objects.select_related('cliente')
+            .filter(fecha_evento__gte=hoy, fecha_evento__lte=hoy + timedelta(days=dias))
+            .order_by('fecha_evento')[:8],
     }
     return render(request, 'panel_admin/dashboard.html', contexto)
 
 
 # ───────────────────────────── Usuarios ─────────────────────────────
 
-@admin_required
+@staff_required
 def usuarios_list(request):
-    usuarios = Usuario.objects.all().order_by('nombre_completo')
+    # tiene_cotizacion se anota para que la plantilla sepa, sin consultas
+    # extra por fila, a qué clientes puede eliminar un 'empleado' (solo
+    # los que todavía no han hecho ninguna cotización).
+    usuarios = Usuario.objects.annotate(
+        tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
+    ).order_by('nombre_completo')
     return render(request, 'panel_admin/usuarios_list.html', {'usuarios': usuarios})
 
 
-@admin_required
+@staff_required
 def usuario_create(request):
+    # Un 'empleado' puede crear usuarios, pero el formulario le oculta la
+    # posibilidad de asignar rol admin/empleado (ver UsuarioAdminForm).
+    actor_rol = request.session.get('usuario_rol')
     if request.method == 'POST':
-        form = UsuarioAdminForm(request.POST)
+        form = UsuarioAdminForm(request.POST, actor_rol=actor_rol)
         if form.is_valid():
             form.save()
             messages.success(request, 'Usuario creado correctamente.')
             return redirect('panel_admin:usuarios_list')
     else:
-        form = UsuarioAdminForm()
+        form = UsuarioAdminForm(actor_rol=actor_rol)
     return render(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'crear'})
 
 
 @admin_required
 def usuario_edit(request, pk):
+    # Solo admin: un 'empleado' no puede editar ninguna cuenta (ni
+    # clientes ni otro staff) — así se lo pidieron explícitamente para
+    # los clientes, y se extiende a cualquier usuario porque dejar que un
+    # empleado cambie la contraseña o el rol de otra cuenta de staff
+    # sería una puerta abierta a que se dé permisos a sí mismo.
     usuario = get_object_or_404(Usuario, pk=pk)
     if request.method == 'POST':
-        form = UsuarioAdminForm(request.POST, instance=usuario)
+        form = UsuarioAdminForm(request.POST, instance=usuario, actor_rol='admin')
         if form.is_valid():
             form.save()
             messages.success(request, 'Usuario actualizado correctamente.')
             return redirect('panel_admin:usuarios_list')
     else:
-        form = UsuarioAdminForm(instance=usuario)
+        form = UsuarioAdminForm(instance=usuario, actor_rol='admin')
     return render(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'editar', 'usuario': usuario})
 
 
-@admin_required
+@staff_required
 def usuario_delete(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
+
+    # Un 'empleado' solo puede eliminar clientes que todavía no hayan
+    # hecho ninguna cotización (pedido explícito). Cualquier otro caso
+    # (otro rol, o un cliente que ya cotizó) queda bloqueado aquí, no
+    # solo oculto en la plantilla, por si alguien arma el POST a mano.
+    if not es_admin(request):
+        tiene_cotizacion = Cotizacion.objects.filter(cliente__usuario=usuario).exists()
+        if usuario.rol != Usuario.ROL_CLIENTE or tiene_cotizacion:
+            messages.error(request, 'Como empleado, solo puedes eliminar clientes que aún no hayan hecho ninguna cotización.')
+            return redirect('panel_admin:usuarios_list')
+
     if request.method == 'POST':
         if usuario.pk == request.session.get('usuario_id'):
             messages.error(request, 'No puedes eliminar tu propio usuario mientras tienes la sesión activa.')
@@ -87,13 +155,13 @@ def usuario_delete(request, pk):
 
 # ─────────────────── Catálogo de decoración (ItemDecoracion) ───────────────────
 
-@admin_required
+@staff_required
 def catalogo_list(request):
     items = ItemDecoracion.objects.all().order_by('nombre')
     return render(request, 'panel_admin/catalogo_list.html', {'items': items})
 
 
-@admin_required
+@staff_required
 def catalogo_create(request):
     if request.method == 'POST':
         form = ItemDecoracionForm(request.POST)
@@ -106,7 +174,7 @@ def catalogo_create(request):
     return render(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'crear'})
 
 
-@admin_required
+@staff_required
 def catalogo_edit(request, pk):
     item = get_object_or_404(ItemDecoracion, pk=pk)
     if request.method == 'POST':
@@ -120,7 +188,7 @@ def catalogo_edit(request, pk):
     return render(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'editar', 'item': item})
 
 
-@admin_required
+@admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
 def catalogo_delete(request, pk):
     item = get_object_or_404(ItemDecoracion, pk=pk)
     if request.method == 'POST':
@@ -134,13 +202,13 @@ def catalogo_delete(request, pk):
 
 # ─────────────────── Mensajes de contacto (ContactoSimple) ───────────────────
 
-@admin_required
+@staff_required
 def mensajes_list(request):
     mensajes = ContactoSimple.objects.all().order_by('-fecha_contacto')
     return render(request, 'panel_admin/mensajes_list.html', {'mensajes': mensajes})
 
 
-@admin_required
+@admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
 def mensaje_delete(request, pk):
     mensaje = get_object_or_404(ContactoSimple, pk=pk)
     if request.method == 'POST':
@@ -154,27 +222,55 @@ def mensaje_delete(request, pk):
 
 # ───────────────────────────── Cotizaciones ─────────────────────────────
 
-@admin_required
+@staff_required
 def cotizaciones_list(request):
     cotizaciones = Cotizacion.objects.select_related('cliente').order_by('-id_cotizacion')
     return render(request, 'panel_admin/cotizaciones_list.html', {'cotizaciones': cotizaciones})
 
 
-@admin_required
+@staff_required
 def cotizacion_edit(request, pk):
+    """
+    Muestra el detalle completo de la cotización a admin y empleado por
+    igual (antes faltaban los servicios solicitados, observaciones, etc.
+    — quedaban solo en el JSON de DetalleCotizacion.detalles sin
+    mostrarse en ningún lado). El formulario de estado/notas (el botón
+    "Validar") solo se procesa si quien está autenticado es admin: un
+    empleado puede ver esta pantalla completa, pero no cambiar nada en
+    ella (se bloquea aquí, no solo ocultando el formulario en la
+    plantilla, por si alguien arma el POST a mano).
+    """
     cotizacion = get_object_or_404(Cotizacion, pk=pk)
+    detalle = cotizacion.detallecotizacion_set.first()
+
+    detalles_extra = {}
+    if detalle and detalle.detalles:
+        try:
+            detalles_extra = json.loads(detalle.detalles)
+        except (TypeError, ValueError):
+            detalles_extra = {}
+
     if request.method == 'POST':
+        if not es_admin(request):
+            return HttpResponseForbidden('Solo un administrador puede validar el estado de una cotización.')
         form = CotizacionEstadoForm(request.POST, instance=cotizacion)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Cotización actualizada correctamente.')
+            messages.success(request, 'Cotización validada correctamente.')
             return redirect('panel_admin:cotizaciones_list')
     else:
         form = CotizacionEstadoForm(instance=cotizacion)
-    return render(request, 'panel_admin/cotizacion_form.html', {'form': form, 'cotizacion': cotizacion})
+
+    return render(request, 'panel_admin/cotizacion_form.html', {
+        'form': form,
+        'cotizacion': cotizacion,
+        'detalle': detalle,
+        'detalles_extra': detalles_extra,
+        'puede_validar': es_admin(request),
+    })
 
 
-@admin_required
+@admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
 def cotizacion_delete(request, pk):
     cotizacion = get_object_or_404(Cotizacion, pk=pk)
     if request.method == 'POST':
@@ -225,7 +321,7 @@ def _filtrar_historial(request):
     return detalles, contexto_filtro
 
 
-@admin_required
+@staff_required
 def historial_list(request):
     detalles, contexto_filtro = _filtrar_historial(request)
 
@@ -247,7 +343,7 @@ def historial_list(request):
     return render(request, 'panel_admin/historial.html', contexto)
 
 
-@admin_required
+@staff_required
 def historial_pdf(request):
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import letter, landscape
@@ -280,19 +376,19 @@ def historial_pdf(request):
         Spacer(1, 0.5 * cm),
     ]
 
-    encabezados = ['#', 'Cliente', 'Evento', 'Fecha evento', 'Invitados',
+    encabezados = ['Código', 'Cliente', 'Evento', 'Fecha evento', 'Invitados',
                     'Presupuesto', 'Precio cotizado', 'Estado', 'Fecha cotización']
     filas = [encabezados]
     for detalle in detalles:
         cot = detalle.cotizacion
         filas.append([
-            str(cot.id_cotizacion),
+            cot.codigo_seguimiento,
             cot.nombre_cliente,
             detalle.evento,
             cot.fecha_evento.strftime('%Y-%m-%d'),
-            str(cot.cantidad_invitados),
-            f'${detalle.presupuesto:,.0f}',
-            f'${detalle.precio_cotizado:,.0f}',
+            formatear_miles(cot.cantidad_invitados),
+            f'${formatear_miles(detalle.presupuesto)}',
+            f'${formatear_miles(detalle.precio_cotizado)}',
             cot.get_estado_display(),
             timezone.localtime(detalle.fecha_cotizacion).strftime('%Y-%m-%d %H:%M'),
         ])
@@ -310,9 +406,9 @@ def historial_pdf(request):
 
     elementos.append(Spacer(1, 0.5 * cm))
     resumen = (
-        f"Total de cotizaciones: {totales['cantidad'] or 0}    |    "
-        f"Suma presupuestos: ${(totales['suma_presupuesto'] or 0):,.0f}    |    "
-        f"Suma cotizado: ${(totales['suma_cotizado'] or 0):,.0f}"
+        f"Total de cotizaciones: {formatear_miles(totales['cantidad'] or 0)}    |    "
+        f"Suma presupuestos: ${formatear_miles(totales['suma_presupuesto'] or 0)}    |    "
+        f"Suma cotizado: ${formatear_miles(totales['suma_cotizado'] or 0)}"
     )
     elementos.append(Paragraph(resumen, estilos['Heading4']))
 

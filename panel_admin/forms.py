@@ -24,9 +24,23 @@ class UsuarioAdminForm(forms.ModelForm):
         widgets = {
             'nombre_completo': forms.TextInput(attrs={'class': 'form-control'}),
             'correo_electronico': forms.EmailInput(attrs={'class': 'form-control'}),
-            'rol': forms.Select(choices=[('admin', 'Administrador'), ('cliente', 'Cliente')],
-                                 attrs={'class': 'form-control'}),
+            'rol': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, actor_rol=None, **kwargs):
+        """
+        `actor_rol` es el rol de quien está usando el formulario (viene de
+        request.session['usuario_rol']). Un 'empleado' puede crear cuentas,
+        pero no puede otorgarse a sí mismo ni a nadie el rol 'admin' ni
+        'empleado' — solo puede registrar clientes. Esto evita que crear
+        usuarios se convierta en una puerta trasera para auto-ascenderse.
+        """
+        super().__init__(*args, **kwargs)
+        if actor_rol == 'empleado':
+            self.fields['rol'].choices = [(Usuario.ROL_CLIENTE, 'Cliente')]
+            self.fields['rol'].initial = Usuario.ROL_CLIENTE
+        else:
+            self.fields['rol'].choices = Usuario.ROL_CHOICES
 
     def clean_contrasena(self):
         contrasena = self.cleaned_data.get('contrasena')

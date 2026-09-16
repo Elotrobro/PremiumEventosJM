@@ -21,7 +21,11 @@
         <td>{{ mensaje.telefono|default:'—' }}</td>
         <td>{{ mensaje.mensaje|truncatechars:80 }}</td>
         <td>
-          <a href="{% url 'panel_admin:mensaje_delete' mensaje.pk %}" class="pa-btn pa-btn-sm pa-btn-danger"><i class="fas fa-trash"></i></a>
+          {% if request.session.usuario_rol == 'admin' %}
+            <a href="{% url 'panel_admin:mensaje_delete' mensaje.pk %}" class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar"><i class="fas fa-trash"></i></a>
+          {% else %}
+            <span class="pa-help">—</span>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}

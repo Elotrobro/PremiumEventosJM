@@ -40,6 +40,17 @@ body.panel-admin-body {
     margin-right: 0.4rem;
 }
 
+.pa-rol-tag {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    margin-right: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
 .pa-layout {
     display: flex;
     min-height: calc(100vh - 60px);
@@ -181,6 +192,14 @@ body.panel-admin-body {
 .pa-badge-aprobada { background: #3f8f57; }
 .pa-badge-rechazada { background: #b3423b; }
 .pa-badge-completada { background: #3c6ea5; }
+.pa-badge-pagado { background: #6a3fa0; }
+
+.pa-codigo {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    color: #7a6856;
+    letter-spacing: 0.02em;
+}
 
 .pa-filtros {
     display: flex;
@@ -263,6 +282,49 @@ body.panel-admin-body {
     color: #fff;
     border-color: var(--pa-oro);
 }
+
+/* ── Novedades (dashboard) ────────────────────────────────────────── */
+
+.pa-dias-opciones {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.pa-btn-activo {
+    background: var(--pa-marron);
+    color: #fff;
+}
+
+.pa-novedades {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.pa-lista-novedades {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pa-lista-novedades li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--pa-borde);
+}
+
+.pa-lista-novedades li:last-child { border-bottom: none; }
+
+.pa-lista-novedades a {
+    color: var(--pa-marron);
+    text-decoration: none;
+    font-size: 0.92rem;
+}
+
+.pa-lista-novedades a:hover { color: var(--pa-oro); }
 
 @media (max-width: 768px) {
     .pa-layout { flex-direction: column; }
