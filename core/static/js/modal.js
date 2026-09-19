@@ -387,3 +387,340 @@ if (inputFechaEvento) {
     if (inputInvitados) {
       inputInvitados.addEventListener("input", actualizarEstimado);
     }
+
+    // ============================================================
+// RESUMEN EN TIEMPO REAL DE LA COTIZACIÓN
+// ============================================================
+
+function actualizarResumenModal() {
+
+    const resumen = document.getElementById("resumen-modal-cotizacion");
+    const contador = document.getElementById("contador-modal-items");
+    const total = document.getElementById("total-modal-cotizacion");
+
+    if (!resumen || !contador || !total) return;
+
+    let items = [];
+
+    // ------------------------------------------------------------
+    // Tipo de evento
+    // ------------------------------------------------------------
+
+    const tipoEvento = document.getElementById("tipo_evento");
+
+    if (tipoEvento && tipoEvento.value) {
+
+        const texto =
+            tipoEvento.options[tipoEvento.selectedIndex].text;
+
+        items.push({
+            label: "Tipo de evento",
+            valor: texto
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Fecha
+    // ------------------------------------------------------------
+
+    const fecha = document.getElementById("fecha_evento");
+
+    if (fecha && fecha.value) {
+
+        let fechaTexto = fecha.value;
+
+        const partes = fechaTexto.split("-");
+
+        if (partes.length === 3) {
+            fechaTexto =
+                `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        items.push({
+            label: "Fecha",
+            valor: fechaTexto
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Hora
+    // ------------------------------------------------------------
+
+    const hora = document.getElementById("hora_evento");
+
+    if (hora && hora.value) {
+
+        const texto =
+            hora.options[hora.selectedIndex].text;
+
+        items.push({
+            label: "Hora",
+            valor: texto
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Invitados
+    // ------------------------------------------------------------
+
+    const invitados =
+        document.getElementById("invitados");
+
+    if (invitados && invitados.value) {
+
+        items.push({
+            label: "Invitados",
+            valor: `${invitados.value} personas`
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Lugar
+    // ------------------------------------------------------------
+
+    const lugar =
+        document.getElementById("lugar_evento");
+
+    if (lugar && lugar.value.trim()) {
+
+        items.push({
+            label: "Lugar",
+            valor: lugar.value.trim()
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Salón
+    // ------------------------------------------------------------
+
+    const salon =
+        document.getElementById("salon");
+
+    if (salon && salon.value) {
+
+        const texto =
+            salon.options[salon.selectedIndex].text;
+
+        items.push({
+            label: "¿Cuenta con salón?",
+            valor: texto
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Sugerencias de sede
+    // ------------------------------------------------------------
+
+    const sugerencias =
+        document.getElementById("sugerencias_sede");
+
+    if (sugerencias && sugerencias.value) {
+
+        const texto =
+            sugerencias.options[sugerencias.selectedIndex].text;
+
+        items.push({
+            label: "Sugerencias de sede",
+            valor: texto
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Servicios seleccionados
+    // ------------------------------------------------------------
+
+    const serviciosSeleccionados =
+        document.querySelectorAll(
+            'input[name="servicios"]:checked'
+        );
+
+    if (serviciosSeleccionados.length > 0) {
+
+        let serviciosHTML = "";
+
+        serviciosSeleccionados.forEach(servicio => {
+
+            const label =
+                document.querySelector(
+                    `label[for="${servicio.id}"]`
+                );
+
+            const nombre =
+                label
+                    ? label.textContent.trim()
+                    : servicio.value;
+
+            serviciosHTML += `
+                <div class="resumen-servicio-modal">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${nombre}</span>
+                </div>
+            `;
+        });
+
+        items.push({
+            label: "Servicios seleccionados",
+            valor: serviciosHTML,
+            html: true
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Presupuesto
+    // ------------------------------------------------------------
+
+    const presupuesto =
+        document.getElementById("presupuesto");
+
+    if (presupuesto && presupuesto.value) {
+
+        items.push({
+            label: "Presupuesto aproximado",
+            valor: formatearCOP(
+                Number(presupuesto.value)
+            )
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Tema
+    // ------------------------------------------------------------
+
+    const tema =
+        document.getElementById("tema_evento");
+
+    if (tema && tema.value.trim()) {
+
+        items.push({
+            label: "Tema / estilo",
+            valor: tema.value.trim()
+        });
+    }
+
+
+    // ------------------------------------------------------------
+    // Mostrar mensaje cuando todavía no hay información
+    // ------------------------------------------------------------
+
+    if (items.length === 0) {
+
+        resumen.innerHTML = `
+            <p class="text-muted text-center py-4 my-0">
+                Completa los datos para ver el resumen.
+            </p>
+        `;
+
+        contador.textContent = "0 ítems";
+        total.textContent = "$0";
+
+        return;
+    }
+
+
+    // ------------------------------------------------------------
+    // Construir HTML
+    // ------------------------------------------------------------
+
+    resumen.innerHTML = "";
+
+    items.forEach(item => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "resumen-item-modal";
+
+        if (item.html) {
+
+            div.innerHTML = `
+                <div class="resumen-label">
+                    ${item.label}
+                </div>
+
+                <div class="resumen-valor">
+                    ${item.valor}
+                </div>
+            `;
+
+        } else {
+
+            div.innerHTML = `
+                <div class="resumen-label">
+                    ${item.label}
+                </div>
+
+                <div class="resumen-valor">
+                    ${item.valor}
+                </div>
+            `;
+        }
+
+        resumen.appendChild(div);
+    });
+
+
+    // ------------------------------------------------------------
+    // Contador
+    // ------------------------------------------------------------
+
+    contador.textContent =
+        `${items.length} ${items.length === 1 ? "ítem" : "ítems"}`;
+
+
+    // ------------------------------------------------------------
+    // Precio estimado
+    // ------------------------------------------------------------
+
+    const inputInvitados =
+        document.getElementById("invitados");
+
+    if (inputInvitados && inputInvitados.value) {
+
+        const precio =
+            calcularPrecioEstimado(
+                inputInvitados.value
+            );
+
+        if (precio !== null) {
+
+            total.textContent =
+                formatearCOP(precio);
+
+        } else {
+
+            total.textContent = "$0";
+        }
+
+    } else {
+
+        total.textContent = "$0";
+    }
+} 
+
+// ============================================================
+// ACTUALIZAR RESUMEN AL CAMBIAR CUALQUIER CAMPO
+// ============================================================
+
+const camposResumen = document.querySelectorAll(
+    "#formCotizacion input, " +
+    "#formCotizacion select, " +
+    "#formCotizacion textarea"
+);
+
+camposResumen.forEach(campo => {
+
+    campo.addEventListener("input", actualizarResumenModal);
+
+    campo.addEventListener("change", actualizarResumenModal);
+
+});
