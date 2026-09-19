@@ -331,3 +331,170 @@ dialog::backdrop {
 .estimado-aviso i {
     margin-right: 0.3rem;
 }
+
+/* ============================================================
+   MODAL DE COTIZACIÓN - DISEÑO CON RESUMEN LATERAL
+   ============================================================ */
+
+.modal-cotizacion {
+    border: none;
+    border-radius: 24px;
+    padding: 0;
+    width: min(1200px, 94vw);
+    max-width: 1200px;
+    max-height: 90vh;
+    background: white;
+    overflow: hidden;
+
+    /* Mover ligeramente el modal hacia la izquierda */
+    transform: translateX(-80px);
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Fondo oscuro detrás del modal */
+
+.modal-cotizacion::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+
+/* Contenedor de las dos columnas */
+
+.modal-cotizacion-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+
+    padding: 20px;
+
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+}
+
+
+/* Columna principal del formulario */
+
+.modal-form-col {
+    min-width: 0;
+}
+
+
+/* Columna derecha */
+
+.modal-resumen-col {
+    min-width: 0;
+}
+
+
+/* Card de resumen */
+
+.modal-panel-resumen {
+    position: sticky;
+    top: 0;
+
+    border-radius: 16px;
+    overflow: hidden;
+
+    max-height: calc(90vh - 120px);
+}
+
+
+/* Área donde aparecen los detalles */
+
+#resumen-modal-cotizacion {
+    max-height: 330px;
+    overflow-y: auto;
+}
+
+
+/* Cada detalle de la cotización */
+
+.resumen-item-modal {
+    padding: 9px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+
+.resumen-item-modal:last-child {
+    border-bottom: none;
+}
+
+
+/* Nombre del detalle */
+
+.resumen-item-modal .resumen-label {
+    font-size: 0.78rem;
+    color: #777;
+    margin-bottom: 2px;
+}
+
+
+/* Valor del detalle */
+
+.resumen-item-modal .resumen-valor {
+    font-weight: 600;
+    color: #2c2a29;
+}
+
+
+/* Servicios */
+
+.resumen-servicio-modal {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 5px 0;
+
+    font-size: 0.88rem;
+}
+
+
+.resumen-servicio-modal i {
+    color: #c17b3c;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+
+    .modal-cotizacion {
+        transform: none;
+        width: 94vw;
+    }
+
+    .modal-cotizacion-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-resumen-col {
+        order: -1;
+    }
+
+    .modal-panel-resumen {
+        position: relative;
+        max-height: none;
+    }
+
+    #resumen-modal-cotizacion {
+        max-height: 250px;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .modal-cotizacion {
+        width: 96vw;
+        max-height: 94vh;
+        border-radius: 16px;
+    }
+
+    .modal-cotizacion-layout {
+        padding: 12px;
+        gap: 12px;
+    }
+}
