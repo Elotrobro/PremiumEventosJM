@@ -58,14 +58,17 @@
 </section>
 
 <!-- Ventana modal con dialog -->
-<dialog id="modalCotizacion" class="modal-cotizacion" style="display: 1; left: 300px;">
-  <div class="modal-header-custom">
-    <h3>Solicita tu cotización</h3>
-    <button type="button" class="btn-cerrar-modal" onclick="cerrarModalCotizacion()">×</button>
-  </div>
+<dialog id="modalCotizacion" class="modal-cotizacion">
+        <div class="modal-header-custom">
+        <h3>Solicita tu cotización</h3>
+        <button type="button" class="btn-cerrar-modal" onclick="cerrarModalCotizacion()">×</button>
+    </div>
 
-  <form method="post" action="/cotizacion/" class="modal-formulario" id="formCotizacion">
-    {% csrf_token %}
+    <div class="modal-cotizacion-layout">
+        <div class="modal-form-col">
+
+    <form method="post" action="/cotizacion/" class="modal-formulario" id="formCotizacion">
+        {% csrf_token %}
 
 
 <fieldset class="border rounded p-3 mb-4">
@@ -125,16 +128,7 @@
             <input type="number" class="form-control" id="invitados" name="invitados" min="1" required>
         </div>
 
-        <div class="col-12">
-            <div id="cotizacionEstimada" class="estimado-precio-box d-none">
-                <p class="estimado-titulo">Estimado para tu evento: <span id="precioEstimadoTexto">$0</span></p>
-                <p class="estimado-aviso">
-                    <i class="fas fa-triangle-exclamation"></i>
-                    Atención, esta es una cotización aproximada de lo que puede costar el evento.
-                </p>
-            </div>
-            <input type="hidden" name="precio_estimado" id="precio_estimado_input" value="0">
-        </div>
+       
 
         <div class="col-md-6">
             <label for="lugar_evento" class="form-label">Lugar del evento / ciudad</label>
@@ -267,9 +261,21 @@
             <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Cuéntanos cómo imaginas tu evento"></textarea>
         </div>
 
+        
+
     </div>
 </fieldset>
 
+<div class="col-12">
+            <div id="cotizacionEstimada" class="estimado-precio-box d-none">
+                <p class="estimado-titulo">Estimado para tu evento: <span id="precioEstimadoTexto">$0</span></p>
+                <p class="estimado-aviso">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Atención, esta es una cotización aproximada de lo que puede costar el evento.
+                </p>
+            </div>
+            <input type="hidden" name="precio_estimado" id="precio_estimado_input" value="0">
+        </div>
     
 <div class="modal-footer d-flex justify-content-end gap-2">
     <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold" 
@@ -283,7 +289,63 @@
     </button>
 </div>
 
+
+
     </form>
+
+    <div class="modal-resumen-col">
+
+    <div class="card panel-cotizacion modal-panel-resumen shadow border-0">
+
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+            <h5 class="mb-0">
+                <i class="fas fa-file-invoice-dollar me-2"></i>
+                Tu Cotización
+            </h5>
+
+            <span class="badge bg-warning text-dark" id="contador-modal-items">
+                0 ítems
+            </span>
+
+        </div>
+
+        <div class="card-body p-3">
+
+            <div id="resumen-modal-cotizacion" class="mb-3">
+
+                <p class="text-muted text-center py-4 my-0">
+                    Completa los datos para ver el resumen.
+                </p>
+
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between fs-5 fw-bold mb-3">
+
+                <span>Total estimado:</span>
+
+                <span id="total-modal-cotizacion" class="text-success">
+                    $0
+                </span>
+
+            </div>
+
+            <div class="alert alert-light border small mb-0">
+
+                <i class="fas fa-info-circle me-1"></i>
+
+                Este valor es una estimación y puede variar según
+                los servicios y características de tu evento.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 </dialog>
 
 <script src="{% static 'js/modal.js' %}"></script>
