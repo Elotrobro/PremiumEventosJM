@@ -9,10 +9,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from Bd_PremiumEventos.models import (
-    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion,
+    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,
 )
+from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
-from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm
+from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, FotoGaleriaForm
 from .utils import formatear_miles
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -197,6 +198,51 @@ def catalogo_delete(request, pk):
         return redirect('panel_admin:catalogo_list')
     return render(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': item, 'titulo': 'ítem de decoración', 'cancelar_url': 'panel_admin:catalogo_list',
+    })
+
+
+# ─────────────────── Galería (FotoGaleria) ───────────────────
+#
+# Fotos que se muestran en /galeria/ y /galeria/<slug>/ (ver
+# core/galeria_data.py). Antes había que copiar los archivos a mano en
+# core/static/images/galeria/<categoria>/; ahora se suben aquí y quedan
+# en /media, servidas por FotoGaleria.imagen.
+
+@staff_required
+def galeria_list(request):
+    fotos_por_categoria = [
+        {**categoria, 'fotos': FotoGaleria.objects.filter(categoria=categoria['slug'])}
+        for categoria in CATEGORIAS
+    ]
+    form = FotoGaleriaForm()
+    return render(request, 'panel_admin/galeria_list.html', {
+        'fotos_por_categoria': fotos_por_categoria,
+        'form': form,
+    })
+
+
+@staff_required
+def galeria_upload(request):
+    if request.method == 'POST':
+        form = FotoGaleriaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Foto subida correctamente.')
+        else:
+            messages.error(request, 'No se pudo subir la foto. Revisa la categoría y el archivo seleccionado.')
+    return redirect('panel_admin:galeria_list')
+
+
+@admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
+def galeria_delete(request, pk):
+    foto = get_object_or_404(FotoGaleria, pk=pk)
+    if request.method == 'POST':
+        foto.imagen.delete(save=False)  # borra también el archivo en /media, no solo el registro
+        foto.delete()
+        messages.success(request, 'Foto eliminada correctamente.')
+        return redirect('panel_admin:galeria_list')
+    return render(request, 'panel_admin/confirmar_eliminar.html', {
+        'objeto': foto, 'titulo': 'foto de la galería', 'cancelar_url': 'panel_admin:galeria_list',
     })
 
 

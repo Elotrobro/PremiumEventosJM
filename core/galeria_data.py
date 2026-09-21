@@ -1,20 +1,16 @@
 """
 Catálogo de galerías por tipo de evento.
 
-Las fotos NO viven en la base de datos: cada categoría muestra
-automáticamente las imágenes que existan en
-
-    core/static/images/galeria/<slug>/
-
-Para publicar fotos nuevas basta con copiarlas en la carpeta de su
-categoría; no hay que tocar el código ni el HTML. Mientras una carpeta
-esté vacía, la galería usa imágenes de muestra del sitio y lo advierte
-en pantalla (ver `es_demo` en `fotos_de_categoria`).
+Las fotos de cada categoría viven en la tabla FotoGaleria (Bd_PremiumEventos
+.models), cargadas desde el panel de administrador (ver
+panel_admin.views.galeria_upload/galeria_delete). Mientras una categoría
+todavía no tenga ninguna foto propia subida, la galería usa imágenes de
+muestra del sitio y lo advierte en pantalla (ver `es_demo` en
+`fotos_de_categoria`).
 """
 
 import os
 
-from django.contrib.staticfiles import finders
 from django.templatetags.static import static
 from PIL import Image
 
@@ -171,25 +167,26 @@ def fotos_de_categoria(slug):
     Devuelve (fotos, es_demo) para una categoría.
 
     `fotos` es una lista de diccionarios {url, proporcion} lista para el
-    mosaico; `es_demo` indica que la carpeta de la categoría todavía está
-    vacía y se están mostrando imágenes de muestra del sitio.
+    mosaico; `es_demo` indica que la categoría todavía no tiene ninguna
+    foto propia subida desde el panel y se están mostrando imágenes de
+    muestra del sitio.
     """
-    carpeta = finders.find(f'images/galeria/{slug}')
+    # Import perezoso (no al inicio del módulo) para que `core` no dependa
+    # de que la app Bd_PremiumEventos ya esté cargada al importar este
+    # archivo: para cuando se llama a esta función (resolviendo una vista)
+    # todas las apps ya están listas, así que aquí es seguro.
+    from Bd_PremiumEventos.models import FotoGaleria
 
-    if carpeta and os.path.isdir(carpeta):
-        archivos = sorted(
-            nombre for nombre in os.listdir(carpeta)
-            if os.path.splitext(nombre)[1].lower() in EXTENSIONES_VALIDAS
-        )
-        if archivos:
-            fotos = [
-                {
-                    'url': static(f'images/galeria/{slug}/{nombre}'),
-                    'proporcion': _proporcion(os.path.join(carpeta, nombre)),
-                }
-                for nombre in archivos
-            ]
-            return fotos, False
+    fotos_subidas = list(FotoGaleria.objects.filter(categoria=slug))
+    if fotos_subidas:
+        fotos = [
+            {
+                'url': foto.imagen.url,
+                'proporcion': _proporcion(foto.imagen.path),
+            }
+            for foto in fotos_subidas
+        ]
+        return fotos, False
 
     # Sin fotos propias todavía: vista previa con imágenes del sitio. Cada
     # categoría arranca la lista de muestra en una posición distinta para

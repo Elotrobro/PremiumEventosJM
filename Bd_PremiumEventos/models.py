@@ -4,6 +4,8 @@ import string
 from django.db import models
 from django.utils import timezone
 
+from core.galeria_data import CATEGORIAS
+
 # ═══════════════════════════════════════════════════════════════════════
 # Modelos de la app Bd_PremiumEventos
 #
@@ -259,3 +261,36 @@ class DetalleCotizacion(models.Model):
 
     class Meta:
         db_table = 'detalle_cotizacion'
+
+
+def _ruta_imagen_galeria(instance, nombre_archivo):
+    """Cada foto queda en media/galeria/<categoria>/<archivo>, agrupada
+    por categoría igual que antes se agrupaban a mano en
+    core/static/images/galeria/ (ver core/galeria_data.py)."""
+    return f'galeria/{instance.categoria}/{nombre_archivo}'
+
+
+class FotoGaleria(models.Model):
+    """
+    Foto de la galería pública (/galeria/), cargada desde el panel de
+    administrador (ver panel_admin.views.galeria_upload/galeria_delete).
+
+    Antes las fotos de la galería no vivían en la base de datos: había
+    que copiarlas a mano en core/static/images/galeria/<categoria>/. Este
+    modelo reemplaza ese flujo manual; core.galeria_data.fotos_de_categoria
+    ahora lee de aquí primero y solo cae en las imágenes de muestra del
+    sitio si la categoría todavía no tiene ninguna foto propia subida.
+    """
+    id_foto = models.AutoField(primary_key=True)
+    # Mismas categorías que ya existían en core/galeria_data.CATEGORIAS,
+    # para no mantener dos catálogos de "tipos de evento" por separado.
+    categoria = models.CharField(max_length=50, choices=[(c['slug'], c['nombre']) for c in CATEGORIAS])
+    imagen = models.ImageField(upload_to=_ruta_imagen_galeria)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_categoria_display()} — {self.imagen.name}"
+
+    class Meta:
+        db_table = 'foto_galeria'
+        ordering = ['-fecha_subida']

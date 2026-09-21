@@ -326,6 +326,45 @@ body.panel-admin-body {
 
 .pa-lista-novedades a:hover { color: var(--pa-oro); }
 
+/* ── Galería ───────────────────────────────────────────────────────── */
+
+.pa-card-titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    color: var(--pa-marron);
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+}
+
+.pa-galeria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.9rem;
+}
+
+.pa-galeria-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--pa-borde);
+    aspect-ratio: 1;
+}
+
+.pa-galeria-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.pa-galeria-item .pa-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+}
+
 @media (max-width: 768px) {
     .pa-layout { flex-direction: column; }
     .pa-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }

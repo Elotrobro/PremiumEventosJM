@@ -1,0 +1,48 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Galería{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-images"></i> Galería</h1>
+</div>
+
+<div class="pa-card" style="max-width: 560px;">
+  <h2 class="pa-card-titulo">Subir foto nueva</h2>
+  <form method="post" action="{% url 'panel_admin:galeria_upload' %}" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="pa-form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="pa-btn"><i class="fas fa-upload"></i> Subir foto</button>
+  </form>
+</div>
+
+{% for categoria in fotos_por_categoria %}
+<div class="pa-card">
+  <h2 class="pa-card-titulo">
+    <i class="fas {{ categoria.icono }}"></i> {{ categoria.nombre }}
+    <span class="pa-badge pa-badge-aprobada">{{ categoria.fotos|length }} foto{{ categoria.fotos|length|pluralize:"s" }}</span>
+  </h2>
+
+  {% if categoria.fotos %}
+    <div class="pa-galeria-grid">
+      {% for foto in categoria.fotos %}
+        <div class="pa-galeria-item">
+          <img src="{{ foto.imagen.url }}" alt="{{ categoria.nombre }}">
+          <a href="{% url 'panel_admin:galeria_delete' foto.pk %}" class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar">
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="pa-empty">Sin fotos todavía. La galería pública muestra fotos de muestra mientras tanto.</p>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}

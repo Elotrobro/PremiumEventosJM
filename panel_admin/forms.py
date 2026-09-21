@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
 
-from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion
+from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -69,6 +69,16 @@ class ItemDecoracionForm(forms.ModelForm):
             'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {'estado': 'Disponible para alquilar'}
+
+
+class FotoGaleriaForm(forms.ModelForm):
+    class Meta:
+        model = FotoGaleria
+        fields = ['categoria', 'imagen']
+        widgets = {
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        }
 
 
 class CotizacionEstadoForm(forms.ModelForm):
