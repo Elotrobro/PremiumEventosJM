@@ -2,8 +2,8 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.hashers import make_password
 
-from .models import (Usuario, Cliente, ContactoSimple, ItemDecoracion, 
-                    CarritoSeleccion, DetalleCarrito, Cotizacion, DetalleCotizacion)
+from .models import (Usuario, Cliente, ContactoSimple, ItemDecoracion,
+                    CarritoSeleccion, DetalleCarrito, Cotizacion, DetalleCotizacion, FotoGaleria)
 
 # ═══════════════════════════════════════════════════════════════════════
 # Configuración del panel de administración de Django para todos los
@@ -113,3 +113,11 @@ class CotizacionAdmin(admin.ModelAdmin):
     search_fields = ('cliente__nombre_completo',)  # búsqueda a través de la relación con Cliente
     list_filter = ('fecha_evento', 'estado')
     inlines = [DetalleCotizacionInline]  # muestra presupuesto, precio cotizado y servicios solicitados en la misma pantalla
+
+@admin.register(FotoGaleria)
+class FotoGaleriaAdmin(admin.ModelAdmin):
+    # La forma normal de gestionar esto es el panel de administrador propio
+    # (panel_admin), no este admin de Django; queda registrado aquí solo
+    # como respaldo/consulta rápida.
+    list_display = ('id_foto', 'categoria', 'imagen', 'fecha_subida')
+    list_filter = ('categoria',)

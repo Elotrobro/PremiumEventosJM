@@ -34,6 +34,9 @@
     <a href="{% url 'panel_admin:catalogo_list' %}" class="{% if 'catalogo' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-gift"></i> Catálogo decoración
     </a>
+    <a href="{% url 'panel_admin:galeria_list' %}" class="{% if 'galeria' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-images"></i> Galería
+    </a>
     <a href="{% url 'panel_admin:mensajes_list' %}" class="{% if 'mensaje' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-envelope"></i> Mensajes de contacto
     </a>

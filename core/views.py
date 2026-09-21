@@ -39,8 +39,8 @@ def testimonios(request):
 def galeria(request):
     # Índice de la galería: el acordeón con los tipos de evento (menú de
     # navegación entre galerías) y un mosaico que mezcla fotos de todas
-    # las categorías. Las fotos se leen de core/static/images/galeria/
-    # (ver core/galeria_data.py), no de la base de datos.
+    # las categorías. Las fotos se leen de la tabla FotoGaleria, subidas
+    # desde el panel de administrador (ver core/galeria_data.py).
     return render(request, 'galeria.html', {
         'grupos': categorias_por_grupo(),
         'total_categorias': len(CATEGORIAS),

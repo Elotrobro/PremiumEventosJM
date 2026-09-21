@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from core import views
@@ -33,3 +35,8 @@ urlpatterns = [
     # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----
     path('panel-admin/', include('panel_admin.urls')),
 ]
+
+if settings.DEBUG:
+    # Sirve /media/ (fotos de la galería subidas desde el panel) en
+    # desarrollo. En producción esto lo debe servir el servidor web, no Django.
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -149,3 +149,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Media files (contenido subido por usuarios, ej. fotos de la galería
+# cargadas desde el panel de administrador). A diferencia de STATIC_URL,
+# esto no son archivos del código sino datos: por eso /media/ está en
+# .gitignore y se sirve aparte (ver PremiumEventosJM/urls.py, solo en
+# desarrollo con DEBUG=True; en producción lo debe servir el propio
+# servidor web, ej. Nginx).
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
