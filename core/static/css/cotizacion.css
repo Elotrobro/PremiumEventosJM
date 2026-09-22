@@ -498,3 +498,334 @@ dialog::backdrop {
         gap: 12px;
     }
 }
+
+/* ============================================================
+   MODAL "COTIZAR MI EVENTO"
+   PALETA PREMIUM EVENTOS JM
+   Solo cambios visuales - no modifica estructura ni funcionalidad
+   ============================================================ */
+
+/* ---------- CONTENEDOR PRINCIPAL ---------- */
+
+.modal-cotizacion {
+    background: #fffaf5;
+    border: 1px solid #e4d3bf;
+    box-shadow: 0 24px 60px rgba(74, 58, 44, 0.28);
+}
+
+
+/* ---------- FONDO DETRÁS DEL MODAL ---------- */
+
+.modal-cotizacion::backdrop {
+    background: rgba(44, 35, 29, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+
+/* ---------- ENCABEZADO ---------- */
+
+.modal-header-custom {
+    background: linear-gradient(
+        135deg,
+        #771f1f 0%,
+        #8b3f2f 55%,
+        #c17b3c 100%
+    );
+
+    border-bottom: 3px solid #d6a15f;
+    color: #ffffff;
+}
+
+.modal-header-custom h3 {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+
+/* ---------- BOTÓN X ---------- */
+
+.btn-cerrar-modal {
+    color: #f8eadb;
+    transition: all 0.2s ease;
+}
+
+.btn-cerrar-modal:hover {
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+
+/* ---------- ÁREA GENERAL DEL FORMULARIO ---------- */
+
+.modal-formulario {
+    background: #fffaf5;
+}
+
+
+/* ---------- SECCIONES DEL FORMULARIO ---------- */
+
+.modal-formulario fieldset {
+    background: #fffdf9;
+    border: 1px solid #e4d3bf !important;
+    box-shadow: 0 3px 12px rgba(108, 91, 75, 0.06);
+}
+
+
+/* ---------- TÍTULOS DE LAS SECCIONES ---------- */
+
+.modal-formulario legend {
+    color: #771f1f;
+    background: #fffdf9;
+    font-weight: 700;
+    opacity: 1 !important;
+}
+
+
+/* ---------- ETIQUETAS ---------- */
+
+.modal-formulario .form-label {
+    color: #4a3a2c;
+    font-weight: 600;
+}
+
+
+/* ---------- CAMPOS ---------- */
+
+.modal-formulario .form-control,
+.modal-formulario .form-select {
+    background-color: #ffffff;
+    border: 1px solid #d9cabb;
+    color: #2c2a29;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+
+/* ---------- CAMPOS AL SELECCIONAR ---------- */
+
+.modal-formulario .form-control:focus,
+.modal-formulario .form-select:focus {
+    border-color: #c17b3c;
+    box-shadow: 0 0 0 3px rgba(193, 123, 60, 0.14);
+    background-color: #fffdfb;
+}
+
+
+/* ---------- PLACEHOLDER ---------- */
+
+.modal-formulario .form-control::placeholder {
+    color: #9b8e80;
+}
+
+
+/* ---------- CHECKBOX ---------- */
+
+.modal-formulario .form-check-input {
+    border-color: #cbb9a7;
+}
+
+.modal-formulario .form-check-input:checked {
+    background-color: #771f1f;
+    border-color: #771f1f;
+}
+
+.modal-formulario .form-check-input:focus {
+    border-color: #c17b3c;
+    box-shadow: 0 0 0 3px rgba(193, 123, 60, 0.14);
+}
+
+
+/* ---------- TEXTO DE CHECKBOX ---------- */
+
+.modal-formulario .form-check-label {
+    color: #5c4b3d;
+}
+
+
+/* ---------- CAJA DE ESTIMACIÓN ---------- */
+
+.estimado-precio-box {
+    background: linear-gradient(
+        135deg,
+        #fff7ec 0%,
+        #f5ede4 100%
+    );
+
+    border: 1px solid #d9b98f;
+    box-shadow: 0 4px 12px rgba(108, 91, 75, 0.08);
+}
+
+.estimado-titulo {
+    color: #6c4a23;
+}
+
+.estimado-titulo span {
+    color: #a5632a;
+}
+
+.estimado-aviso {
+    color: #7a6856;
+}
+
+
+/* ---------- PIE DEL MODAL ---------- */
+
+.modal-footer {
+    background: #f5ede4;
+    border-top: 1px solid #e4d3bf;
+}
+
+
+/* ---------- BOTÓN CANCELAR ---------- */
+
+.modal-footer .btn-outline-secondary {
+    color: #6c5b4b;
+    border-color: #cbb9a7;
+    background: #fffaf5;
+}
+
+.modal-footer .btn-outline-secondary:hover {
+    color: #4a3a2c;
+    background: #eee5df;
+    border-color: #9b8e80;
+}
+
+
+/* ---------- BOTÓN COTIZAR ---------- */
+
+.modal-footer #btnCotizar {
+    background: linear-gradient(
+        135deg,
+        #771f1f 0%,
+        #8b3f2f 55%,
+        #c17b3c 100%
+    );
+
+    border: none;
+    color: #ffffff;
+
+    box-shadow: 0 5px 15px rgba(119, 31, 31, 0.25);
+
+    transition: all 0.2s ease;
+}
+
+.modal-footer #btnCotizar:hover {
+    background: linear-gradient(
+        135deg,
+        #8b1a1a 0%,
+        #9c4935 55%,
+        #d68b47 100%
+    );
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(119, 31, 31, 0.32);
+}
+
+.modal-footer #btnCotizar:active {
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   RESUMEN DE COTIZACIÓN - COLUMNA DERECHA
+   ============================================================ */
+
+/* ---------- TARJETA ---------- */
+
+.modal-panel-resumen {
+    background: #fffdf9;
+    border: 1px solid #e4d3bf !important;
+    box-shadow: 0 8px 24px rgba(108, 91, 75, 0.12) !important;
+}
+
+
+/* ---------- CABECERA DEL RESUMEN ---------- */
+
+.modal-panel-resumen .card-header {
+    background: linear-gradient(
+        135deg,
+        #771f1f 0%,
+        #8b3f2f 60%,
+        #c17b3c 100%
+    ) !important;
+
+    border-bottom: 2px solid #d6a15f;
+    color: #ffffff;
+}
+
+
+/* ---------- TÍTULO DEL RESUMEN ---------- */
+
+.modal-panel-resumen .card-header h5 {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+
+/* ---------- CONTADOR ---------- */
+
+.modal-panel-resumen .card-header .badge {
+    background: #e4b96a !important;
+    color: #4a3a2c !important;
+    font-weight: 700;
+}
+
+
+/* ---------- CUERPO DEL RESUMEN ---------- */
+
+.modal-panel-resumen .card-body {
+    background: #fffdf9;
+    color: #4a3a2c;
+}
+
+
+/* ---------- LÍNEAS DE SEPARACIÓN ---------- */
+
+.modal-panel-resumen hr {
+    border-color: #e4d3bf;
+    opacity: 1;
+}
+
+
+/* ---------- DETALLES ---------- */
+
+.resumen-item-modal {
+    border-bottom-color: #eee5df;
+}
+
+.resumen-item-modal .resumen-label {
+    color: #9b8e80;
+}
+
+.resumen-item-modal .resumen-valor {
+    color: #4a3a2c;
+}
+
+
+/* ---------- ICONOS DE SERVICIOS ---------- */
+
+.resumen-servicio-modal i {
+    color: #c17b3c;
+}
+
+
+/* ---------- TOTAL ---------- */
+
+.modal-panel-resumen #total-modal-cotizacion {
+    color: #771f1f !important;
+}
+
+
+/* ---------- MENSAJE INFORMATIVO ---------- */
+
+.modal-panel-resumen .alert-light {
+    background: #f5ede4;
+    border-color: #e4d3bf !important;
+    color: #6c5b4b;
+}
+
+.modal-panel-resumen .alert-light i {
+    color: #c17b3c;
+}

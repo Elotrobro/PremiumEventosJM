@@ -724,3 +724,140 @@ camposResumen.forEach(campo => {
     campo.addEventListener("change", actualizarResumenModal);
 
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("cotizar") === "1") {
+        abrirModalCotizacion();
+    }
+});
+
+// ------------------------------------------------------------
+// Validación: salón y sugerencias de sede
+// ------------------------------------------------------------
+
+const salonSelect = document.getElementById("salon");
+const sugerenciasSedeSelect = document.getElementById("sugerencias_sede");
+const sedeSugerida = document.getElementById("sede_sugerida");
+
+if (salonSelect && sugerenciasSedeSelect) {
+
+    function actualizarSugerenciaSede() {
+
+        if (salonSelect.value === "si") {
+
+            // Si ya tiene salón, no necesita sugerencias
+            sugerenciasSedeSelect.value = "";
+            sugerenciasSedeSelect.disabled = true;
+
+            if (sedeSugerida) {
+                sedeSugerida.classList.add("d-none");
+            }
+
+        } else if (salonSelect.value === "no") {
+
+            // Si no tiene salón, se sugiere nuestra sede
+            sugerenciasSedeSelect.disabled = false;
+            sugerenciasSedeSelect.value = "si";
+
+            if (sedeSugerida) {
+                sedeSugerida.classList.remove("d-none");
+            }
+
+        } else {
+
+            // Estado inicial
+            sugerenciasSedeSelect.disabled = false;
+            sugerenciasSedeSelect.value = "";
+
+            if (sedeSugerida) {
+                sedeSugerida.classList.add("d-none");
+            }
+        }
+    }
+
+    salonSelect.addEventListener("change", actualizarSugerenciaSede);
+
+    // Ejecutar al cargar por si ya existe un valor seleccionado
+    actualizarSugerenciaSede();
+}
+
+    // ============================================================
+    // VALIDACIÓN GLOBAL DE CORREOS ELECTRÓNICOS
+    // ============================================================
+
+    const camposCorreo = document.querySelectorAll('input[type="email"]');
+
+    camposCorreo.forEach((campo) => {
+
+        campo.addEventListener('input', function () {
+
+            const correo = this.value.trim();
+
+            // Campo vacío: estado neutral
+            if (correo === "") {
+                this.classList.remove("correo-valido", "correo-invalido");
+                this.setCustomValidity("");
+                return;
+            }
+
+            /*
+             * Valida:
+             * usuario@dominio.extension
+             *
+             * Ejemplos válidos:
+             * usuario@gmail.com
+             * usuario@hotmail.com
+             * usuario@yahoo.com
+             * usuario@outlook.com
+             * usuario@icloud.com
+             * usuario@empresa.com.co
+             *
+             * No se limita a un proveedor específico.
+             */
+            const formatoCorreo =
+                /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+            if (formatoCorreo.test(correo)) {
+
+                // CORREO VÁLIDO
+                this.classList.remove("correo-invalido");
+                this.classList.add("correo-valido");
+
+                this.setCustomValidity("");
+
+            } else {
+
+                // CORREO INVÁLIDO
+                this.classList.remove("correo-valido");
+                this.classList.add("correo-invalido");
+
+                this.setCustomValidity(
+                    "Ingresa un correo electrónico válido. Ejemplo: usuario@gmail.com"
+                );
+            }
+        });
+
+        // Validar también cuando el usuario sale del campo
+        campo.addEventListener('blur', function () {
+
+            const correo = this.value.trim();
+
+            if (correo === "") {
+                this.classList.remove("correo-valido", "correo-invalido");
+                return;
+            }
+
+            const formatoCorreo =
+                /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+            if (formatoCorreo.test(correo)) {
+                this.classList.remove("correo-invalido");
+                this.classList.add("correo-valido");
+            } else {
+                this.classList.remove("correo-valido");
+                this.classList.add("correo-invalido");
+            }
+        });
+    });
