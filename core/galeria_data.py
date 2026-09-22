@@ -50,13 +50,6 @@ CATEGORIAS = [
         'descripcion': 'Celebraciones de grado que convierten el final de una etapa en una gran fiesta.',
     },
     {
-        'slug': 'proms',
-        'nombre': 'Proms',
-        'grupo': 'Celebraciones',
-        'icono': 'fa-glass-cheers',
-        'descripcion': 'Fiestas de fin de grado con montaje, luces y ambientación de gala.',
-    },
-    {
         'slug': 'primera-comunion',
         'nombre': 'Primera Comunión',
         'grupo': 'Celebraciones',
