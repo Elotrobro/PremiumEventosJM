@@ -433,7 +433,7 @@ def testimonios(request):
 
             messages.success(request,"¡Gracias por compartir tu experiencia! Tu opinión fue enviada y será revisada antes de publicarse.");
 
-            return redirect("testimonios");
+            return redirect("testimonios")
 
     else:
         form = TestimonioForm()
