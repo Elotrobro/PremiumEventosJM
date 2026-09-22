@@ -463,6 +463,8 @@ nav.navbar{
     position: sticky !important;
     top: 0;
     z-index: 1000;
+
+    
 }
 
 @media (min-width: 992px) {
@@ -526,4 +528,1100 @@ nav.navbar{
 .user-chip-menu .dropdown-item:hover {
     background: #f5ede4;
     color: #c17b3c;
+}
+
+/* =========================================================
+   MENÚ DESPLEGABLE DE SERVICIOS
+   ========================================================= */
+
+.servicios-dropdown {
+    position: relative;
+}
+
+
+/* ---------------------------------------------------------
+   BOTÓN SERVICIOS
+   --------------------------------------------------------- */
+
+.servicios-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+
+/* Flecha */
+
+.servicios-arrow {
+    font-size: 0.65rem;
+    margin-left: 5px;
+    transition: transform 0.25s ease;
+}
+
+
+/* Girar flecha cuando se pasa el mouse */
+
+.servicios-dropdown:hover .servicios-arrow {
+    transform: rotate(180deg);
+}
+
+
+/* ---------------------------------------------------------
+   CONTENEDOR DEL MENÚ
+   --------------------------------------------------------- */
+
+.servicios-menu {
+    position: absolute;
+
+    top: calc(100% + 15px);
+    left: 50%;
+
+    transform: translateX(-50%) translateY(10px);
+
+    width: 720px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.15);
+
+    border: 1px solid #eee5df;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease,
+        visibility 0.25s ease;
+
+    z-index: 9999;
+}
+
+
+/* Pequeño triángulo superior */
+
+.servicios-menu::before {
+    content: "";
+
+    position: absolute;
+
+    top: -7px;
+    left: 50%;
+
+    width: 14px;
+    height: 14px;
+
+    background: #ffffff;
+
+    border-left: 1px solid #eee5df;
+    border-top: 1px solid #eee5df;
+
+    transform: translateX(-50%) rotate(45deg);
+}
+
+
+/* ---------------------------------------------------------
+   MOSTRAR MENÚ
+   --------------------------------------------------------- */
+
+.servicios-dropdown:hover .servicios-menu {
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+
+/* ---------------------------------------------------------
+   ENCABEZADO
+   --------------------------------------------------------- */
+
+.servicios-header {
+    border-bottom: 1px solid #eee5df;
+
+    padding-bottom: 18px;
+
+    margin-bottom: 20px;
+}
+
+
+.servicios-title {
+    display: block;
+
+    font-size: 0.72rem;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    /* VINOTINTO */
+    color: #771F1F;
+}
+
+
+.servicios-header p {
+    margin: 7px 0 0;
+
+    font-size: 0.88rem;
+
+    color: #777;
+
+    line-height: 1.5;
+}
+
+
+/* ---------------------------------------------------------
+   GRID
+   --------------------------------------------------------- */
+
+.servicios-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+}
+
+
+/* ---------------------------------------------------------
+   CADA SERVICIO
+   --------------------------------------------------------- */
+
+.servicio-item {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 17px 14px;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.servicio-item:hover {
+    background: #f8eeee;
+
+    transform: translateY(-2px);
+}
+
+
+/* ---------------------------------------------------------
+   ICONOS
+   --------------------------------------------------------- */
+
+.servicio-icon {
+    flex-shrink: 0;
+
+    width: 43px;
+    height: 43px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    /* VINOTINTO CLARO */
+    background: #f4e5e5;
+
+    /* VINOTINTO */
+    color: #771F1F;
+
+    font-size: 1.05rem;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+/* Hover del icono */
+
+.servicio-item:hover .servicio-icon {
+    /* VINOTINTO */
+    background: #771F1F;
+
+    color: #ffffff;
+}
+
+
+/* ---------------------------------------------------------
+   TEXTO
+   --------------------------------------------------------- */
+
+.servicio-info h4 {
+    margin: 0 0 6px;
+
+    font-size: 0.95rem;
+
+    font-weight: 700;
+
+    color: #302c29;
+}
+
+
+.servicio-info p {
+    margin: 0;
+
+    font-size: 0.78rem;
+
+    line-height: 1.45;
+
+    color: #777;
+}
+
+
+/* ---------------------------------------------------------
+   BOTÓN SERVICIOS
+   --------------------------------------------------------- */
+
+.servicios-dropdown > .servicios-toggle:hover {
+    background: transparent;
+
+    /* VINOTINTO */
+    color: #771F1F !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .servicios-menu {
+        position: static;
+
+        width: 100%;
+
+        transform: none;
+
+        box-shadow: none;
+
+        border: none;
+
+        border-radius: 0;
+
+        padding: 10px 0 10px 15px;
+
+        opacity: 1;
+
+        visibility: visible;
+
+        display: none;
+    }
+
+
+    .servicios-menu::before {
+        display: none;
+    }
+
+
+    .servicios-dropdown:hover .servicios-menu {
+        transform: none;
+    }
+
+
+    .servicios-dropdown:hover .servicios-menu {
+        display: block;
+    }
+
+
+    .servicios-grid {
+        grid-template-columns: 1fr;
+
+        gap: 4px;
+    }
+
+
+    .servicios-header {
+        padding-bottom: 10px;
+
+        margin-bottom: 8px;
+    }
+
+
+    .servicio-item {
+        padding: 10px;
+    }
+
+
+    .servicio-info p {
+        font-size: 0.8rem;
+    }
+
+}
+
+/* =========================================================
+   FOOTER - COMPACTO PERO CON MÁS AIRE
+   ========================================================= */
+
+.footer {
+    background: #c9a55b;
+
+    color: #111111;
+
+    padding: 1.25rem 0 0.65rem;
+
+    margin: 0;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   CONTENIDO PRINCIPAL
+   ========================================================= */
+
+.footer-content {
+    display: grid;
+
+    grid-template-columns:
+        1.25fr
+        0.9fr
+        1.4fr;
+
+    column-gap: 4rem;
+
+    align-items: start;
+
+    padding: 0;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   TÍTULOS
+   ========================================================= */
+
+.footer h4 {
+    position: relative;
+
+    display: inline-block;
+
+    margin: 0 0 0.7rem;
+
+    padding-bottom: 0.3rem;
+
+    font-size: 0.86rem;
+
+    line-height: 1.2;
+
+    font-weight: 700 !important;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+}
+
+
+.footer h4::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    bottom: 0;
+
+    width: 28px;
+
+    height: 2px;
+
+    background: #111111;
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   CONTACTO
+   ========================================================= */
+
+.contact-line {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.55rem;
+
+    margin: 0 0 0.38rem;
+
+    padding: 0;
+
+    line-height: 1;
+
+    opacity: 1 !important;
+}
+
+
+.contact-line:last-child {
+    margin-bottom: 0;
+}
+
+
+.contact-line i {
+    width: 16px;
+
+    flex-shrink: 0;
+
+    text-align: center;
+
+    font-size: 0.76rem;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+}
+
+
+.contact-line p {
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.74rem;
+
+    line-height: 1.3;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+}
+
+
+.gerente-name {
+    font-weight: 700;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   REDES SOCIALES
+   ========================================================= */
+
+.social-icons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.7rem;
+
+    margin: 0 0 0.7rem;
+
+    padding: 0;
+
+    opacity: 1 !important;
+}
+
+
+.social-icons a {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 25px;
+
+    height: 25px;
+
+    padding: 0;
+
+    background: transparent;
+
+    color: #111111 !important;
+
+    text-decoration: none;
+
+    font-size: 1rem;
+
+    opacity: 1 !important;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.social-icons a:hover {
+    color: #111111 !important;
+
+    transform: translateY(-2px);
+
+    opacity: 0.75 !important;
+}
+
+
+/* =========================================================
+   FRASE
+   ========================================================= */
+
+.footer-slogan {
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.69rem;
+
+    line-height: 1.4;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   NAVEGACIÓN
+   ========================================================= */
+
+.footer-navigation-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    column-gap: 3rem;
+
+    align-items: start;
+}
+
+
+.footer-links {
+    list-style: none;
+
+    padding: 0;
+
+    margin: 0;
+}
+
+
+.footer-links li {
+    margin: 0 0 0.32rem;
+
+    padding: 0;
+
+    line-height: 1.2;
+
+    opacity: 1 !important;
+}
+
+
+.footer-links li:last-child {
+    margin-bottom: 0;
+}
+
+
+.footer-links li a {
+    display: inline-block;
+
+    padding: 0;
+
+    font-size: 0.74rem;
+
+    line-height: 1.3;
+
+    text-decoration: none;
+
+    color: #111111 !important;
+
+    opacity: 1 !important;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.footer-links li a:hover {
+    color: #111111 !important;
+
+    transform: translateX(3px);
+
+    opacity: 0.75 !important;
+}
+
+
+/* =========================================================
+   COPYRIGHT
+   ========================================================= */
+
+.copyright {
+    margin-top: 1rem;
+
+    padding-top: 0.5rem;
+
+    border-top: 1px solid rgba(17, 17, 17, 0.5);
+
+    text-align: center;
+
+    font-size: 0.64rem;
+
+    line-height: 1.3;
+
+    color: #111111 !important;
+
+    font-weight: 500 !important;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .footer-content {
+        grid-template-columns:
+            1.2fr
+            0.9fr
+            1.3fr;
+
+        column-gap: 2.5rem;
+    }
+
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .footer {
+        padding: 1.15rem 0 0.6rem;
+    }
+
+
+    .footer-content {
+        grid-template-columns:
+            1fr
+            1fr;
+
+        gap: 1.1rem 2rem;
+    }
+
+
+    .footer-contact-section {
+        grid-column: span 2;
+    }
+
+
+    .footer-social {
+        grid-column: span 1;
+    }
+
+
+    .footer-navigation {
+        grid-column: span 1;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .footer-content {
+        grid-template-columns: 1fr;
+
+        gap: 1rem;
+    }
+
+
+    .footer-contact-section,
+    .footer-social,
+    .footer-navigation {
+        grid-column: span 1;
+    }
+
+
+    .footer-navigation-grid {
+        max-width: 260px;
+
+        column-gap: 2rem;
+    }
+
+}
+
+/* =========================================================
+   NAVBAR PRINCIPAL
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CONTENEDOR GENERAL
+   --------------------------------------------------------- */
+
+.navbar > .container,
+.navbar > .container-fluid {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.navbar-brand {
+    display: flex;
+
+    align-items: center;
+
+    flex-shrink: 0;
+
+    margin-right: 1.2rem !important;
+
+    padding: 0 !important;
+}
+
+
+.navbar-brand img {
+    width: 105px !important;
+
+    height: auto !important;
+
+    max-height: 58px;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* =========================================================
+   CONTENEDOR DEL MENÚ
+   ========================================================= */
+
+.navbar-collapse {
+    flex-grow: 1;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   MENÚ PRINCIPAL
+   ========================================================= */
+
+.navbar-nav {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: nowrap;
+
+    gap: 0.35rem !important;
+
+    margin-left: 0 !important;
+
+    margin-right: 0 !important;
+}
+
+
+.navbar-nav .nav-item {
+    margin: 0 !important;
+
+    padding: 0 !important;
+}
+
+
+/* =========================================================
+   ENLACES DE LA NAVBAR
+   ========================================================= */
+
+.navbar-nav .nav-link {
+    display: flex;
+
+    align-items: center;
+
+    white-space: nowrap;
+
+    margin: 0 !important;
+
+    padding: 0.45rem 0.65rem !important;
+
+    font-size: 0.9rem;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   BOTÓN PRINCIPAL / COTIZAR
+   ========================================================= */
+
+.navbar .btn,
+.navbar .navbar-button,
+.navbar .cotizar,
+.navbar .btn-cotizar {
+    white-space: nowrap;
+
+    margin-left: 0.8rem !important;
+
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+
+/* =========================================================
+   DROPDOWN DE SERVICIOS
+   ========================================================= */
+
+.navbar .dropdown-menu {
+    margin-top: 0.4rem;
+
+    white-space: nowrap;
+}
+
+
+.navbar .dropdown-item {
+    padding-left: 1rem;
+
+    padding-right: 1rem;
+}
+
+
+/* =========================================================
+   ICONOS / ELEMENTOS ADICIONALES
+   ========================================================= */
+
+.navbar-social,
+.navbar .social-icons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.5rem !important;
+}
+
+
+/* =========================================================
+   TABLET / PANTALLAS MEDIANAS
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .navbar > .container,
+    .navbar > .container-fluid {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+
+    .navbar-brand {
+        margin-right: 0.8rem !important;
+    }
+
+
+    .navbar-brand img {
+        width: 100px !important;
+
+        max-height: 54px;
+    }
+
+
+    .navbar-nav {
+        gap: 0.2rem !important;
+    }
+
+
+    .navbar-nav .nav-link {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+
+        font-size: 0.86rem;
+    }
+
+
+    .navbar .btn,
+    .navbar .navbar-button,
+    .navbar .cotizar,
+    .navbar .btn-cotizar {
+        margin-left: 0.6rem !important;
+
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+}
+
+
+/* =========================================================
+   PANTALLAS MÁS PEQUEÑAS
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .navbar > .container,
+    .navbar > .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+
+    .navbar-brand {
+        margin-right: 0.6rem !important;
+    }
+
+
+    .navbar-brand img {
+        width: 92px !important;
+
+        max-height: 50px;
+    }
+
+
+    .navbar-nav {
+        gap: 0.1rem !important;
+    }
+
+
+    .navbar-nav .nav-link {
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+
+        font-size: 0.8rem;
+    }
+
+
+    .navbar .btn,
+    .navbar .navbar-button,
+    .navbar .cotizar,
+    .navbar .btn-cotizar {
+        margin-left: 0.45rem !important;
+
+        padding-left: 0.7rem !important;
+        padding-right: 0.7rem !important;
+    }
+
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .navbar > .container,
+    .navbar > .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+
+    .navbar-brand {
+        margin-right: 0 !important;
+    }
+
+
+    .navbar-brand img {
+        width: 100px !important;
+
+        max-height: 55px;
+    }
+
+
+    .navbar-collapse {
+        width: 100%;
+    }
+
+
+    .navbar-nav {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 0 !important;
+
+        margin-top: 0.7rem !important;
+    }
+
+
+    .navbar-nav .nav-link {
+        width: 100%;
+
+        padding: 0.65rem 0.75rem !important;
+
+        font-size: 0.9rem;
+    }
+
+
+    .navbar .btn,
+    .navbar .navbar-button,
+    .navbar .cotizar,
+    .navbar .btn-cotizar {
+        margin-left: 0 !important;
+
+        margin-top: 0.5rem;
+
+        width: fit-content;
+    }
+
+
+    .navbar .dropdown-menu {
+        margin-top: 0;
+
+        border: none;
+    }
+
+}
+
+
+/* =========================================================
+   MÓVILES PEQUEÑOS
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .navbar > .container,
+    .navbar > .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+
+    .navbar-brand img {
+        width: 90px !important;
+
+        max-height: 50px;
+    }
+
 }
