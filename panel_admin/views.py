@@ -9,11 +9,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from Bd_PremiumEventos.models import (
-    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,
+    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,Testimonio
 )
 from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
-from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, FotoGaleriaForm
+from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, FotoGaleriaForm,TestimonioAdminForm
 from .utils import formatear_miles
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -264,6 +264,118 @@ def mensaje_delete(request, pk):
     return render(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': mensaje, 'titulo': 'mensaje de contacto', 'cancelar_url': 'panel_admin:mensajes_list',
     })
+
+
+# ───────────────────────────── Testimonios ─────────────────────────────
+
+@staff_required
+def testimonios_list(request):
+    testimonios = Testimonio.objects.select_related(
+        'usuario'
+    ).order_by('-fecha_creacion')
+
+    return render(
+        request,
+        'panel_admin/testimonios_list.html',
+        {
+            'testimonios': testimonios,
+        }
+    )
+
+
+@staff_required
+def testimonio_create(request):
+    if request.method == 'POST':
+        form = TestimonioAdminForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                'Testimonio creado correctamente.'
+            )
+
+            return redirect('panel_admin:testimonios_list')
+
+    else:
+        form = TestimonioAdminForm()
+
+    return render(
+        request,
+        'panel_admin/testimonio_form.html',
+        {
+            'form': form,
+            'modo': 'crear',
+        }
+    )
+
+
+@staff_required
+def testimonio_edit(request, pk):
+    testimonio = get_object_or_404(
+        Testimonio,
+        pk=pk
+    )
+
+    if request.method == 'POST':
+        form = TestimonioAdminForm(
+            request.POST,
+            instance=testimonio
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                'Testimonio actualizado correctamente.'
+            )
+
+            return redirect('panel_admin:testimonios_list')
+
+    else:
+        form = TestimonioAdminForm(
+            instance=testimonio
+        )
+
+    return render(
+        request,
+        'panel_admin/testimonio_form.html',
+        {
+            'form': form,
+            'modo': 'editar',
+            'testimonio': testimonio,
+        }
+    )
+
+
+@admin_required
+def testimonio_delete(request, pk):
+    testimonio = get_object_or_404(
+        Testimonio,
+        pk=pk
+    )
+
+    if request.method == 'POST':
+        testimonio.delete()
+
+        messages.success(
+            request,
+            'Testimonio eliminado correctamente.'
+        )
+
+        return redirect('panel_admin:testimonios_list')
+
+    return render(
+        request,
+        'panel_admin/confirmar_eliminar.html',
+        {
+            'objeto': testimonio,
+            'titulo': 'testimonio',
+            'cancelar_url': 'panel_admin:testimonios_list',
+        }
+    )
 
 
 # ───────────────────────────── Cotizaciones ─────────────────────────────

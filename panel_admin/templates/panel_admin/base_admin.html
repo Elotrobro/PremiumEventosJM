@@ -40,6 +40,11 @@
     <a href="{% url 'panel_admin:mensajes_list' %}" class="{% if 'mensaje' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-envelope"></i> Mensajes de contacto
     </a>
+
+    <a href="{% url 'panel_admin:testimonios_list' %}" class="{% if 'testimonio' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-star"></i> Testimonios
+    </a>
+
     <a href="{% url 'panel_admin:cotizaciones_list' %}" class="{% if 'cotizacion' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-file-invoice-dollar"></i> Cotizaciones
     </a>

@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 import json
 
-from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple
-
+from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
+from .forms import TestimonioForm
 
 # ─────────────────────────────────────────────────────────────────────────
 # Lógica de negocio: cálculo del precio estimado según cantidad de
@@ -403,3 +403,47 @@ def guardar_contacto(request):
 
     messages.success(request, f'¡Gracias, {nombre}! Hemos recibido tu mensaje y te contactaremos pronto.')
     return redirect('contacto')
+
+
+# Mostrar testimonios
+def testimonios(request):
+
+    testimonios_publicados = Testimonio.objects.filter(
+        aprobado=True,
+        activo=True
+    ).select_related("usuario")
+
+    usuario_id = request.session.get("usuario_id")
+
+    if request.method == "POST":
+
+        if not usuario_id:
+            return redirect("/?login=1")
+
+        form = TestimonioForm(request.POST)
+
+        if form.is_valid():
+
+            testimonio = form.save(commit=False)
+            testimonio.usuario_id = usuario_id
+            testimonio.aprobado = False
+            testimonio.activo = True
+
+            testimonio.save()
+
+            messages.success(request,"¡Gracias por compartir tu experiencia! Tu opinión fue enviada y será revisada antes de publicarse.");
+
+            return redirect("testimonios")
+
+    else:
+        form = TestimonioForm()
+
+    return render(
+        request,
+        "testimonios.html",
+        {
+            "testimonios": testimonios_publicados,
+            "form": form,
+            "usuario_logueado": bool(usuario_id),
+        }
+    )

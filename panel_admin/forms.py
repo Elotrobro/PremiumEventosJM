@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
 
-from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria
+from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria,Testimonio
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -93,5 +93,55 @@ class CotizacionEstadoForm(forms.ModelForm):
         widgets = {
             'estado': forms.Select(attrs={'class': 'form-control'}),
             'notas_admin': forms.Textarea(attrs={'class': 'form-control', 'rows': 4,
-                                                  'placeholder': 'Notas internas (no visibles para el cliente)'}),
+                                                'placeholder': 'Notas internas (no visibles para el cliente)'}),
+        }
+
+from django import forms
+from Bd_PremiumEventos.models import Testimonio
+
+
+class TestimonioAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = Testimonio
+
+        fields = [
+            "usuario",
+            "calificacion",
+            "comentario",
+            "aprobado",
+            "activo",
+        ]
+
+        widgets = {
+            "usuario": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "calificacion": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "comentario": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                }
+            ),
+
+            "aprobado": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
+
+            "activo": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
         }

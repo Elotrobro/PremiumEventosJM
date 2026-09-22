@@ -34,6 +34,8 @@ urlpatterns = [
 
     # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----
     path('panel-admin/', include('panel_admin.urls')),
+
+    path("testimonios/",auth_views.testimonios,name="testimonios"),
 ]
 
 if settings.DEBUG:

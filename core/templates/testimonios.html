@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}Testimonios{% endblock %}
+
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/testimonios.css' %}">
@@ -8,77 +10,173 @@
 <div class="testimonios-header">
     <div class="container">
         <h2>Testimonios</h2>
-        <p class="reseñas">Reseñas De Google</p>
+        <p class="reseñas">OPINIONES DE NUESTROS CLIENTES</p>
     </div>
 </div>
 
 <div class="testimonios-section">
     <div class="container">
+
+        <!-- Testimonios aprobados -->
+        {% if testimonios %}
+
+            {% for testimonio in testimonios %}
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="testimonio-card">
+
+                        <div class="estrellas">
+                            {% for estrella in "12345" %}
+                                {% if forloop.counter <= testimonio.calificacion %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <p class="testimonio-texto">
+                            "{{ testimonio.comentario }}"
+                        </p>
+
+                        <p class="testimonio-autor">
+                            {{ testimonio.usuario.nombre_completo }}
+                        </p>
+
+                        <p class="testimonio-fecha">
+                            Cliente de Premium Eventos JM
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="testimonio-card text-center">
+
+                        <div class="estrellas">
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+
+                        <p class="testimonio-texto">
+                            Aún no hay testimonios publicados.
+                            ¡Sé el primero en compartir tu experiencia!
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+
+
+        <!-- Dejar una opinión -->
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                <div class="testimonio-card">
-                    <div class="estrellas">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonio-texto">
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
-                        when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+
+                <div class="formulario-testimonio">
+
+                    <h3>Déjanos tu opinión</h3>
+
+                    <p class="formulario-descripcion">
+                        Cuéntanos cómo fue tu experiencia con Premium Eventos JM.
                     </p>
-                    <p class="testimonio-autor">JEAN PAUL</p>
-                    <p class="testimonio-fecha">Cliente Satisfecho</p>
+
+                    {% if usuario_logueado %}
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <div class="campo-testimonio">
+
+                                <label>
+                                Calificación
+                                </label>
+
+                                <div class="selector-estrellas" id="selectorEstrellas">
+
+                                    <button type="button" class="estrella-btn" data-valor="1">
+                                        <i class="far fa-star"></i>
+                                    </button>
+
+                                    <button type="button" class="estrella-btn" data-valor="2">
+                                        <i class="far fa-star"></i>
+                                    </button>
+
+                                    <button type="button" class="estrella-btn" data-valor="3">
+                                        <i class="far fa-star"></i>
+                                    </button>
+
+                                    <button type="button" class="estrella-btn" data-valor="4">
+                                        <i class="far fa-star"></i>
+                                    </button>
+
+                                    <button type="button" class="estrella-btn" data-valor="5">
+                                        <i class="far fa-star"></i>
+                                    </button>
+
+                                </div>
+
+                                {{ form.calificacion }}
+
+                            </div>
+
+                            <div class="campo-testimonio">
+
+                                <label for="{{ form.comentario.id_for_label }}">
+                                    Tu opinión
+                                </label>
+
+                                {{ form.comentario }}
+
+                            </div>
+
+                            {% if form.errors %}
+                                <div class="errores-testimonio">
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+
+                            <button type="submit" class="btn-enviar-testimonio">
+                                Enviar opinión
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <div class="login-testimonio">
+
+                            <p>
+                                Debes iniciar sesión para dejar una opinión.
+                            </p>
+
+                            <a href="?login=1" class="btn-login-testimonio">
+                                Iniciar sesión
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
                 </div>
+
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="testimonio-card">
-                    <div class="estrellas">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonio-texto">
-                        "Excelente servicio, atención personalizada y calidad en cada detalle. 
-                        Hicieron realidad el evento de mis sueños. Totalmente recomendados."
-                    </p>
-                    <p class="testimonio-autor">SANTIAGO GONZALES</p>
-                    <p class="testimonio-fecha">Boda - Marzo 2025</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="testimonio-card">
-                    <div class="estrellas">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonio-texto">
-                        "Contratamos Premium Eventos JM para un evento corporativo y fue todo un éxito. 
-                        Profesionales, puntuales y con una creatividad impresionante. Superaron nuestras expectativas."
-                    </p>
-                    <p class="testimonio-autor">CARLOS RODRÍGUEZ</p>
-                    <p class="testimonio-fecha">Evento Corporativo - Enero 2026</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="btn-ver-todos">
-            <a href="#">Ver más reseñas</a>
-        </div>
     </div>
 </div>
 
+<script src= "{% static 'js/testimonios.js' %}"></script>
 {% endblock %}
