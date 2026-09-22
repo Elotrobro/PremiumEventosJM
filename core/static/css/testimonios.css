@@ -95,3 +95,140 @@
         padding: 1.5rem;
     }
 }
+
+/* ================================
+   FORMULARIO DE TESTIMONIOS
+================================ */
+
+.formulario-testimonio {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.formulario-testimonio h3 {
+    color: #2c2a29;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.formulario-descripcion {
+    color: #9b8e80;
+    margin-bottom: 1.5rem;
+}
+
+.campo-testimonio {
+    margin-bottom: 1.2rem;
+}
+
+.campo-testimonio label {
+    display: block;
+    font-weight: 600;
+    color: #4a3a2c;
+    margin-bottom: 0.5rem;
+}
+
+.campo-testimonio .form-select,
+.campo-testimonio .form-control {
+    width: 100%;
+    border: 1px solid #d2c7bb;
+    border-radius: 10px;
+    padding: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.campo-testimonio .form-select:focus,
+.campo-testimonio .form-control:focus {
+    border-color: #c17b3c;
+    box-shadow: 0 0 0 0.2rem rgba(193, 123, 60, 0.15);
+    outline: none;
+}
+
+.btn-enviar-testimonio {
+    border: none;
+    background: #c17b3c;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-enviar-testimonio:hover {
+    background: #a5632a;
+    transform: translateY(-2px);
+}
+
+.login-testimonio {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.login-testimonio p {
+    color: #4a3a2c;
+    margin-bottom: 1rem;
+}
+
+.btn-login-testimonio {
+    display: inline-block;
+    background: #c17b3c;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-login-testimonio:hover {
+    background: #a5632a;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.errores-testimonio {
+    background: #f8d7da;
+    color: #842029;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+/* ================================
+   SELECTOR DE ESTRELLAS
+================================ */
+
+.selector-estrellas {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 0.5rem;
+}
+
+.estrella-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: #ffc107;
+    font-size: 2rem;
+    transition: transform 0.15s ease;
+}
+
+.estrella-btn:hover {
+    transform: scale(1.15);
+}
+
+.estrella-btn i {
+    pointer-events: none;
+}
+
+/* Ocultamos el select de Django.
+   JavaScript sigue modificando su valor. */
+#id_calificacion {
+    display: none;
+}

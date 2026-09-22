@@ -28,6 +28,12 @@ urlpatterns = [
     path('mensajes/', views.mensajes_list, name='mensajes_list'),
     path('mensajes/<int:pk>/eliminar/', views.mensaje_delete, name='mensaje_delete'),
 
+    # Testimonios
+    path('testimonios/', views.testimonios_list, name='testimonios_list'),
+    path('testimonios/nuevo/', views.testimonio_create, name='testimonio_create'),
+    path('testimonios/<int:pk>/editar/', views.testimonio_edit, name='testimonio_edit'),
+    path('testimonios/<int:pk>/eliminar/', views.testimonio_delete, name='testimonio_delete'),
+
     # Cotizaciones
     path('cotizaciones/', views.cotizaciones_list, name='cotizaciones_list'),
     path('cotizaciones/<int:pk>/editar/', views.cotizacion_edit, name='cotizacion_edit'),
@@ -36,4 +42,6 @@ urlpatterns = [
     # Historial y reportes
     path('historial/', views.historial_list, name='historial_list'),
     path('historial/pdf/', views.historial_pdf, name='historial_pdf'),
+
+    
 ]

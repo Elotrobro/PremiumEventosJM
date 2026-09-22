@@ -294,3 +294,33 @@ class FotoGaleria(models.Model):
     class Meta:
         db_table = 'foto_galeria'
         ordering = ['-fecha_subida']
+
+class Testimonio(models.Model):
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="testimonios"
+    )
+
+    calificacion = models.PositiveSmallIntegerField(
+        choices=[
+            (1, "1 Estrella"),
+            (2, "2 Estrellas"),
+            (3, "3 Estrellas"),
+            (4, "4 Estrellas"),
+            (5, "5 Estrellas"),
+        ]
+    )
+    comentario = models.TextField()
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    aprobado = models.BooleanField(default=False)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "testimonio"
+        ordering = ["-fecha_creacion"]
+
+    def __str__(self):
+        return f"{self.usuario} - {self.calificacion} estrellas"

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.hashers import make_password
 
 from .models import (Usuario, Cliente, ContactoSimple, ItemDecoracion,
-                    CarritoSeleccion, DetalleCarrito, Cotizacion, DetalleCotizacion, FotoGaleria)
+                    CarritoSeleccion, DetalleCarrito, Cotizacion, DetalleCotizacion, FotoGaleria,Testimonio)
 
 # ═══════════════════════════════════════════════════════════════════════
 # Configuración del panel de administración de Django para todos los
@@ -121,3 +121,24 @@ class FotoGaleriaAdmin(admin.ModelAdmin):
     # como respaldo/consulta rápida.
     list_display = ('id_foto', 'categoria', 'imagen', 'fecha_subida')
     list_filter = ('categoria',)
+
+@admin.register(Testimonio)
+class TestimonioAdmin(admin.ModelAdmin):
+    list_display = (
+        "usuario",
+        "calificacion",
+        "aprobado",
+        "activo",
+        "fecha_creacion",
+    )
+
+    list_filter = (
+        "aprobado",
+        "activo",
+        "calificacion",
+    )
+
+    search_fields = (
+        "usuario__nombre_completo",
+        "comentario",
+    )
