@@ -29,13 +29,6 @@ def informacion(request):
     return render(request, 'informacion.html')
 
 
-def testimonios(request):
-    # Testimonios de clientes. Están escritos directamente en el HTML
-    # (no existe un modelo Testimonio); para agregar/editar uno hay que
-    # modificar core/templates/testimonios.html.
-    return render(request, 'testimonios.html')
-
-
 def galeria(request):
     # Índice de la galería: el acordeón con los tipos de evento (menú de
     # navegación entre galerías) y un mosaico que mezcla fotos de todas
