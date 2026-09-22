@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from core import views
 from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que sí tocan la base de datos (login/cotización)
+from Bd_PremiumEventos import recuperacion
 
 # ═══════════════════════════════════════════════════════════════════════
 # Tabla de rutas del proyecto (URLconf principal).
@@ -31,6 +32,12 @@ urlpatterns = [
     path('registro/', auth_views.registro_view, name='registro'),  # crea cuentas de cliente desde la modal
     path('logout/', auth_views.logout_view, name='logout'),
     path('testimonios/', auth_views.testimonios, name='testimonios'),  # lista testimonios aprobados y recibe nuevos (requiere sesión para opinar)
+
+    # ---- Recuperación de contraseña (Bd_PremiumEventos/recuperacion.py) ----
+    path('recuperar-password/', recuperacion.recuperar_password, name='recuperar_password'),
+    path('recuperar-password/enviado/', recuperacion.recuperar_password_enviado, name='password_reset_done'),
+    path('recuperar-password/<uidb64>/<token>/', recuperacion.restablecer_password, name='password_reset_confirm'),
+    path('recuperar-password/completado/', recuperacion.recuperar_password_completo, name='password_reset_complete'),
 
     # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----
     path('panel-admin/', include('panel_admin.urls')),
