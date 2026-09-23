@@ -1298,6 +1298,8 @@ nav.navbar {
     text-decoration: none;
     white-space: nowrap;
     transition: background-color 0.2s;
+
+    transform: translateX(-200px);
 }
 
 .nav-link2:hover,

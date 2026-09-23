@@ -27,7 +27,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav" style="transform: translateX(-30px);">
     <ul class="navbar-nav mx-lg-auto">
         <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="/informacion">Información</a></li>
@@ -101,17 +101,17 @@
 
     <div class="nav-acciones">
       {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
-        <a class="nav-link nav-admin" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Admin</a>
+        <a class="nav-link nav-admin" href="{% url 'panel_admin:dashboard' %}" style="transform: translateX(-170px);"><i class="fas fa-gauge"></i> Admin</a>
       {% endif %}
 
       {% if request.session.usuario_id %}
         <div class="user-chip dropdown">
-          <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"style="transform: translateX(-170px);">
             <i class="fas fa-circle-user"></i>
             <span class="user-chip-nombre">{{ request.session.usuario_nombre }}</span>
             <i class="fas fa-chevron-down user-chip-caret"></i>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end user-chip-menu">
+          <ul class="dropdown-menu dropdown-menu-end user-chip-menu" style="transform: translateX(-140px);">
             <li><a class="dropdown-item" href="/logout"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
           </ul>
         </div>
