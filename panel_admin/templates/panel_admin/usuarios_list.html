@@ -20,13 +20,12 @@
   <table class="pa-table">
     <thead>
       <tr>
-        <th>#</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Último acceso</th><th>Creado</th><th></th>
+        <th>Nombre</th><th>Correo</th><th>Rol</th><th>Último acceso</th><th>Creado</th><th></th>
       </tr>
     </thead>
     <tbody>
       {% for usuario in usuarios %}
       <tr>
-        <td>{{ usuario.id_usuario }}</td>
         <td>{{ usuario.nombre_completo }}</td>
         <td>{{ usuario.correo_electronico }}</td>
         <td>{{ usuario.get_rol_display }}</td>
