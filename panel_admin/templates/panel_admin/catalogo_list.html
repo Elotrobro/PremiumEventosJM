@@ -12,14 +12,22 @@
   {% if items %}
   <table class="pa-table">
     <thead>
-      <tr><th>#</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Disponible</th><th></th></tr>
+      <tr><th></th><th>#</th><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Precio</th><th>Disponible</th><th></th></tr>
     </thead>
     <tbody>
       {% for item in items %}
       <tr>
+        <td>
+          {% if item.imagen %}
+            <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" class="pa-thumb">
+          {% else %}
+            <span class="pa-thumb pa-thumb-vacio"><i class="fas fa-image"></i></span>
+          {% endif %}
+        </td>
         <td>{{ item.id_item }}</td>
         <td>{{ item.nombre }}</td>
-        <td>{{ item.descripcion|truncatechars:60 }}</td>
+        <td>{{ item.get_categoria_display }}</td>
+        <td>{{ item.unidad }}</td>
         <td>${{ item.precio|miles }}</td>
         <td>
           {% if item.estado %}<span class="pa-badge pa-badge-aprobada">Sí</span>{% else %}<span class="pa-badge pa-badge-rechazada">No</span>{% endif %}

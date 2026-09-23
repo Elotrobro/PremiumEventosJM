@@ -165,7 +165,7 @@ def catalogo_list(request):
 @staff_required
 def catalogo_create(request):
     if request.method == 'POST':
-        form = ItemDecoracionForm(request.POST)
+        form = ItemDecoracionForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Ítem de decoración creado correctamente.')
@@ -179,7 +179,7 @@ def catalogo_create(request):
 def catalogo_edit(request, pk):
     item = get_object_or_404(ItemDecoracion, pk=pk)
     if request.method == 'POST':
-        form = ItemDecoracionForm(request.POST, instance=item)
+        form = ItemDecoracionForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             form.save()
             messages.success(request, 'Ítem de decoración actualizado correctamente.')
@@ -193,6 +193,8 @@ def catalogo_edit(request, pk):
 def catalogo_delete(request, pk):
     item = get_object_or_404(ItemDecoracion, pk=pk)
     if request.method == 'POST':
+        if item.imagen:
+            item.imagen.delete(save=False)  # borra también el archivo en /media, no solo el registro
         item.delete()
         messages.success(request, 'Ítem de decoración eliminado correctamente.')
         return redirect('panel_admin:catalogo_list')

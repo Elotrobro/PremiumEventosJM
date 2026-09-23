@@ -61,11 +61,14 @@ class UsuarioAdminForm(forms.ModelForm):
 class ItemDecoracionForm(forms.ModelForm):
     class Meta:
         model = ItemDecoracion
-        fields = ['nombre', 'descripcion', 'precio', 'estado']
+        fields = ['nombre', 'descripcion', 'precio', 'categoria', 'unidad', 'imagen', 'estado']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+            'unidad': forms.TextInput(attrs={'class': 'form-control'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {'estado': 'Disponible para alquilar'}

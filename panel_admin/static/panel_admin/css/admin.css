@@ -365,6 +365,23 @@ body.panel-admin-body {
     right: 0.4rem;
 }
 
+.pa-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block;
+}
+
+.pa-thumb-vacio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pa-fondo-suave);
+    color: #b5aa9c;
+    font-size: 1.1rem;
+}
+
 @media (max-width: 768px) {
     .pa-layout { flex-direction: column; }
     .pa-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }
