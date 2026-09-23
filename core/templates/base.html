@@ -16,19 +16,19 @@
       data-open-login="{% if request.GET.login or request.GET.registro %}true{% else %}false{% endif %}"
       data-open-tab="{% if request.GET.registro %}registro{% else %}login{% endif %}">
 
-<nav class="navbar navbar-expand-lg bg-white py-3 ms-auto">
+<!-- Navbar: logo a la izquierda, enlaces centrados y acciones de cuenta a la
+     derecha. Tamaños y espaciados en core/static/css/base.css ("NAVBAR PRINCIPAL"). -->
+<nav class="navbar navbar-expand-lg bg-white">
   <div class="container">
-    <div class="logo">
-      <h1>
-        <img src="{% static 'images/Logo.png' %}" alt="" style="width: auto; height: 220px; display: block;">
-      </h1>
-    </div>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <a class="navbar-brand" href="/">
+      <img src="{% static 'images/Logo_nav.png' %}" alt="Premium Eventos JM">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav mb-2 mb-lg-0 align-items-center gap-lg-3">
+    <ul class="navbar-nav mx-lg-auto">
         <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="/informacion">Información</a></li>
         <li class="nav-item"><a class="nav-link" href="/testimonios">Testimonios</a></li>
@@ -97,34 +97,28 @@
           </div>
       </li>
         <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
-        
-        {% if not request.session.usuario_id %}
-        <!-- Blindaje aplicado aquí -->
-        <li class="nav-item">
-            <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
-        </li>    
-        {% endif %}
-        
-        {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Admin</a>
-        </li>    
-        {% endif %}
     </ul>
 
-    {% if request.session.usuario_id %}
-      <!-- Blindaje aplicado aquí -->
-      <div class="user-chip dropdown" style="position: relative; z-index: 9999;">
-        <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-circle-user"></i>
-          <span class="user-chip-nombre">{{ request.session.usuario_nombre }}</span>
-          <i class="fas fa-chevron-down user-chip-caret"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end user-chip-menu">
-          <li><a class="dropdown-item" href="/logout"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
-        </ul>
-      </div>
-    {% endif %}
+    <div class="nav-acciones">
+      {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
+        <a class="nav-link nav-admin" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-gauge"></i> Admin</a>
+      {% endif %}
+
+      {% if request.session.usuario_id %}
+        <div class="user-chip dropdown">
+          <button class="user-chip-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-circle-user"></i>
+            <span class="user-chip-nombre">{{ request.session.usuario_nombre }}</span>
+            <i class="fas fa-chevron-down user-chip-caret"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end user-chip-menu">
+            <li><a class="dropdown-item" href="/logout"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a class="nav-link2" href="#" id="navLoginBtn">Iniciar Sesión</a>
+      {% endif %}
+    </div>
     </div>
   </div>
 </nav>
