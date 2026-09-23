@@ -7,7 +7,11 @@
 </div>
 
 <div class="pa-card" style="max-width: 560px;">
-  <form method="post" novalidate>
+  {% if item and item.imagen %}
+    <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" style="max-width: 160px; border-radius: 8px; margin-bottom: 1rem; display: block;">
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {% for field in form %}
       <div class="pa-form-group">

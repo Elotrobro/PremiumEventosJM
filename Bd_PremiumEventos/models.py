@@ -100,21 +100,44 @@ class ContactoSimple(models.Model):
         db_table = 'contacto_simple'
 
 
+def _ruta_imagen_catalogo(instance, nombre_archivo):
+    """Cada foto de producto queda en media/catalogo/<archivo>."""
+    return f'catalogo/{nombre_archivo}'
+
+
 class ItemDecoracion(models.Model):
     """
     Catálogo de artículos de alquiler/decoración (ej. sillas, manteles,
-    cilindros decorativos) con su precio y si está disponible o no.
+    cilindros decorativos) con su precio, categoría, unidad de cobro y si
+    está disponible o no.
 
     ⚠️ Pendiente: el catálogo público (catalogo.html) todavía NO lee de
-    este modelo; los productos y precios que ve el visitante están
-    escritos directamente en el HTML. Este modelo solo se gestiona hoy
-    desde el panel de administración de Django.
+    este modelo; los 32 productos y precios que ve el visitante siguen
+    escritos directamente en ese HTML (con sus propias imágenes en
+    core/static/images/catalogo_productos/). Lo que sí lee de aquí es el
+    panel de administrador: `python manage.py migrar_catalogo` copia esos
+    mismos 32 productos e imágenes a esta tabla para poder gestionarlos
+    (crear, editar, eliminar) desde /panel-admin/catalogo/.
     """
+    CATEGORIA_MOBILIARIO = 'mobiliario'
+    CATEGORIA_TEXTILES = 'textiles'
+    CATEGORIA_DECORACION = 'decoracion'
+    CATEGORIA_CHOICES = [
+        (CATEGORIA_MOBILIARIO, 'Mobiliario'),
+        (CATEGORIA_TEXTILES, 'Textiles y Mantelería'),
+        (CATEGORIA_DECORACION, 'Decoración y Ambientación'),
+    ]
+
     id_item = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=12, decimal_places=2)
     estado = models.BooleanField(default=True)  # TINYINT(1) se traduce a Boolean; True = disponible para alquilar
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default=CATEGORIA_MOBILIARIO)
+    unidad = models.CharField(max_length=50, default='Unidad')  # ej. "Metro lineal", "Por letra", "Kit completo"
+    # null=True porque los ítems que ya existían antes de este campo no
+    # tienen foto todavía; no todo ítem del catálogo necesita una.
+    imagen = models.ImageField(upload_to=_ruta_imagen_catalogo, null=True, blank=True)
 
     def __str__(self):
         return self.nombre

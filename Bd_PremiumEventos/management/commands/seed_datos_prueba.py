@@ -1,36 +1,43 @@
-import io
 import json
-from datetime import date, datetime, time, timedelta
-from decimal import Decimal
+from datetime import date, datetime, timedelta
 
 from django.contrib.auth.hashers import make_password
-from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from Bd_PremiumEventos.models import (
     CarritoSeleccion, Cliente, ContactoSimple, Cotizacion, DetalleCarrito,
-    DetalleCotizacion, FotoGaleria, ItemDecoracion, Testimonio, Usuario,
+    DetalleCotizacion, ItemDecoracion, Testimonio, Usuario,
 )
 from Bd_PremiumEventos.views import calcular_precio_estimado
+
+# ═══════════════════════════════════════════════════════════════════════
+# A propósito este comando NO llena item_decoracion ni foto_galeria:
+# esas dos tablas tienen datos REALES para migrar (el catálogo de
+# alquiler y las fotos de la galería que ya existían en core/static/),
+# así que usan sus propios comandos en vez de datos inventados:
+#
+#   python manage.py migrar_catalogo         (32 productos del catálogo)
+#   python manage.py migrar_fotos_galeria    (fotos de la galería)
+#
+# Corre esos dos ANTES que este, porque _crear_detalle_carritos usa los
+# ItemDecoracion que deja migrar_catalogo.
+#
+# Tampoco se generan cuentas de prueba con rol admin/empleado: esas
+# cuentas dan acceso al panel de administrador, así que se crean aparte
+# con `python manage.py crear_admin`, no como datos de relleno.
+# ═══════════════════════════════════════════════════════════════════════
 
 # Contraseña compartida por las 15 cuentas de prueba (cumple el mínimo de
 # 8 caracteres de registro_view). Se hashea igual que cualquier cuenta
 # real; nunca se guarda en texto plano.
 CONTRASENA_PRUEBA = 'Prueba2026'
 
-# ─────────────────────────────────────────────────────────────────────────
 # 15 "clientes" de prueba. Son la base de Usuario/Cliente/Cotizacion/
 # DetalleCotizacion/CarritoSeleccion/Testimonio: cada uno de estos 15
 # genera exactamente una fila en cada una de esas tablas, tal como pasaría
 # si esa persona se registrara, agregara algo al carrito, cotizara un
 # evento y dejara una reseña.
-#
-# A propósito NO se generan cuentas de prueba con rol admin/empleado: esas
-# cuentas dan acceso al panel de administrador, así que se crean aparte
-# con `python manage.py crear_admin` (ver ese comando), no como datos de
-# relleno.
-# ─────────────────────────────────────────────────────────────────────────
 CLIENTES = [
     {'nombre': 'Camila Restrepo Gómez', 'correo': 'camila.restrepo@prueba.com'},
     {'nombre': 'Andrés Felipe Muñoz', 'correo': 'andres.munoz@prueba.com'},
@@ -78,24 +85,6 @@ SERVICIOS_POR_TIPO = {
     'otro': ['decoracion', 'mobiliario'],
 }
 
-ITEMS_DECORACION = [
-    {'nombre': 'Silla Tiffany dorada', 'descripcion': 'Silla Tiffany en acabado dorado, ideal para matrimonios y 15 años.', 'precio': Decimal('8500'), 'estado': True},
-    {'nombre': 'Silla Tiffany blanca', 'descripcion': 'Silla Tiffany en acabado blanco, combina con cualquier decoración.', 'precio': Decimal('8000'), 'estado': True},
-    {'nombre': 'Mantel redondo blanco', 'descripcion': 'Mantel redondo para mesa de 1.5m, tela blanca premium.', 'precio': Decimal('25000'), 'estado': True},
-    {'nombre': 'Mantel rectangular vino tinto', 'descripcion': 'Mantel rectangular color vino tinto para mesas alargadas.', 'precio': Decimal('30000'), 'estado': True},
-    {'nombre': 'Centro de mesa floral', 'descripcion': 'Arreglo floral artificial para centro de mesa, varios colores.', 'precio': Decimal('45000'), 'estado': True},
-    {'nombre': 'Candelabro de cristal', 'descripcion': 'Candelabro de cristal de 5 brazos para mesa principal.', 'precio': Decimal('60000'), 'estado': True},
-    {'nombre': 'Arco de globos metálicos', 'descripcion': 'Arco decorativo de globos en tonos metálicos, 3 metros.', 'precio': Decimal('180000'), 'estado': True},
-    {'nombre': 'Cortina de luces LED (10m)', 'descripcion': 'Cortina de luces LED cálidas, 10 metros, para fondo o entrada.', 'precio': Decimal('35000'), 'estado': True},
-    {'nombre': 'Pista de baile iluminada 4x4', 'descripcion': 'Pista de baile modular con iluminación LED, 4x4 metros.', 'precio': Decimal('450000'), 'estado': True},
-    {'nombre': 'Trono decorativo dorado', 'descripcion': 'Trono decorativo dorado para quinceañeras o cumpleaños.', 'precio': Decimal('150000'), 'estado': False},
-    {'nombre': 'Cilindro decorativo espejado', 'descripcion': 'Cilindro espejado de 1m de alto, ideal para centros de mesa altos.', 'precio': Decimal('40000'), 'estado': True},
-    {'nombre': 'Camino de mesa dorado', 'descripcion': 'Camino de mesa en tela dorada, 3 metros.', 'precio': Decimal('15000'), 'estado': True},
-    {'nombre': 'Photo booth con accesorios', 'descripcion': 'Cabina de fotos con fondo y accesorios temáticos.', 'precio': Decimal('220000'), 'estado': True},
-    {'nombre': 'Carpa/toldo 6x6', 'descripcion': 'Carpa blanca de 6x6 metros para eventos al aire libre.', 'precio': Decimal('380000'), 'estado': True},
-    {'nombre': 'Barra de bar móvil', 'descripcion': 'Barra de bar móvil de madera, incluye iluminación interna.', 'precio': Decimal('320000'), 'estado': False},
-]
-
 CONTACTOS = [
     {'nombre': 'Luisa', 'apellidos': 'Ramírez Ortiz', 'email': 'luisa.ramirez@correo.com', 'telefono': '3101112201', 'mensaje': '¿Manejan paquetes para matrimonios de más de 200 invitados?'},
     {'nombre': 'Jorge', 'apellidos': 'Tabares León', 'email': 'jorge.tabares@correo.com', 'telefono': '3101112202', 'mensaje': 'Quisiera saber si tienen disponibilidad para un evento el próximo mes.'},
@@ -112,25 +101,6 @@ CONTACTOS = [
     {'nombre': 'Camila', 'apellidos': 'Franco Gil', 'email': 'camila.franco@correo.com', 'telefono': '3101112213', 'mensaje': 'Quiero saber si incluyen menú vegetariano en el servicio de banquete.'},
     {'nombre': 'Julián', 'apellidos': 'Palacio Arboleda', 'email': 'julian.palacio@correo.com', 'telefono': '3101112214', 'mensaje': '¿Puedo ver el mobiliario en persona antes de contratar?'},
     {'nombre': 'Tatiana', 'apellidos': 'Márquez Osorio', 'email': 'tatiana.marquez@correo.com', 'telefono': '3101112215', 'mensaje': 'Necesito una cotización urgente para un evento empresarial en 2 semanas.'},
-]
-
-# 15 fotos repartidas entre las 11 categorías de la galería (algunas
-# categorías quedan con 2, para llegar a 15 en total). Son imágenes de
-# relleno generadas en el momento (un rectángulo de color), no fotos
-# reales: sirven para probar que la galería y el panel admin funcionan
-# con datos en la tabla, no para publicar en el sitio.
-FOTOS_GALERIA = [
-    ('matrimonio', (193, 123, 60)), ('matrimonio', (168, 99, 43)),
-    ('15-anos', (214, 139, 71)), ('15-anos', (233, 196, 158)),
-    ('grados', (44, 42, 41)),
-    ('primera-comunion', (245, 237, 228)),
-    ('bautizo', (122, 104, 86)),
-    ('fiesta-infantil', (255, 193, 7)),
-    ('cumpleanos', (220, 53, 69)),
-    ('baby-shower', (173, 216, 230)),
-    ('revelacion-de-genero', (255, 105, 180)),
-    ('fiesta-empresarial', (52, 58, 64)), ('fiesta-empresarial', (108, 117, 125)),
-    ('alquiler-de-mobiliario', (161, 136, 127)), ('alquiler-de-mobiliario', (121, 85, 72)),
 ]
 
 TESTIMONIOS = [
@@ -152,35 +122,37 @@ TESTIMONIOS = [
 ]
 
 
-def _imagen_de_prueba(color):
-    """Genera un PNG sólido pequeño en memoria (no depende de archivos
-    externos), solo para que FotoGaleria.imagen tenga un archivo real."""
-    from PIL import Image
-    buffer = io.BytesIO()
-    Image.new('RGB', (600, 400), color=color).save(buffer, format='PNG')
-    return buffer.getvalue()
-
-
 class Command(BaseCommand):
-    help = 'Llena cada tabla del proyecto con 15 filas de datos de prueba (ver Bd_PremiumEventos/management/commands/seed_datos_prueba.py para el detalle exacto).'
+    help = (
+        'Llena de datos de prueba las tablas que no tienen datos reales para migrar: usuario, '
+        'cliente, cotizacion, detalle_cotizacion, carrito_seleccion, detalle_carrito, '
+        'contacto_simple y testimonio (15 filas cada una). item_decoracion y foto_galeria NO se '
+        'tocan aquí: usa `migrar_catalogo` y `migrar_fotos_galeria` para esas.'
+    )
 
     def handle(self, *args, **options):
+        items = list(ItemDecoracion.objects.order_by('id_item'))
+        if not items:
+            raise CommandError(
+                'No hay ningún ItemDecoracion todavía: corre primero "python manage.py '
+                'migrar_catalogo" (detalle_carrito necesita productos reales para poder armar '
+                'sus filas).'
+            )
+
         with transaction.atomic():
             usuarios = self._crear_usuarios()
             clientes = self._crear_clientes(usuarios)
             cotizaciones = self._crear_cotizaciones(clientes)
             self._crear_detalle_cotizaciones(cotizaciones)
-            items = self._crear_items_decoracion()
             carritos = self._crear_carritos(usuarios)
             self._crear_detalle_carritos(carritos, items)
             self._crear_contactos()
-            self._crear_fotos_galeria()
             self._crear_testimonios(usuarios)
 
         self.stdout.write(self.style.SUCCESS(
-            'Listo: 15 filas de prueba en cada una de las 10 tablas (usuario, cliente, cotizacion, '
-            'detalle_cotizacion, item_decoracion, carrito_seleccion, detalle_carrito, contacto_simple, '
-            'foto_galeria y testimonio). Es seguro volver a correrlo: no duplica lo que ya existía.'
+            'Listo: 15 filas de prueba en usuario, cliente, cotizacion, detalle_cotizacion, '
+            'carrito_seleccion, detalle_carrito, contacto_simple y testimonio. Es seguro volver '
+            'a correrlo: no duplica lo que ya existía.'
         ))
 
     def _crear_usuarios(self):
@@ -267,21 +239,6 @@ class Command(BaseCommand):
             total += 1
         self.stdout.write(f'  detalle_cotizacion: {total} filas')
 
-    def _crear_items_decoracion(self):
-        items = []
-        for dato in ITEMS_DECORACION:
-            item, _creado = ItemDecoracion.objects.get_or_create(
-                nombre=dato['nombre'],
-                defaults={
-                    'descripcion': dato['descripcion'],
-                    'precio': dato['precio'],
-                    'estado': dato['estado'],
-                },
-            )
-            items.append(item)
-        self.stdout.write(f'  item_decoracion: {len(items)} filas')
-        return items
-
     def _crear_carritos(self, usuarios):
         carritos = []
         for i, usuario in enumerate(usuarios):
@@ -295,6 +252,8 @@ class Command(BaseCommand):
         return carritos
 
     def _crear_detalle_carritos(self, carritos, items):
+        # `items` son los productos reales del catálogo (ver migrar_catalogo),
+        # no datos inventados: cada carrito de prueba agrega uno real.
         total = 0
         for i, carrito in enumerate(carritos):
             if DetalleCarrito.objects.filter(carrito=carrito).exists():
@@ -314,7 +273,7 @@ class Command(BaseCommand):
     def _crear_contactos(self):
         total = 0
         for dato in CONTACTOS:
-            _obj, creado = ContactoSimple.objects.get_or_create(
+            _obj, _creado = ContactoSimple.objects.get_or_create(
                 email=dato['email'],
                 defaults={
                     'nombre': dato['nombre'],
@@ -325,18 +284,6 @@ class Command(BaseCommand):
             )
             total += 1
         self.stdout.write(f'  contacto_simple: {total} filas')
-
-    def _crear_fotos_galeria(self):
-        total = 0
-        for i, (categoria, color) in enumerate(FOTOS_GALERIA, start=1):
-            nombre_archivo = f'prueba_{i:02d}.png'
-            if FotoGaleria.objects.filter(categoria=categoria, imagen__endswith=nombre_archivo).exists():
-                total += 1
-                continue
-            foto = FotoGaleria(categoria=categoria)
-            foto.imagen.save(nombre_archivo, ContentFile(_imagen_de_prueba(color)), save=True)
-            total += 1
-        self.stdout.write(f'  foto_galeria: {total} filas')
 
     def _crear_testimonios(self, usuarios):
         total = 0
