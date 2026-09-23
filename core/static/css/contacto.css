@@ -177,3 +177,46 @@ textarea.form-control {
     color: #7a6856;
     margin-bottom: 0;
 }
+
+.mapa-contacto {
+    width: 90%;
+    max-width: 650px;
+    margin: 30px auto 25px auto;
+    padding: 18px;
+    background: #f8f9fa;
+    border: 1px solid #e2e2e2;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+    box-sizing: border-box;
+}
+
+.mapa-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+}
+
+.mapa-titulo i {
+    font-size: 18px;
+    color: #b8860b;
+}
+
+.mapa-contenedor {
+    width: 100%;
+    height: 230px;
+    overflow: hidden;
+    border-radius: 11px;
+    border: 1px solid #d6d6d6;
+}
+
+.mapa-contenedor iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+}
