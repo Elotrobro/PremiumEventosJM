@@ -11,6 +11,7 @@ import json
 
 from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
 from .forms import TestimonioForm
+from . import limpieza
 
 # ─────────────────────────────────────────────────────────────────────────
 # Lógica de negocio: cálculo del precio estimado según cantidad de
@@ -85,6 +86,10 @@ def login_view(request):
     # se manda a inicio con la modal abierta.
     if request.method != 'POST':
         return redirect(url_inicio_con_modal)
+
+    # Elimina (máximo una vez al día) las cuentas de cliente que llevan 60
+    # días sin cotizar; así una cuenta vencida ya no puede iniciar sesión.
+    limpieza.ejecutar_si_toca()
 
     # .strip() quita espacios accidentales; .lower() normaliza el correo
     # porque la búsqueda de abajo también es insensible a mayúsculas.
@@ -409,8 +414,7 @@ def guardar_contacto(request):
 def testimonios(request):
 
     testimonios_publicados = Testimonio.objects.filter(
-        aprobado=True,
-        activo=True
+        aprobado=True
     ).select_related("usuario")
 
     usuario_id = request.session.get("usuario_id")
@@ -427,7 +431,6 @@ def testimonios(request):
             testimonio = form.save(commit=False)
             testimonio.usuario_id = usuario_id
             testimonio.aprobado = False
-            testimonio.activo = True
 
             testimonio.save()
 

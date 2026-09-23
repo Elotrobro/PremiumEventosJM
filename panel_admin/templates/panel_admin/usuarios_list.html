@@ -15,6 +15,11 @@
   </p>
 {% endif %}
 
+<p class="pa-help mb-3">
+  <i class="fas fa-hourglass-half"></i>
+  Las cuentas de cliente que no hagan ninguna cotización en {{ dias_sin_cotizar }} días desde que se crearon se eliminan automáticamente.
+</p>
+
 <div class="pa-card" style="padding:0; overflow-x:auto;">
   {% if usuarios %}
   <table class="pa-table">
@@ -28,7 +33,12 @@
       <tr>
         <td>{{ usuario.nombre_completo }}</td>
         <td>{{ usuario.correo_electronico }}</td>
-        <td>{{ usuario.get_rol_display }}</td>
+        <td>
+          {{ usuario.get_rol_display }}
+          {% if usuario.rol == 'cliente' and not usuario.tiene_cotizacion %}
+            <br><span class="pa-badge pa-badge-pendiente" title="Se elimina si no cotiza antes">Sin cotizar: se elimina en {{ usuario.dias_para_eliminar }} día{{ usuario.dias_para_eliminar|pluralize }}</span>
+          {% endif %}
+        </td>
         <td>{{ usuario.ultimo_acceso|default:'—' }}</td>
         <td>{{ usuario.fecha_creacion|date:'Y-m-d' }}</td>
         <td>

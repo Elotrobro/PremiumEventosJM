@@ -128,13 +128,11 @@ class TestimonioAdmin(admin.ModelAdmin):
         "usuario",
         "calificacion",
         "aprobado",
-        "activo",
         "fecha_creacion",
     )
 
     list_filter = (
         "aprobado",
-        "activo",
         "calificacion",
     )
 

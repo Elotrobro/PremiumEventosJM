@@ -8,6 +8,8 @@
   <a href="{% url 'panel_admin:historial_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-clock-rotate-left"></i> Ver historial</a>
 </div>
 
+{% include 'panel_admin/_filtros_cotizaciones.html' %}
+
 <div class="pa-card" style="padding:0; overflow-x:auto;">
   {% if cotizaciones %}
   <table class="pa-table">
@@ -41,7 +43,7 @@
     </tbody>
   </table>
   {% else %}
-  <p class="pa-empty">No hay cotizaciones registradas todavía.</p>
+  <p class="pa-empty">No hay cotizaciones para el filtro seleccionado.</p>
   {% endif %}
 </div>
 

@@ -5,28 +5,12 @@
 
 <div class="pa-page-header">
   <h1><i class="fas fa-clock-rotate-left"></i> Historial de cotizaciones</h1>
-  <a href="{% url 'panel_admin:historial_pdf' %}?filtro={{ filtro }}&fecha={{ fecha }}" class="pa-btn">
+  <a href="{% url 'panel_admin:historial_pdf' %}?{{ querystring }}" class="pa-btn">
     <i class="fas fa-file-pdf"></i> Descargar PDF
   </a>
 </div>
 
-<form method="get" class="pa-filtros pa-card">
-  <div>
-    <label for="filtroSelect">Filtrar por</label>
-    <select name="filtro" id="filtroSelect" class="form-control" onchange="document.getElementById('fechaWrap').hidden = (this.value !== 'fecha')">
-      <option value="siempre" {% if filtro == 'siempre' %}selected{% endif %}>Siempre</option>
-      <option value="anio" {% if filtro == 'anio' %}selected{% endif %}>Este año</option>
-      <option value="fecha" {% if filtro == 'fecha' %}selected{% endif %}>Fecha específica</option>
-    </select>
-  </div>
-  <div id="fechaWrap" {% if filtro != 'fecha' %}hidden{% endif %}>
-    <label for="fechaInput">Fecha</label>
-    <input type="date" name="fecha" id="fechaInput" class="form-control" value="{{ fecha }}">
-  </div>
-  <div>
-    <button type="submit" class="pa-btn"><i class="fas fa-filter"></i> Aplicar</button>
-  </div>
-</form>
+{% include 'panel_admin/_filtros_cotizaciones.html' %}
 
 <div class="pa-totales">
   <span>Cotizaciones: <strong>{{ totales.cantidad|default:0|miles }}</strong></span>
@@ -67,17 +51,17 @@
 {% if pagina.paginator.num_pages > 1 %}
 <div class="pa-pagination">
   {% if pagina.has_previous %}
-    <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ pagina.previous_page_number }}">« Anterior</a>
+    <a href="?{{ querystring }}&page={{ pagina.previous_page_number }}">« Anterior</a>
   {% endif %}
   {% for numero in pagina.paginator.page_range %}
     {% if numero == pagina.number %}
       <span class="pa-page-current">{{ numero }}</span>
     {% else %}
-      <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ numero }}">{{ numero }}</a>
+      <a href="?{{ querystring }}&page={{ numero }}">{{ numero }}</a>
     {% endif %}
   {% endfor %}
   {% if pagina.has_next %}
-    <a href="?filtro={{ filtro }}&fecha={{ fecha }}&page={{ pagina.next_page_number }}">Siguiente »</a>
+    <a href="?{{ querystring }}&page={{ pagina.next_page_number }}">Siguiente »</a>
   {% endif %}
 </div>
 {% endif %}

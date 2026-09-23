@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
 
-from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria,Testimonio
+from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -74,14 +74,39 @@ class ItemDecoracionForm(forms.ModelForm):
         labels = {'estado': 'Disponible para alquilar'}
 
 
-class FotoGaleriaForm(forms.ModelForm):
-    class Meta:
-        model = FotoGaleria
-        fields = ['categoria', 'imagen']
-        widgets = {
-            'categoria': forms.Select(attrs={'class': 'form-control'}),
-            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
-        }
+class _VariosArchivosInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class _VariasImagenesField(forms.ImageField):
+    """Como ImageField, pero acepta varios archivos a la vez: valida cada uno
+    (que sea una imagen real) y devuelve la lista."""
+    widget = _VariosArchivosInput
+
+    def clean(self, data, initial=None):
+        if isinstance(data, (list, tuple)) and data:
+            return [super(_VariasImagenesField, self).clean(archivo, initial) for archivo in data]
+        if isinstance(data, (list, tuple)):
+            data = None  # ningún archivo: que dispare el error de "campo obligatorio"
+        return [super().clean(data, initial)]
+
+
+class SubirFotosGaleriaForm(forms.Form):
+    """Sube varias fotos de una vez a la misma categoría de la galería."""
+    categoria = forms.ChoiceField(
+        label='Categoría',
+        choices=FotoGaleria._meta.get_field('categoria').choices,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    imagenes = _VariasImagenesField(
+        label='Imágenes',
+        help_text='Puedes seleccionar varias a la vez (Ctrl o Shift + clic).',
+        error_messages={
+            'required': 'Selecciona al menos una imagen.',
+            'invalid_image': 'Uno de los archivos no es una imagen válida.',
+        },
+        widget=_VariosArchivosInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+    )
 
 
 class CotizacionEstadoForm(forms.ModelForm):
@@ -97,54 +122,4 @@ class CotizacionEstadoForm(forms.ModelForm):
             'estado': forms.Select(attrs={'class': 'form-control'}),
             'notas_admin': forms.Textarea(attrs={'class': 'form-control', 'rows': 4,
                                                 'placeholder': 'Notas internas (no visibles para el cliente)'}),
-        }
-
-from django import forms
-from Bd_PremiumEventos.models import Testimonio
-
-
-class TestimonioAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = Testimonio
-
-        fields = [
-            "usuario",
-            "calificacion",
-            "comentario",
-            "aprobado",
-            "activo",
-        ]
-
-        widgets = {
-            "usuario": forms.Select(
-                attrs={
-                    "class": "form-select"
-                }
-            ),
-
-            "calificacion": forms.Select(
-                attrs={
-                    "class": "form-select"
-                }
-            ),
-
-            "comentario": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 5,
-                }
-            ),
-
-            "aprobado": forms.CheckboxInput(
-                attrs={
-                    "class": "form-check-input"
-                }
-            ),
-
-            "activo": forms.CheckboxInput(
-                attrs={
-                    "class": "form-check-input"
-                }
-            ),
         }

@@ -338,8 +338,7 @@ class Testimonio(models.Model):
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    aprobado = models.BooleanField(default=False)
-    activo = models.BooleanField(default=True)
+    aprobado = models.BooleanField(default=False)  # solo los aprobados se muestran en /testimonios/
 
     class Meta:
         db_table = "testimonio"
