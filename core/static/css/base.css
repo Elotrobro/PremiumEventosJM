@@ -194,25 +194,38 @@
         background: #d4c5b5;
     }
 
-.carousel-placeholder {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-size: cover;
-        background-position: center;
-    }
+/* Foto completa al centro (.carrusel-foto) sobre una copia difuminada de
+   la misma foto que llena los lados (.carrusel-fondo): sirve igual para
+   fotos verticales y horizontales sin recortarlas. */
+.carrusel-slide {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background: #d4c5b5;
+}
 
-.carousel-placeholder i {
-        font-size: 4rem;
-        color: #9b8e80;
-    }
+.carrusel-fondo {
+    position: absolute;
+    inset: -30px;
+    width: calc(100% + 60px);
+    height: calc(100% + 60px);
+    object-fit: cover;
+    filter: blur(22px) brightness(0.8);
+}
 
-.carousel-placeholder span {
-        font-size: 1.2rem;
-        color: #6c5b4b;
-        margin-left: 1rem;
+.carrusel-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+@media (max-width: 767.98px) {
+    .carousel-item {
+        height: 380px;
     }
+}
 
 .momentos {
         background: #f5ede4;
@@ -327,10 +340,6 @@
         font-size: 0.8rem;
         color: #9b8e80;
     }
-
-.imagencarru1{
-    width: 50vw;
-}
 
 h4{
     color: #000000 !important;
