@@ -1625,3 +1625,20 @@ nav.navbar{
     }
 
 }
+
+/* ============================================================
+   VALIDACIÓN VISUAL DE CORREOS
+   ============================================================ */
+
+/* Correo válido */
+input[type="email"].correo-valido {
+    border: 2px solid #198754 !important;
+    box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.15) !important;
+}
+
+/* Correo inválido */
+input[type="email"].correo-invalido {
+    border: 2px solid #dc3545 !important;
+    box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.15) !important;
+}
+
