@@ -8,13 +8,9 @@
     <div>
         <h1>Testimonios</h1>
         <p class="text-muted mb-0">
-            Administra las opiniones de los clientes.
+            Marca la casilla "Aprobado" para publicar una opinión en la página de testimonios; desmárcala para ocultarla.
         </p>
     </div>
-
-    <a href="{% url 'panel_admin:testimonio_create' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Nuevo testimonio
-    </a>
 </div>
 
 
@@ -30,7 +26,6 @@
                 <th>Comentario</th>
                 <th>Fecha</th>
                 <th>Aprobado</th>
-                <th>Activo</th>
                 <th class="text-end">Acciones</th>
             </tr>
         </thead>
@@ -70,47 +65,20 @@
 
 
                 <td>
-
-                    {% if testimonio.aprobado %}
-
-                        <span class="badge bg-success">
-                            Aprobado
-                        </span>
-
-                    {% else %}
-
-                        <span class="badge bg-warning text-dark">
-                            Pendiente
-                        </span>
-
-                    {% endif %}
-
-                </td>
-
-
-                <td>
-
-                    {% if testimonio.activo %}
-
-                        <span class="badge bg-success">
-                            Sí
-                        </span>
-
-                    {% else %}
-
-                        <span class="badge bg-secondary">No</span>
-
-                    {% endif %}
-
+                    {# Al marcar/desmarcar se envía el formulario solo, sin botón extra #}
+                    <form method="post" action="{% url 'panel_admin:testimonio_aprobar' testimonio.pk %}" class="form-check form-switch m-0">
+                        {% csrf_token %}
+                        <input class="form-check-input" type="checkbox" role="switch" name="aprobado"
+                               id="aprobado-{{ testimonio.pk }}" onchange="this.form.submit()"
+                               {% if testimonio.aprobado %}checked{% endif %}>
+                        <label class="form-check-label" for="aprobado-{{ testimonio.pk }}">
+                            {% if testimonio.aprobado %}Publicado{% else %}Pendiente{% endif %}
+                        </label>
+                    </form>
                 </td>
 
 
                 <td class="text-end">
-
-                    <a href="{% url 'panel_admin:testimonio_edit' testimonio.pk %}" class="btn btn-sm btn-outline-primary" title="Editar">
-                        <i class="fas fa-pen"></i>
-                    </a>
-
 
                     {% if request.session.usuario_rol == 'admin' %}
 

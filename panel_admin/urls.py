@@ -30,8 +30,7 @@ urlpatterns = [
 
     # Testimonios
     path('testimonios/', views.testimonios_list, name='testimonios_list'),
-    path('testimonios/nuevo/', views.testimonio_create, name='testimonio_create'),
-    path('testimonios/<int:pk>/editar/', views.testimonio_edit, name='testimonio_edit'),
+    path('testimonios/<int:pk>/aprobar/', views.testimonio_aprobar, name='testimonio_aprobar'),
     path('testimonios/<int:pk>/eliminar/', views.testimonio_delete, name='testimonio_delete'),
 
     # Cotizaciones

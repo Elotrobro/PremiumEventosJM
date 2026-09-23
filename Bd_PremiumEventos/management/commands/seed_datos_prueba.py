@@ -296,7 +296,6 @@ class Command(BaseCommand):
                 calificacion=dato['calificacion'],
                 comentario=dato['comentario'],
                 aprobado=(i % 3 != 0),  # 10 aprobados, 5 pendientes de aprobar
-                activo=True,
             )
             total += 1
         self.stdout.write(f'  testimonio: {total} filas')

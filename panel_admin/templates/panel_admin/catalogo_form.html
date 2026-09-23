@@ -6,27 +6,46 @@
   <h1><i class="fas fa-gift"></i> {% if modo == 'crear' %}Nuevo ítem de decoración{% else %}Editar ítem de decoración{% endif %}</h1>
 </div>
 
-<div class="pa-card" style="max-width: 560px;">
-  {% if item and item.imagen %}
-    <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" style="max-width: 160px; border-radius: 8px; margin-bottom: 1rem; display: block;">
-  {% endif %}
-
+{# Dos columnas para que el formulario quepa sin hacer scroll: datos básicos #}
+{# a la izquierda y clasificación/imagen a la derecha. En pantallas angostas #}
+{# vuelve a una sola columna (ver .pa-form-2col en admin.css).              #}
+<div class="pa-card" style="max-width: 980px;">
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
-    {% for field in form %}
-      <div class="pa-form-group">
-        {% if field.name == 'estado' %}
-          <div class="form-check">
-            {{ field }}
-            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          </div>
-        {% else %}
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-        {% endif %}
-        {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+
+    <div class="pa-form-2col">
+      <div>
+        {% for field in form %}
+          {% if field.name == 'nombre' or field.name == 'descripcion' or field.name == 'precio' %}
+            <div class="pa-form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
       </div>
-    {% endfor %}
+
+      <div>
+        {% for field in form %}
+          {% if field.name == 'categoria' or field.name == 'unidad' or field.name == 'imagen' %}
+            <div class="pa-form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.name == 'imagen' and item and item.imagen %}
+                <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" class="pa-form-preview">
+              {% endif %}
+              {{ field }}
+              {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+            </div>
+          {% elif field.name == 'estado' %}
+            <div class="pa-form-group form-check">
+              {{ field }}
+              <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
 
     <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
     <a href="{% url 'panel_admin:catalogo_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>

@@ -1,0 +1,38 @@
+{# Barra de filtros compartida por Cotizaciones e Historial. Las opciones #}
+{# vienen de FILTROS_FECHA y Cotizacion.ESTADO_CHOICES (panel_admin/views.py). #}
+<form method="get" class="pa-filtros pa-card">
+  <div>
+    <label for="estadoSelect">Estado</label>
+    <select name="estado" id="estadoSelect" class="form-control">
+      <option value="">Todos</option>
+      {% for valor, texto in estados %}
+        <option value="{{ valor }}" {% if estado == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="filtroSelect">Fecha de la cotización</label>
+    <select name="filtro" id="filtroSelect" class="form-control"
+            onchange="document.getElementById('rangoWrap').hidden = (this.value !== 'rango')">
+      {% for valor, texto in filtros_fecha %}
+        <option value="{{ valor }}" {% if filtro == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div id="rangoWrap" class="pa-filtros-rango" {% if filtro != 'rango' %}hidden{% endif %}>
+    <div>
+      <label for="desdeInput">Fecha inicial</label>
+      <input type="date" name="desde" id="desdeInput" class="form-control" value="{{ desde }}">
+    </div>
+    <div>
+      <label for="hastaInput">Fecha final</label>
+      <input type="date" name="hasta" id="hastaInput" class="form-control" value="{{ hasta }}">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="pa-btn"><i class="fas fa-filter"></i> Aplicar</button>
+    {% if querystring %}
+      <a href="{{ request.path }}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Limpiar</a>
+    {% endif %}
+  </div>
+</form>

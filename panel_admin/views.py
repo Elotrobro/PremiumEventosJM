@@ -11,9 +11,10 @@ from django.utils import timezone
 from Bd_PremiumEventos.models import (
     Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,Testimonio
 )
+from Bd_PremiumEventos import limpieza
 from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
-from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, FotoGaleriaForm,TestimonioAdminForm
+from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, SubirFotosGaleriaForm
 from .utils import formatear_miles
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -55,6 +56,7 @@ def _dias_novedades(request):
 
 @staff_required
 def dashboard(request):
+    limpieza.ejecutar_si_toca()  # clientes sin cotizar en 60 días (ver Bd_PremiumEventos/limpieza.py)
     dias = _dias_novedades(request)
     ahora = timezone.now()
     hoy = timezone.localdate()
@@ -87,10 +89,18 @@ def usuarios_list(request):
     # tiene_cotizacion se anota para que la plantilla sepa, sin consultas
     # extra por fila, a qué clientes puede eliminar un 'empleado' (solo
     # los que todavía no han hecho ninguna cotización).
-    usuarios = Usuario.objects.annotate(
+    usuarios = list(Usuario.objects.annotate(
         tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
-    ).order_by('nombre_completo')
-    return render(request, 'panel_admin/usuarios_list.html', {'usuarios': usuarios})
+    ).order_by('nombre_completo'))
+    # Días que le quedan a cada cliente sin cotizaciones antes de que el
+    # sistema lo elimine solo (ver Bd_PremiumEventos/limpieza.py).
+    for usuario in usuarios:
+        if usuario.rol == Usuario.ROL_CLIENTE and not usuario.tiene_cotizacion:
+            usuario.dias_para_eliminar = limpieza.dias_para_eliminar(usuario)
+    return render(request, 'panel_admin/usuarios_list.html', {
+        'usuarios': usuarios,
+        'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
+    })
 
 
 @staff_required
@@ -216,7 +226,7 @@ def galeria_list(request):
         {**categoria, 'fotos': FotoGaleria.objects.filter(categoria=categoria['slug'])}
         for categoria in CATEGORIAS
     ]
-    form = FotoGaleriaForm()
+    form = SubirFotosGaleriaForm()
     return render(request, 'panel_admin/galeria_list.html', {
         'fotos_por_categoria': fotos_por_categoria,
         'form': form,
@@ -226,12 +236,16 @@ def galeria_list(request):
 @staff_required
 def galeria_upload(request):
     if request.method == 'POST':
-        form = FotoGaleriaForm(request.POST, request.FILES)
+        form = SubirFotosGaleriaForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Foto subida correctamente.')
+            categoria = form.cleaned_data['categoria']
+            for imagen in form.cleaned_data['imagenes']:
+                FotoGaleria.objects.create(categoria=categoria, imagen=imagen)
+            total = len(form.cleaned_data['imagenes'])
+            messages.success(request, f'{total} foto{"s" if total != 1 else ""} subida{"s" if total != 1 else ""} correctamente.')
         else:
-            messages.error(request, 'No se pudo subir la foto. Revisa la categoría y el archivo seleccionado.')
+            errores = ' '.join(e for lista in form.errors.values() for e in lista)
+            messages.error(request, f'No se subió ninguna foto. {errores}')
     return redirect('panel_admin:galeria_list')
 
 
@@ -286,70 +300,20 @@ def testimonios_list(request):
 
 
 @staff_required
-def testimonio_create(request):
+def testimonio_aprobar(request, pk):
+    """
+    Lo usa la casilla "Aprobado" de cada fila del listado: al marcarla o
+    desmarcarla se envía este POST y se guarda al instante. Los testimonios
+    no se crean ni se editan desde el panel (son la opinión del cliente);
+    solo se decide si se publican en /testimonios/ o no.
+    """
+    testimonio = get_object_or_404(Testimonio, pk=pk)
     if request.method == 'POST':
-        form = TestimonioAdminForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-
-            messages.success(
-                request,
-                'Testimonio creado correctamente.'
-            )
-
-            return redirect('panel_admin:testimonios_list')
-
-    else:
-        form = TestimonioAdminForm()
-
-    return render(
-        request,
-        'panel_admin/testimonio_form.html',
-        {
-            'form': form,
-            'modo': 'crear',
-        }
-    )
-
-
-@staff_required
-def testimonio_edit(request, pk):
-    testimonio = get_object_or_404(
-        Testimonio,
-        pk=pk
-    )
-
-    if request.method == 'POST':
-        form = TestimonioAdminForm(
-            request.POST,
-            instance=testimonio
-        )
-
-        if form.is_valid():
-            form.save()
-
-            messages.success(
-                request,
-                'Testimonio actualizado correctamente.'
-            )
-
-            return redirect('panel_admin:testimonios_list')
-
-    else:
-        form = TestimonioAdminForm(
-            instance=testimonio
-        )
-
-    return render(
-        request,
-        'panel_admin/testimonio_form.html',
-        {
-            'form': form,
-            'modo': 'editar',
-            'testimonio': testimonio,
-        }
-    )
+        testimonio.aprobado = request.POST.get('aprobado') == 'on'
+        testimonio.save(update_fields=['aprobado'])
+        estado = 'aprobado y publicado' if testimonio.aprobado else 'marcado como no aprobado (ya no se publica)'
+        messages.success(request, f'Testimonio de {testimonio.usuario.nombre_completo} {estado}.')
+    return redirect('panel_admin:testimonios_list')
 
 
 @admin_required
@@ -384,8 +348,14 @@ def testimonio_delete(request, pk):
 
 @staff_required
 def cotizaciones_list(request):
-    cotizaciones = Cotizacion.objects.select_related('cliente').order_by('-id_cotizacion')
-    return render(request, 'panel_admin/cotizaciones_list.html', {'cotizaciones': cotizaciones})
+    cotizaciones = Cotizacion.objects.select_related('cliente')
+    cotizaciones, contexto_filtro = _filtrar_cotizaciones(
+        request, cotizaciones, 'detallecotizacion__fecha_cotizacion', 'estado',
+    )
+    return render(request, 'panel_admin/cotizaciones_list.html', {
+        'cotizaciones': cotizaciones.distinct().order_by('-id_cotizacion'),
+        **contexto_filtro,
+    })
 
 
 @staff_required
@@ -464,34 +434,89 @@ def cotizacion_delete(request, pk):
 # para un "historial de cotizaciones hechas" lo que importa es cuándo se
 # generó la solicitud, no cuándo será la fiesta.
 
-def _filtrar_historial(request):
+# Opciones del filtro de fechas (valor en la URL, texto que ve el usuario).
+# "Último año" y "último mes" cuentan hacia atrás desde hoy (365 y 30 días).
+FILTROS_FECHA = [
+    ('siempre', 'Siempre'),
+    ('anio', 'Último año'),
+    ('mes', 'Último mes'),
+    ('rango', 'Rango de fechas'),
+]
+DIAS_POR_FILTRO = {'anio': 365, 'mes': 30}
+
+
+def _leer_fecha(texto):
+    try:
+        return datetime.strptime(texto, '%Y-%m-%d').date()
+    except (TypeError, ValueError):
+        return None
+
+
+def _filtrar_cotizaciones(request, queryset, campo_fecha, campo_estado):
     """
-    Aplica el filtro de fecha elegido y devuelve (queryset, contexto_filtro).
-    Filtros soportados: 'siempre' (todo), 'anio' (año en curso) y
-    'fecha' (una fecha exacta, elegida con un <input type="date">).
+    Filtra por estado y por fecha de la cotización (cuándo la hizo el
+    cliente). Lo usan el historial, su PDF y el listado de cotizaciones;
+    como cada uno parte de un modelo distinto, se le indica en qué campo
+    está la fecha y en cuál el estado. Devuelve (queryset, contexto).
     """
     filtro = request.GET.get('filtro', 'siempre')
-    fecha_str = request.GET.get('fecha', '')
+    estado = request.GET.get('estado', '')
+    desde_txt = request.GET.get('desde', '')
+    hasta_txt = request.GET.get('hasta', '')
 
-    detalles = DetalleCotizacion.objects.select_related('cotizacion', 'cotizacion__cliente')
-
-    if filtro == 'anio':
-        anio_actual = timezone.localdate().year
-        detalles = detalles.filter(fecha_cotizacion__year=anio_actual)
-    elif filtro == 'fecha' and fecha_str:
-        try:
-            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-            detalles = detalles.filter(fecha_cotizacion__date=fecha)
-        except ValueError:
-            messages.error(request, 'La fecha ingresada no es válida.')
-            filtro = 'siempre'
+    if filtro in DIAS_POR_FILTRO:
+        limite = timezone.now() - timedelta(days=DIAS_POR_FILTRO[filtro])
+        queryset = queryset.filter(**{f'{campo_fecha}__gte': limite})
+    elif filtro == 'rango':
+        desde, hasta = _leer_fecha(desde_txt), _leer_fecha(hasta_txt)
+        if (desde_txt and not desde) or (hasta_txt and not hasta):
+            messages.error(request, 'Alguna de las fechas del rango no es válida.')
+        if desde and hasta and desde > hasta:
+            desde, hasta = hasta, desde
+            desde_txt, hasta_txt = hasta_txt, desde_txt
+        if desde:
+            queryset = queryset.filter(**{f'{campo_fecha}__date__gte': desde})
+        if hasta:
+            queryset = queryset.filter(**{f'{campo_fecha}__date__lte': hasta})
     else:
         filtro = 'siempre'
 
-    detalles = detalles.order_by('-fecha_cotizacion')
+    estados_validos = dict(Cotizacion.ESTADO_CHOICES)
+    if estado in estados_validos:
+        queryset = queryset.filter(**{campo_estado: estado})
+    else:
+        estado = ''
 
-    contexto_filtro = {'filtro': filtro, 'fecha': fecha_str}
-    return detalles, contexto_filtro
+    # Mismos filtros en forma de querystring, para la paginación y el PDF.
+    parametros = request.GET.copy()
+    parametros.pop('page', None)
+
+    contexto = {
+        'filtro': filtro,
+        'estado': estado,
+        'desde': desde_txt,
+        'hasta': hasta_txt,
+        'filtros_fecha': FILTROS_FECHA,
+        'estados': Cotizacion.ESTADO_CHOICES,
+        'querystring': parametros.urlencode(),
+    }
+    return queryset, contexto
+
+
+def _descripcion_filtro(contexto):
+    """Texto legible del filtro aplicado, para el encabezado del PDF."""
+    partes = [dict(FILTROS_FECHA).get(contexto['filtro'], 'Siempre')]
+    if contexto['filtro'] == 'rango':
+        partes[0] += f" ({contexto['desde'] or '…'} a {contexto['hasta'] or '…'})"
+    if contexto['estado']:
+        partes.append(f"estado {dict(Cotizacion.ESTADO_CHOICES)[contexto['estado']]}")
+    return ', '.join(partes)
+
+
+def _filtrar_historial(request):
+    detalles = DetalleCotizacion.objects.select_related('cotizacion', 'cotizacion__cliente')
+    detalles, contexto = _filtrar_cotizaciones(request, detalles, 'fecha_cotizacion', 'cotizacion__estado')
+    return detalles.order_by('-fecha_cotizacion'), contexto
 
 
 @staff_required
@@ -531,10 +556,7 @@ def historial_pdf(request):
         suma_presupuesto=Sum('presupuesto'),
     )
 
-    etiquetas_filtro = {'siempre': 'Siempre', 'anio': 'Este año', 'fecha': 'Fecha específica'}
-    descripcion_filtro = etiquetas_filtro.get(contexto_filtro['filtro'], 'Siempre')
-    if contexto_filtro['filtro'] == 'fecha' and contexto_filtro['fecha']:
-        descripcion_filtro += f" ({contexto_filtro['fecha']})"
+    descripcion_filtro = _descripcion_filtro(contexto_filtro)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_cotizaciones.pdf"'

@@ -216,7 +216,34 @@ body.panel-admin-body {
     margin-bottom: 0.25rem;
 }
 
+.pa-filtros-rango {
+    display: flex;
+    gap: 1rem;
+}
+
+.pa-filtros-rango[hidden] { display: none; }
+
 .pa-form-group { margin-bottom: 1rem; }
+
+/* Formulario en dos columnas (ej. catálogo); una sola en pantallas angostas. */
+.pa-form-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .pa-form-2col { grid-template-columns: 1fr; }
+}
+
+.pa-form-preview {
+    display: block;
+    max-width: 120px;
+    max-height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
 
 .pa-form-group label {
     display: block;

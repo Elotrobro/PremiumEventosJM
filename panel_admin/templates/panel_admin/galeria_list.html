@@ -7,17 +7,18 @@
 </div>
 
 <div class="pa-card" style="max-width: 560px;">
-  <h2 class="pa-card-titulo">Subir foto nueva</h2>
+  <h2 class="pa-card-titulo">Subir fotos nuevas</h2>
   <form method="post" action="{% url 'panel_admin:galeria_upload' %}" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {% for field in form %}
       <div class="pa-form-group">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}
+        {% if field.help_text %}<div class="pa-help">{{ field.help_text }}</div>{% endif %}
         {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
       </div>
     {% endfor %}
-    <button type="submit" class="pa-btn"><i class="fas fa-upload"></i> Subir foto</button>
+    <button type="submit" class="pa-btn"><i class="fas fa-upload"></i> Subir fotos</button>
   </form>
 </div>
 
