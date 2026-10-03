@@ -7,8 +7,17 @@ este sitio no usa django.contrib.auth.User):
   2. recuperar_password_enviado → "revisa tu correo".
   3. restablecer_password       → el enlace del correo lleva aquí; escribe la contraseña nueva.
   4. recuperar_password_completo → "tu contraseña fue cambiada".
+
+El correo del paso 1 lo envía n8n si en el .env está N8N_WEBHOOK_RECUPERAR_URL
+(ver _enviar_por_n8n). Si no está, o si n8n no responde, lo envía Django
+directamente con la configuración EMAIL_* de settings.py.
 """
 
+import json
+import logging
+import urllib.request
+
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
@@ -19,6 +28,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .models import Usuario
+
+logger = logging.getLogger(__name__)
 
 
 class TokenRecuperacion(PasswordResetTokenGenerator):
@@ -36,6 +47,30 @@ class TokenRecuperacion(PasswordResetTokenGenerator):
 token_recuperacion = TokenRecuperacion()
 
 
+def _enviar_por_n8n(usuario, enlace):
+    """Le pasa a n8n los datos del correo; n8n arma el mensaje y lo envía."""
+    datos = json.dumps({
+        'correo': usuario.correo_electronico,
+        'nombre': usuario.nombre_completo,
+        'enlace': enlace,
+    }).encode('utf-8')
+    peticion = urllib.request.Request(
+        settings.N8N_WEBHOOK_RECUPERAR_URL,
+        data=datos,
+        method='POST',
+        headers={'Content-Type': 'application/json', 'X-Webhook-Secret': settings.N8N_WEBHOOK_SECRET},
+    )
+    with urllib.request.urlopen(peticion, timeout=10):
+        pass
+
+
+def _enviar_por_django(usuario, enlace):
+    contexto = {'usuario': usuario, 'enlace': enlace}
+    asunto = render_to_string('recuperacion/password_reset_subject.txt', contexto).strip()
+    cuerpo = render_to_string('recuperacion/password_reset_email.txt', contexto)
+    send_mail(asunto, cuerpo, None, [usuario.correo_electronico])
+
+
 def recuperar_password(request):
     if request.method == 'POST':
         correo = request.POST.get('correo_electronico', '').strip().lower()
@@ -45,11 +80,15 @@ def recuperar_password(request):
             uid = urlsafe_base64_encode(force_bytes(usuario.pk))
             token = token_recuperacion.make_token(usuario)
             enlace = request.build_absolute_uri(reverse('password_reset_confirm', args=[uid, token]))
-            contexto = {'usuario': usuario, 'enlace': enlace}
 
-            asunto = render_to_string('recuperacion/password_reset_subject.txt', contexto).strip()
-            cuerpo = render_to_string('recuperacion/password_reset_email.txt', contexto)
-            send_mail(asunto, cuerpo, None, [usuario.correo_electronico])
+            if settings.N8N_WEBHOOK_RECUPERAR_URL:
+                try:
+                    _enviar_por_n8n(usuario, enlace)
+                except Exception:
+                    logger.exception('n8n no respondió; el correo de recuperación se envía desde Django.')
+                    _enviar_por_django(usuario, enlace)
+            else:
+                _enviar_por_django(usuario, enlace)
 
         # Se redirige igual exista o no el correo, para no revelar qué
         # correos están registrados en el sitio.
