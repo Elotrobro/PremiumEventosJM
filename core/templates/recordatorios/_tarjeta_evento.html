@@ -1,0 +1,10 @@
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5ede4;border:1px solid #e4d3bf;border-radius:12px;margin:18px 0;">
+  <tr><td style="padding:18px 22px;font-size:14px;line-height:1.9;color:#4a3a2c;">
+    <b style="color:#a5632a;">🎈 Evento:</b> {{ evento.tipo_evento }}<br>
+    <b style="color:#a5632a;">📅 Fecha:</b> {{ evento.fecha|capfirst }}<br>
+    <b style="color:#a5632a;">🕕 Hora:</b> {{ evento.hora_inicio }} a {{ evento.hora_fin }}<br>
+    <b style="color:#a5632a;">📍 Lugar:</b> {{ evento.ubicacion }}<br>
+    <b style="color:#a5632a;">👥 Invitados:</b> {{ evento.invitados }}<br>
+    <b style="color:#a5632a;">🔖 Código:</b> {{ evento.codigo }}
+  </td></tr>
+</table>
