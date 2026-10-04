@@ -16,54 +16,10 @@ from panel_admin.utils import formatear_miles
 from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
 from .forms import TestimonioForm
 from .n8n import enviar_a_n8n
+from .precios import calcular_precio_estimado  # la tabla de precios se edita en el panel
 from . import limpieza
 
 logger = logging.getLogger(__name__)
-
-# ─────────────────────────────────────────────────────────────────────────
-# Lógica de negocio: cálculo del precio estimado según cantidad de
-# invitados. Es el mismo cálculo que hace modal.js en el navegador (para
-# mostrarle un estimado en vivo al usuario); aquí se vuelve a calcular en
-# el servidor porque el valor que se guarda en la base de datos nunca debe
-# depender únicamente de lo que envía el navegador.
-# ─────────────────────────────────────────────────────────────────────────
-TABLA_PAQUETES = [
-    (20, Decimal('1800000')),
-    (30, Decimal('2600000')),
-    (40, Decimal('3200000')),
-    (50, Decimal('3900000')),
-    (60, Decimal('4500000')),
-    (70, Decimal('4900000')),
-    (80, Decimal('5440000')),
-    (90, Decimal('5850000')),
-    (100, Decimal('5800000')),
-]
-TARIFA_INVITADO_ADICIONAL = Decimal('58000')  # eventos con más de 100 invitados
-
-
-def calcular_precio_estimado(cantidad_invitados):
-    """Replica en Python la tabla de paquetes usada en modal.js."""
-    n = cantidad_invitados
-    if not n or n <= 0:
-        return Decimal('0')
-
-    primero_inv, primero_precio = TABLA_PAQUETES[0]
-    ultimo_inv, ultimo_precio = TABLA_PAQUETES[-1]
-
-    if n <= primero_inv:
-        return primero_precio
-
-    if n >= ultimo_inv:
-        extra = n - ultimo_inv
-        return ultimo_precio + extra * TARIFA_INVITADO_ADICIONAL
-
-    for (inv_inferior, precio_inferior), (inv_superior, precio_superior) in zip(TABLA_PAQUETES, TABLA_PAQUETES[1:]):
-        if inv_inferior < n <= inv_superior:
-            proporcion = Decimal(n - inv_inferior) / Decimal(inv_superior - inv_inferior)
-            precio = precio_inferior + proporcion * (precio_superior - precio_inferior)
-            return (precio / 1000).quantize(Decimal('1')) * 1000  # redondeo a miles
-
-    return Decimal('0')
 
 
 def login_view(request):

@@ -9,13 +9,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from Bd_PremiumEventos.models import (
-    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,Testimonio
+    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria, Testimonio,
+    ConfiguracionPrecios, PaquetePrecio,
 )
 from Bd_PremiumEventos import limpieza
 from Bd_PremiumEventos.recordatorios import enviar_correo_estado
+from Bd_PremiumEventos.precios import calcular_precio_estimado, tabla_precios
 from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
-from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, SubirFotosGaleriaForm
+from .forms import (
+    UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, SubirFotosGaleriaForm,
+    TablaPreciosFormSet, ConfiguracionPreciosForm,
+)
 from .utils import formatear_miles
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -623,3 +628,44 @@ def historial_pdf(request):
 
     doc.build(elementos)
     return response
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Tabla de precios
+# ─────────────────────────────────────────────────────────────────────────
+# Cantidades de ejemplo para la vista previa de la pantalla de precios.
+EJEMPLOS_INVITADOS = [15, 45, 75, 95, 100, 150]
+
+
+@staff_required
+def precios_edit(request):
+    """
+    Tabla de precios por número de invitados + valor por invitado
+    adicional. De aquí salen el estimado del formulario de cotización, el
+    precio que se guarda en cada cotización nueva y el del chatbot (ver
+    Bd_PremiumEventos/precios.py). Las cotizaciones ya creadas conservan
+    su precio. El empleado la ve, pero solo el admin la puede cambiar.
+    """
+    configuracion = ConfiguracionPrecios.actual()
+    if request.method == 'POST':
+        if not es_admin(request):
+            return HttpResponseForbidden('Solo un administrador puede cambiar los precios.')
+        formset = TablaPreciosFormSet(request.POST, queryset=PaquetePrecio.objects.all())
+        form_config = ConfiguracionPreciosForm(request.POST, instance=configuracion)
+        if formset.is_valid() and form_config.is_valid():
+            formset.save()
+            form_config.save()
+            messages.success(request, 'Tabla de precios actualizada. Las cotizaciones nuevas ya usan estos valores.')
+            return redirect('panel_admin:precios_edit')
+    else:
+        formset = TablaPreciosFormSet(queryset=PaquetePrecio.objects.all())
+        form_config = ConfiguracionPreciosForm(instance=configuracion)
+
+    tabla, tarifa = tabla_precios()
+    return render(request, 'panel_admin/precios_form.html', {
+        'formset': formset,
+        'form_config': form_config,
+        'puede_editar': es_admin(request),
+        'ejemplos': [(n, calcular_precio_estimado(n, tabla, tarifa)) for n in EJEMPLOS_INVITADOS],
+        'actualizado': configuracion.fecha_actualizacion,
+    })

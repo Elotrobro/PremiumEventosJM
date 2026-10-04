@@ -5,13 +5,14 @@ from .galeria_data import (
     CATEGORIAS, categorias_por_grupo, fotos_de_categoria, mosaico_general,
     obtener_categoria,
 )
+from Bd_PremiumEventos.precios import tabla_para_js
 
 # ═══════════════════════════════════════════════════════════════════════
 # Vistas de la app `core`
 #
 # Todas son vistas "de solo lectura": no reciben datos (no procesan
-# formularios ni tocan la base de datos), únicamente renderizan una
-# plantilla estática. Por eso ninguna necesita el request.method ni
+# formularios) y casi todas solo renderizan una plantilla estática
+# (inicio además lee la tabla de precios). Por eso ninguna necesita el request.method ni
 # lógica adicional: Django ya sabe resolver GET a estas rutas gracias a
 # PremiumEventosJM/urls.py.
 # ═══════════════════════════════════════════════════════════════════════
@@ -21,7 +22,9 @@ def inicio(request):
     # Página principal: carrusel + botón que abre el modal de cotización
     # (el formulario de ese modal SÍ tiene lógica, pero vive en
     # Bd_PremiumEventos.views.cotizacion_view, no aquí).
-    return render(request, 'inicio.html')
+    # La tabla de precios va a la página para que modal.js calcule el
+    # estimado en vivo con los mismos valores del panel (ver precios.py).
+    return render(request, 'inicio.html', {'tabla_precios': tabla_para_js()})
 
 
 def informacion(request):

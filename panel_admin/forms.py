@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
 
-from Bd_PremiumEventos.models import Usuario, ItemDecoracion, Cotizacion, FotoGaleria
+from Bd_PremiumEventos.models import (
+    Usuario, ItemDecoracion, Cotizacion, FotoGaleria, PaquetePrecio, ConfiguracionPrecios,
+)
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -126,3 +128,92 @@ class CotizacionEstadoForm(forms.ModelForm):
             'motivo_rechazo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3,
                                                    'placeholder': 'Opcional. Solo se usa si el estado es "Rechazada".'}),
         }
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Tabla de precios (panel → Precios). Ver Bd_PremiumEventos/precios.py.
+# ─────────────────────────────────────────────────────────────────────────
+class PaquetePrecioForm(forms.ModelForm):
+    class Meta:
+        model = PaquetePrecio
+        fields = ['invitados', 'precio']
+        error_messages = {'invitados': {'unique': 'Ya hay un tramo con este número de invitados.'}}
+        widgets = {
+            'invitados': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Ej. 50'}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'step': 1000, 'placeholder': 'Ej. 3900000'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:  # 1800000 en vez de 1800000.00
+            self.initial['precio'] = int(self.instance.precio)
+
+    def clean_precio(self):
+        precio = self.cleaned_data['precio']
+        if precio is not None and precio <= 0:
+            raise forms.ValidationError('El precio debe ser mayor que cero.')
+        return precio
+
+
+class _TablaPreciosFormSetBase(forms.BaseModelFormSet):
+    """
+    Revisa la tabla completa antes de guardarla: no se puede quedar vacía,
+    no se pueden repetir tramos y el precio debe subir a medida que suben
+    los invitados (así no vuelve a pasar que 100 invitados salgan más
+    baratos que 90).
+    """
+    def get_unique_error_message(self, unique_check):
+        return 'Hay dos filas con el mismo número de invitados.'
+
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        tramos = []
+        for form in self.forms:
+            if not form.has_changed() and not form.instance.pk:
+                continue  # fila vacía extra
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            invitados = form.cleaned_data.get('invitados')
+            precio = form.cleaned_data.get('precio')
+            if invitados is None or precio is None:
+                raise forms.ValidationError('Cada fila debe tener número de invitados y precio.')
+            tramos.append((invitados, precio))
+
+        if not tramos:
+            raise forms.ValidationError('La tabla debe tener al menos un tramo.')
+
+        cantidades = [inv for inv, _ in tramos]
+        repetidos = sorted({inv for inv in cantidades if cantidades.count(inv) > 1})
+        if repetidos:
+            raise forms.ValidationError(
+                'Hay tramos repetidos: ' + ', '.join(f'{inv} invitados' for inv in repetidos) + '.')
+
+        tramos.sort()
+        for (inv_a, precio_a), (inv_b, precio_b) in zip(tramos, tramos[1:]):
+            if precio_b < precio_a:
+                raise forms.ValidationError(
+                    f'El precio de {inv_b} invitados (${precio_b:,.0f}) no puede ser menor que el de '
+                    f'{inv_a} invitados (${precio_a:,.0f}).'.replace(',', '.'))
+
+
+TablaPreciosFormSet = forms.modelformset_factory(
+    PaquetePrecio, form=PaquetePrecioForm, formset=_TablaPreciosFormSetBase,
+    extra=1, can_delete=True,
+)
+
+
+class ConfiguracionPreciosForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracionPrecios
+        fields = ['tarifa_invitado_adicional']
+        labels = {'tarifa_invitado_adicional': 'Valor por cada invitado adicional'}
+        help_texts = {'tarifa_invitado_adicional': 'Se suma por cada invitado por encima del tramo más grande de la tabla.'}
+        widgets = {
+            'tarifa_invitado_adicional': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'step': 1000}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial['tarifa_invitado_adicional'] = int(self.instance.tarifa_invitado_adicional)

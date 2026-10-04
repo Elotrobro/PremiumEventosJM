@@ -380,6 +380,8 @@
     </div>
 </dialog>
 
+{# Tabla de precios del panel (Bd_PremiumEventos/precios.py); modal.js la lee de aquí #}
+{{ tabla_precios|json_script:"tabla-precios" }}
 <script src="{% static 'js/modal.js' %}"></script>
 
 
