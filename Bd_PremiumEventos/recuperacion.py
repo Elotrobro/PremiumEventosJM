@@ -13,9 +13,7 @@ El correo del paso 1 lo envía n8n si en el .env está N8N_WEBHOOK_RECUPERAR_URL
 directamente con la configuración EMAIL_* de settings.py.
 """
 
-import json
 import logging
-import urllib.request
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -28,6 +26,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .models import Usuario
+from .n8n import enviar_a_n8n
 
 logger = logging.getLogger(__name__)
 
@@ -49,19 +48,11 @@ token_recuperacion = TokenRecuperacion()
 
 def _enviar_por_n8n(usuario, enlace):
     """Le pasa a n8n los datos del correo; n8n arma el mensaje y lo envía."""
-    datos = json.dumps({
+    enviar_a_n8n(settings.N8N_WEBHOOK_RECUPERAR_URL, {
         'correo': usuario.correo_electronico,
         'nombre': usuario.nombre_completo,
         'enlace': enlace,
-    }).encode('utf-8')
-    peticion = urllib.request.Request(
-        settings.N8N_WEBHOOK_RECUPERAR_URL,
-        data=datos,
-        method='POST',
-        headers={'Content-Type': 'application/json', 'X-Webhook-Secret': settings.N8N_WEBHOOK_SECRET},
-    )
-    with urllib.request.urlopen(peticion, timeout=10):
-        pass
+    })
 
 
 def _enviar_por_django(usuario, enlace):
