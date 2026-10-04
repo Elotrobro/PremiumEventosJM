@@ -181,7 +181,8 @@ PASSWORD_RESET_TIMEOUT = 60 * 60
 N8N_WEBHOOK_RECUPERAR_URL = config('N8N_WEBHOOK_RECUPERAR_URL', default='')
 # Si está vacío, las cotizaciones se guardan igual pero no se envía ningún correo.
 N8N_WEBHOOK_COTIZACION_URL = config('N8N_WEBHOOK_COTIZACION_URL', default='')
-# Recordatorios diarios (python manage.py enviar_recordatorios). Sin esta URL el comando no envía nada.
+# Recordatorios diarios (python manage.py enviar_recordatorios) y avisos de cotización
+# aprobada/rechazada desde el panel. Sin esta URL no se envía ninguno de esos correos.
 N8N_WEBHOOK_RECORDATORIOS_URL = config('N8N_WEBHOOK_RECORDATORIOS_URL', default='')
 N8N_WEBHOOK_SECRET = config('N8N_WEBHOOK_SECRET', default='')
 

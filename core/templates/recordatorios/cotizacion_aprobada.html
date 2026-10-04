@@ -1,0 +1,26 @@
+{% extends 'recordatorios/base.html' %}
+{% block titulo %}¡Tu cotización fue aprobada! 🎉{% endblock %}
+{% block contenido %}
+<p style="margin:0 0 12px;">Hola {{ evento.primer_nombre }},</p>
+<p style="margin:0 0 12px;">¡Buenas noticias! Revisamos tu solicitud y <b style="color:#a5632a;">aprobamos tu cotización</b> para tu {{ evento.tipo_evento|lower }}. Ya estamos listos para empezar a preparar cada detalle.</p>
+{% include 'recordatorios/_tarjeta_evento.html' %}
+{% if precio_estimado %}<p style="margin:0 0 18px;"><b>Valor estimado:</b> ${{ precio_estimado }} <span style="color:#7a6856;">(el valor final se confirma contigo en el siguiente paso)</span></p>{% endif %}
+
+<h3 style="margin:0 0 10px;font-size:17px;color:#a5632a;">Siguientes pasos</h3>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;font-size:14px;line-height:1.6;">
+  <tr>
+    <td width="36" valign="top" style="padding:6px 0;"><div style="width:26px;height:26px;border-radius:13px;background:#c17b3c;color:#ffffff;font-weight:bold;text-align:center;line-height:26px;">1</div></td>
+    <td style="padding:6px 0;"><b>Te contactaremos por WhatsApp</b> en las próximas 24 horas para confirmar los detalles finales del evento (decoración, horarios y servicios) y el valor definitivo.</td>
+  </tr>
+  <tr>
+    <td width="36" valign="top" style="padding:6px 0;"><div style="width:26px;height:26px;border-radius:13px;background:#c17b3c;color:#ffffff;font-weight:bold;text-align:center;line-height:26px;">2</div></td>
+    <td style="padding:6px 0;"><b>Reserva tu fecha</b> realizando el pago que te indicaremos en esa conversación. Hasta que no se registre el pago, la fecha no queda apartada.</td>
+  </tr>
+  <tr>
+    <td width="36" valign="top" style="padding:6px 0;"><div style="width:26px;height:26px;border-radius:13px;background:#c17b3c;color:#ffffff;font-weight:bold;text-align:center;line-height:26px;">3</div></td>
+    <td style="padding:6px 0;"><b>Nosotros nos encargamos del resto.</b> Te enviaremos recordatorios 3 días y 1 día antes de tu evento.</td>
+  </tr>
+</table>
+<p style="margin:0 0 12px;">Si tienes alguna pregunta antes, escríbenos al <b>311 775 81 62</b> y menciona tu código <b>{{ evento.codigo }}</b>.</p>
+<p style="margin:0;">¡Gracias por elegirnos!<br><b>Equipo Premium Eventos JM</b></p>
+{% endblock %}

@@ -241,6 +241,9 @@ class Cotizacion(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=ESTADO_PENDIENTE)
     # Notas internas del administrador sobre esta cotización (no se muestran al cliente).
     notas_admin = models.TextField(blank=True, default='')
+    # Motivo que se le envía al cliente por correo si la cotización se
+    # rechaza (opcional). A diferencia de notas_admin, este SÍ lo ve el cliente.
+    motivo_rechazo = models.TextField(blank=True, default='')
 
     def save(self, *args, **kwargs):
         # Se genera el código de seguimiento antes del primer guardado

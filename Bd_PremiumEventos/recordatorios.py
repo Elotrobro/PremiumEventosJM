@@ -9,6 +9,9 @@ Una vez al día se revisan las cotizaciones y se arma cada correo que toca:
   - resumen_admin                 → a la administradora: eventos de los próximos días
                                     y cotizaciones que siguen pendientes.
 
+Aquí también está enviar_correo_estado: el aviso al cliente cuando el
+admin aprueba o rechaza su cotización (lo llama el panel, no la tarea diaria).
+
 Los correos al cliente solo salen para cotizaciones aprobadas o pagadas
 (y completadas, en el caso del día siguiente). Django renderiza el HTML con
 las plantillas de core/templates/recordatorios/ y le pasa a n8n un JSON por
@@ -34,6 +37,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
+from panel_admin.utils import formatear_miles
 
 from .models import Cotizacion, RecordatorioEnviado
 from .n8n import enviar_a_n8n
@@ -183,6 +188,48 @@ def enviar_recordatorios(hoy=None):
         RecordatorioEnviado.objects.create(clave=clave)
         enviados.append(clave)
     return {'enviados': enviados, 'fallidos': fallidos}
+
+
+def enviar_correo_estado(cotizacion):
+    """
+    Avisa al cliente que su cotización fue aprobada (con los siguientes
+    pasos) o rechazada (con el motivo, si se escribió). Se llama desde el
+    panel cuando el admin cambia el estado a uno de esos dos. Usa el mismo
+    webhook de los recordatorios: n8n solo envía el HTML que llega.
+
+    Devuelve True si n8n lo recibió, False si no hay URL configurada o si
+    n8n falló (el cambio de estado se guarda igual).
+    """
+    plantillas = {
+        Cotizacion.ESTADO_APROBADA: ('cotizacion_aprobada', '¡Tu cotización {codigo} fue aprobada! 🎉',
+                                     'recordatorios/cotizacion_aprobada.html'),
+        Cotizacion.ESTADO_RECHAZADA: ('cotizacion_rechazada', 'Sobre tu cotización {codigo}',
+                                      'recordatorios/cotizacion_rechazada.html'),
+    }
+    if cotizacion.estado not in plantillas or not settings.N8N_WEBHOOK_RECORDATORIOS_URL:
+        return False
+
+    tipo, asunto, plantilla = plantillas[cotizacion.estado]
+    evento = _datos_evento(cotizacion)
+    detalle = cotizacion.detallecotizacion_set.first()
+    contexto = {
+        'evento': evento,
+        'precio_estimado': formatear_miles(detalle.precio_cotizado) if detalle else None,
+        'motivo': cotizacion.motivo_rechazo.strip(),
+        'enlace_inicio': _url('inicio'),
+    }
+    try:
+        enviar_a_n8n(settings.N8N_WEBHOOK_RECORDATORIOS_URL, {
+            'tipo': tipo,
+            'destinatario': 'cliente',
+            'correo': cotizacion.correo_cliente,
+            'asunto': asunto.format(**evento),
+            'html': render_to_string(plantilla, contexto),
+        })
+    except Exception:
+        logger.exception('n8n no respondió; no se envió el correo de %s.', tipo)
+        return False
+    return True
 
 
 @csrf_exempt
