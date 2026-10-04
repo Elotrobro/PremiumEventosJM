@@ -179,4 +179,6 @@ PASSWORD_RESET_TIMEOUT = 60 * 60
 # n8n (automatizaciones). Si N8N_WEBHOOK_RECUPERAR_URL está vacío, el correo de
 # recuperación lo envía Django con la configuración EMAIL_* de arriba.
 N8N_WEBHOOK_RECUPERAR_URL = config('N8N_WEBHOOK_RECUPERAR_URL', default='')
+# Si está vacío, las cotizaciones se guardan igual pero no se envía ningún correo.
+N8N_WEBHOOK_COTIZACION_URL = config('N8N_WEBHOOK_COTIZACION_URL', default='')
 N8N_WEBHOOK_SECRET = config('N8N_WEBHOOK_SECRET', default='')
