@@ -366,3 +366,43 @@ class RecordatorioEnviado(models.Model):
 
     class Meta:
         db_table = 'recordatorio_enviado'
+
+
+class PaquetePrecio(models.Model):
+    """
+    Un tramo de la tabla de precios por número de invitados (ej. 50
+    invitados → $3.900.000). La administradora la edita en el panel
+    (panel_admin → Precios) y de aquí la leen el formulario de cotización,
+    el precio que se guarda en cada cotización y el chatbot (ver
+    Bd_PremiumEventos/precios.py).
+    """
+    invitados = models.PositiveIntegerField(unique=True)
+    precio = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.invitados} invitados'
+
+    class Meta:
+        db_table = 'paquete_precio'
+        ordering = ['invitados']
+
+
+class ConfiguracionPrecios(models.Model):
+    """
+    Valores generales del cálculo de precios. Es una tabla de una sola
+    fila (pk=1); se lee con ConfiguracionPrecios.actual().
+    """
+    # Lo que se suma por cada invitado por encima del tramo más grande de la tabla.
+    tarifa_invitado_adicional = models.DecimalField(max_digits=12, decimal_places=2, default=58000)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def actual(cls):
+        configuracion, _ = cls.objects.get_or_create(pk=1)
+        return configuracion
+
+    def __str__(self):
+        return 'Configuración de precios'
+
+    class Meta:
+        db_table = 'configuracion_precios'

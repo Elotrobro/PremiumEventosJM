@@ -9,7 +9,7 @@ from Bd_PremiumEventos.models import (
     CarritoSeleccion, Cliente, ContactoSimple, Cotizacion, DetalleCarrito,
     DetalleCotizacion, ItemDecoracion, Testimonio, Usuario,
 )
-from Bd_PremiumEventos.views import calcular_precio_estimado
+from Bd_PremiumEventos.precios import calcular_precio_estimado
 
 # ═══════════════════════════════════════════════════════════════════════
 # A propósito este comando NO llena item_decoracion ni foto_galeria:

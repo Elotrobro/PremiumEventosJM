@@ -7,11 +7,13 @@ Reparto del trabajo:
     guarda el historial de la conversación en la sesión y, si el mensaje
     trae un código de seguimiento (PJM-AAAAMMDD-XXXXXX), consulta esa
     cotización en la base de datos.
+  - Los precios también los calcula Django: cada número que el cliente
+    haya escrito en sus últimos mensajes (posibles cantidades de
+    invitados) va con su precio estimado en contexto.estimaciones_precio,
+    usando la tabla del panel (precios.py). Así el modelo nunca inventa
+    ni calcula un valor.
   - n8n solo redacta: un AI Agent con DeepSeek recibe {instrucciones,
-    historial, mensaje, contexto} y devuelve {respuesta}. Para estimar
-    precios usa una herramienta (Code Tool, código en
-    n8n/chatbot_calcular_precio.js) con la misma tabla de
-    calcular_precio_estimado de views.py, así el modelo nunca inventa un valor.
+    historial, mensaje, contexto} y devuelve {respuesta}.
 
 Si N8N_WEBHOOK_CHATBOT_URL no está configurada o n8n falla, el chat no se
 rompe: responde con un texto fijo (y con el estado de la cotización, si
@@ -34,6 +36,7 @@ from panel_admin.utils import formatear_miles
 
 from .models import Cotizacion, ItemDecoracion
 from .n8n import enviar_a_n8n
+from .precios import calcular_precio_estimado, tabla_precios
 from .recordatorios import fecha_larga, hoy_negocio
 
 logger = logging.getLogger(__name__)
@@ -91,6 +94,31 @@ def buscar_cotizacion(mensaje):
     if cotizacion.estado == Cotizacion.ESTADO_RECHAZADA and cotizacion.motivo_rechazo.strip():
         datos['motivo_no_aprobada'] = cotizacion.motivo_rechazo.strip()
     return datos
+
+
+# Números sueltos que pueden ser una cantidad de invitados. No toma los que
+# forman parte de una fecha u hora ("20/12", "18:00", "2026-12-05").
+NUMERO_RE = re.compile(r'(?<![\d/:\-])\d+(?![\d/:\-])')
+MAX_INVITADOS_ESTIMABLE = 2000
+
+
+def estimaciones_precio(textos):
+    """
+    {"45": "$3.550.000", ...} para cada número de 1 a 2000 que aparezca en
+    `textos` (los últimos mensajes del cliente). El modelo elige cuál es
+    la cantidad de invitados; si no está, la pide.
+    """
+    numeros = []
+    for texto in textos:
+        texto = CODIGO_RE.sub(' ', texto)                     # el código de seguimiento no cuenta
+        texto = re.sub(r'(\d)\.(?=\d{3}\b)', r'\1', texto)    # "1.200" → 1200
+        for numero in map(int, NUMERO_RE.findall(texto)):
+            if 1 <= numero <= MAX_INVITADOS_ESTIMABLE and numero not in numeros:
+                numeros.append(numero)
+    if not numeros:
+        return {}
+    tabla, tarifa = tabla_precios()
+    return {str(n): f'${formatear_miles(calcular_precio_estimado(n, tabla, tarifa))}' for n in numeros[-6:]}
 
 
 def instrucciones_asistente():
@@ -169,6 +197,8 @@ def chatbot_mensaje(request):
                     'sesion_iniciada': bool(request.session.get('usuario_id')),
                     'nombre_usuario': request.session.get('usuario_nombre', ''),
                     'cotizacion_consultada': cotizacion,
+                    'estimaciones_precio': estimaciones_precio(
+                        [m['texto'] for m in historial if m['rol'] == 'usuario'][-3:] + [mensaje]),
                 },
             }, timeout=60)  # el modelo puede tardar varios segundos en contestar
             respuesta = (resultado or {}).get('respuesta', '').strip() or None

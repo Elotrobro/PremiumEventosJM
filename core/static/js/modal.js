@@ -290,55 +290,32 @@ if (inputFechaEvento) {
 
     // ─────────────────────────────────────────────────────────────────────
     // Lógica de negocio: cálculo del precio estimado según cantidad de
-    // invitados. Basado en la tabla de paquetes de Premium Eventos JM.
-    //
-    //   Invitados | Precio del paquete | Precio por invitado (referencia)
-    //   20        | $1.800.000         | $90.000
-    //   30        | $2.600.000         | $86.000
-    //   40        | $3.200.000         | $80.000
-    //   50        | $3.900.000         | $78.000
-    //   60        | $4.500.000         | $75.000
-    //   70        | $4.900.000         | $70.000
-    //   80        | $5.440.000         | $68.000
-    //   90        | $5.850.000         | $65.000
-    //   100       | $5.800.000         | $58.000
-    //
-    // Reglas de cálculo:
-    //   - Para una cantidad de invitados que coincide con un tramo de la
-    //     tabla, se usa directamente el precio de ese paquete.
-    //   - Para una cantidad entre dos tramos, se interpola linealmente
-    //     entre el paquete inferior y el superior.
-    //   - Para menos de 20 invitados, se cobra el paquete mínimo (20).
-    //   - Para más de 100 invitados, se toma el paquete de 100 como base
-    //     y se suma el valor por invitado adicional ($58.000 c/u, la
-    //     tarifa vigente en el último tramo).
+    // invitados. La tabla NO está escrita aquí: la edita la administradora
+    // en el panel (Precios) y llega en el <script id="tabla-precios"> que
+    // pone inicio.html. Es el mismo cálculo de Bd_PremiumEventos/precios.py:
+    //   - Si coincide con un tramo, se usa el precio de ese tramo.
+    //   - Entre dos tramos se interpola en línea recta (redondeo a miles).
+    //   - Por debajo del primer tramo se cobra el primer tramo.
+    //   - Por encima del último tramo se suma la tarifa por invitado adicional.
     // ─────────────────────────────────────────────────────────────────────
-    const TABLA_PAQUETES = [
-      { invitados: 20, precio: 1800000 },
-      { invitados: 30, precio: 2600000 },
-      { invitados: 40, precio: 3200000 },
-      { invitados: 50, precio: 3900000 },
-      { invitados: 60, precio: 4500000 },
-      { invitados: 70, precio: 4900000 },
-      { invitados: 80, precio: 5440000 },
-      { invitados: 90, precio: 5850000 },
-      { invitados: 100, precio: 5800000 },
-    ];
-    const TARIFA_INVITADO_ADICIONAL = 58000; // usada para eventos de más de 100 personas
+    const elementoTablaPrecios = document.getElementById("tabla-precios");
+    const DATOS_PRECIOS = elementoTablaPrecios ? JSON.parse(elementoTablaPrecios.textContent) : null;
+    const TABLA_PAQUETES = DATOS_PRECIOS ? DATOS_PRECIOS.paquetes : [];
+    const TARIFA_INVITADO_ADICIONAL = DATOS_PRECIOS ? DATOS_PRECIOS.tarifa_adicional : 0;
 
     function calcularPrecioEstimado(cantidadInvitados) {
       const n = Number(cantidadInvitados);
-      if (!n || n <= 0) return null;
+      if (!n || n <= 0 || !TABLA_PAQUETES.length) return null;
 
       const primero = TABLA_PAQUETES[0];
       const ultimo = TABLA_PAQUETES[TABLA_PAQUETES.length - 1];
 
-      // Menos del mínimo: se cobra el paquete base de 20 invitados
+      // Menos del primer tramo: se cobra el paquete mínimo
       if (n <= primero.invitados) {
         return primero.precio;
       }
 
-      // Más del máximo de la tabla: paquete de 100 + tarifa por invitado extra
+      // Más del último tramo: precio de ese tramo + tarifa por invitado extra
       if (n >= ultimo.invitados) {
         const extra = n - ultimo.invitados;
         return ultimo.precio + extra * TARIFA_INVITADO_ADICIONAL;

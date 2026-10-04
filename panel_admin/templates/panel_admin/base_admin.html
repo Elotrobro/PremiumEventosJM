@@ -48,6 +48,9 @@
     <a href="{% url 'panel_admin:cotizaciones_list' %}" class="{% if 'cotizacion' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-file-invoice-dollar"></i> Cotizaciones
     </a>
+    <a href="{% url 'panel_admin:precios_edit' %}" class="{% if 'precios' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-tags"></i> Precios
+    </a>
     <a href="{% url 'panel_admin:historial_list' %}" class="{% if 'historial' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-clock-rotate-left"></i> Historial y reportes
     </a>

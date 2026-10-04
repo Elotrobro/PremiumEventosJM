@@ -38,6 +38,9 @@ urlpatterns = [
     path('cotizaciones/<int:pk>/editar/', views.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<int:pk>/eliminar/', views.cotizacion_delete, name='cotizacion_delete'),
 
+    # Tabla de precios (estimado por número de invitados)
+    path('precios/', views.precios_edit, name='precios_edit'),
+
     # Historial y reportes
     path('historial/', views.historial_list, name='historial_list'),
     path('historial/pdf/', views.historial_pdf, name='historial_pdf'),
