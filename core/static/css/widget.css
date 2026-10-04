@@ -174,12 +174,12 @@
     color: #c17b3c;
 }
 
-/* ── Ventana de chat (placeholder para el futuro chatbot con n8n) ──── */
+/* ── Ventana del chatbot (conectado a n8n, ver Bd_PremiumEventos/chatbot.py) ── */
 .jm-chat-window {
     width: 320px;
     max-width: calc(100vw - 48px);
-    height: 420px;
-    max-height: 70vh;
+    height: 460px;
+    max-height: 72vh;
     background: #fff;
     border-radius: 16px;
     margin-bottom: 14px;
@@ -245,6 +245,63 @@
     border-radius: 14px;
     font-size: 0.86rem;
     line-height: 1.35;
+    white-space: pre-line;      /* respeta los saltos de línea de la respuesta */
+    overflow-wrap: anywhere;    /* los enlaces largos no desbordan la burbuja */
+}
+
+.jm-chat-msg a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* "Escribiendo..." mientras llega la respuesta */
+.jm-chat-typing {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.jm-chat-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a5632a;
+    animation: jm-chat-typing 1s infinite ease-in-out;
+}
+
+.jm-chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+.jm-chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes jm-chat-typing {
+    0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* Botones de respuesta rápida bajo el saludo */
+.jm-chat-sugerencias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.jm-chat-sugerencias button {
+    border: 1px solid #c17b3c;
+    background: #fff;
+    color: #a5632a;
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.jm-chat-sugerencias button:hover {
+    background: #c17b3c;
+    color: #fff;
+}
+
+.jm-chat-header-acciones {
+    display: flex;
+    gap: 10px;
 }
 
 .jm-chat-msg-bot {
@@ -299,6 +356,12 @@
 
 .jm-chat-input button:hover {
     background: #7a2f3b;
+}
+
+.jm-chat-input input:disabled,
+.jm-chat-input button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* ── Responsive: en pantallas muy pequeñas se ajusta el ancho ──────── */
