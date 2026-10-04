@@ -4,7 +4,9 @@
 // Controla 3 piezas:
 //   1) El botón circular "JM" (abre/cierra el panel de opciones)
 //   2) El panel de opciones (WhatsApp / Chatbot)
-//   3) La ventana del chatbot (placeholder, lista para conectarse a n8n)
+//   3) La ventana del chatbot (envía cada mensaje a /chatbot/mensaje/;
+//      Django arma el contexto y n8n responde con IA, ver
+//      Bd_PremiumEventos/chatbot.py)
 // ═══════════════════════════════════════════════════════════════════════
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -78,62 +80,114 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ── Envío de mensajes en el chat ──────────────────────────────────
-  function agregarMensaje(texto, autor) {
-    if (!chatBody) return;
-    const burbuja = document.createElement("div");
-    burbuja.className = "jm-chat-msg " + (autor === "user" ? "jm-chat-msg-user" : "jm-chat-msg-bot");
-    burbuja.textContent = texto;
-    chatBody.appendChild(burbuja);
-    chatBody.scrollTop = chatBody.scrollHeight;
+  const chatSugerencias = document.getElementById("jmChatSugerencias");
+  const chatReiniciar = document.getElementById("jmChatReiniciar");
+  const chatSaludo = document.getElementById("jmChatSaludo");
+  const chatEnviar = chatForm ? chatForm.querySelector("button[type=submit]") : null;
+  const WHATSAPP = "https://wa.me/573117758162";
+
+  // Escapa el texto y convierte en enlaces las URLs que mande el bot.
+  // (Nunca se usa innerHTML con el texto crudo: la respuesta viene de una IA.)
+  function textoConEnlaces(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML.replace(
+      /(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g,
+      '<a href="$1" target="_blank" rel="noopener">$1</a>'
+    );
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // PUNTO DE INTEGRACIÓN CON N8N
-  //
-  // Por ahora esta función solo simula una respuesta ("placeholder"),
-  // para que el botón de chat ya se sienta funcional mientras se
-  // conecta el flujo real en n8n.
-  //
-  // Cuando el webhook de n8n esté listo, reemplaza el contenido de
-  // esta función por algo como:
-  //
-  //   async function obtenerRespuestaBot(mensajeUsuario) {
-  //     const respuesta = await fetch("https://TU-INSTANCIA-N8N/webhook/chatbot-jm", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ mensaje: mensajeUsuario }),
-  //     });
-  //     const datos = await respuesta.json();
-  //     return datos.respuesta; // o el campo que devuelva tu flujo de n8n
-  //   }
-  //
-  // Y en manejarEnvioChat() cambia la llamada a:
-  //   const respuesta = await obtenerRespuestaBot(mensaje);
-  //   agregarMensaje(respuesta, "bot");
-  // ─────────────────────────────────────────────────────────────────
-  function obtenerRespuestaBotPlaceholder(mensajeUsuario) {
-    return "¡Gracias por escribirnos! Este asistente todavía está en construcción. " +
-           "Muy pronto podré responderte automáticamente. Mientras tanto, un asesor " +
-           "te contestará por WhatsApp con gusto.";
+  function agregarMensaje(texto, autor) {
+    if (!chatBody) return null;
+    const burbuja = document.createElement("div");
+    burbuja.className = "jm-chat-msg " + (autor === "user" ? "jm-chat-msg-user" : "jm-chat-msg-bot");
+    if (autor === "user") {
+      burbuja.textContent = texto;
+    } else {
+      burbuja.innerHTML = textoConEnlaces(texto);
+    }
+    chatBody.appendChild(burbuja);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return burbuja;
+  }
+
+  function mostrarEscribiendo() {
+    const burbuja = document.createElement("div");
+    burbuja.className = "jm-chat-msg jm-chat-msg-bot";
+    burbuja.innerHTML = '<span class="jm-chat-typing" aria-label="Escribiendo"><span></span><span></span><span></span></span>';
+    chatBody.appendChild(burbuja);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return burbuja;
+  }
+
+  function bloquearEnvio(bloquear) {
+    if (chatInput) chatInput.disabled = bloquear;
+    if (chatEnviar) chatEnviar.disabled = bloquear;
+  }
+
+  function tokenCsrf() {
+    const campo = chatForm ? chatForm.querySelector("input[name=csrfmiddlewaretoken]") : null;
+    return campo ? campo.value : "";
+  }
+
+  async function obtenerRespuestaBot(mensajeUsuario) {
+    const respuesta = await fetch(chatForm.dataset.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": tokenCsrf() },
+      body: JSON.stringify({ mensaje: mensajeUsuario }),
+    });
+    const datos = await respuesta.json().catch(() => ({}));
+    return datos.respuesta || datos.error ||
+      "No pude responder en este momento. Escríbenos por WhatsApp: " + WHATSAPP;
+  }
+
+  async function enviarMensaje(mensaje) {
+    mensaje = mensaje.trim();
+    if (!mensaje || (chatInput && chatInput.disabled)) return;
+
+    if (chatSugerencias) chatSugerencias.remove();
+    agregarMensaje(mensaje, "user");
+    if (chatInput) chatInput.value = "";
+    bloquearEnvio(true);
+    const escribiendo = mostrarEscribiendo();
+
+    let respuesta;
+    try {
+      respuesta = await obtenerRespuestaBot(mensaje);
+    } catch (error) {
+      respuesta = "Parece que hay un problema de conexión. Intenta de nuevo o escríbenos por WhatsApp: " + WHATSAPP;
+    }
+    escribiendo.remove();
+    agregarMensaje(respuesta, "bot");
+    bloquearEnvio(false);
+    if (chatInput) chatInput.focus();
   }
 
   function manejarEnvioChat(event) {
     event.preventDefault();
-    if (!chatInput) return;
+    if (chatInput) enviarMensaje(chatInput.value);
+  }
 
-    const mensaje = chatInput.value.trim();
-    if (!mensaje) return;
+  if (chatSugerencias) {
+    chatSugerencias.querySelectorAll("button").forEach((boton) => {
+      boton.addEventListener("click", () => enviarMensaje(boton.textContent));
+    });
+  }
 
-    agregarMensaje(mensaje, "user");
-    chatInput.value = "";
-
-    // Simula que el asistente está "escribiendo" antes de responder.
-    // (Cuando se conecte n8n, este setTimeout se reemplaza por el
-    // await a obtenerRespuestaBot() descrito arriba.)
-    setTimeout(() => {
-      const respuesta = obtenerRespuestaBotPlaceholder(mensaje);
-      agregarMensaje(respuesta, "bot");
-    }, 700);
+  // "Nueva conversación": borra el historial en el servidor y en pantalla
+  if (chatReiniciar && chatForm) {
+    chatReiniciar.addEventListener("click", async () => {
+      try {
+        await fetch(chatForm.dataset.urlReiniciar, {
+          method: "POST",
+          headers: { "X-CSRFToken": tokenCsrf() },
+        });
+      } catch (error) { /* si falla, igual se limpia la pantalla */ }
+      chatBody.querySelectorAll(".jm-chat-msg").forEach((msg) => {
+        if (msg !== chatSaludo) msg.remove();
+      });
+      if (chatInput) chatInput.focus();
+    });
   }
 
   if (chatForm) {

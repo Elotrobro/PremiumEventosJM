@@ -6,6 +6,7 @@ from core import views
 from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que sí tocan la base de datos (login/cotización)
 from Bd_PremiumEventos import recuperacion
 from Bd_PremiumEventos import recordatorios
+from Bd_PremiumEventos import chatbot
 
 # ═══════════════════════════════════════════════════════════════════════
 # Tabla de rutas del proyecto (URLconf principal).
@@ -43,6 +44,10 @@ urlpatterns = [
     # ---- Recordatorios diarios por correo (Bd_PremiumEventos/recordatorios.py) ----
     # Lo llama n8n una vez al día con la clave X-Webhook-Secret.
     path('recordatorios/ejecutar/', recordatorios.ejecutar_recordatorios, name='ejecutar_recordatorios'),
+
+    # ---- Chatbot de la burbuja "JM" (Bd_PremiumEventos/chatbot.py) ----
+    path('chatbot/mensaje/', chatbot.chatbot_mensaje, name='chatbot_mensaje'),
+    path('chatbot/reiniciar/', chatbot.chatbot_reiniciar, name='chatbot_reiniciar'),
 
     # ---- Panel de administrador a medida (CRUD, historial y reportes PDF) ----
     path('panel-admin/', include('panel_admin.urls')),

@@ -14,10 +14,12 @@ import urllib.request
 from django.conf import settings
 
 
-def enviar_a_n8n(url, datos):
+def enviar_a_n8n(url, datos, timeout=10):
     """
-    Hace el POST al webhook. Lanza una excepción si n8n no responde o
-    responde con error, para que quien llama decida qué hacer en ese caso.
+    Hace el POST al webhook y devuelve lo que n8n responda, ya convertido
+    de JSON (o None si la respuesta viene vacía o no es JSON). Lanza una
+    excepción si n8n no responde o responde con error, para que quien
+    llama decida qué hacer en ese caso.
     """
     peticion = urllib.request.Request(
         url,
@@ -25,5 +27,9 @@ def enviar_a_n8n(url, datos):
         method='POST',
         headers={'Content-Type': 'application/json', 'X-Webhook-Secret': settings.N8N_WEBHOOK_SECRET},
     )
-    with urllib.request.urlopen(peticion, timeout=10):
-        pass
+    with urllib.request.urlopen(peticion, timeout=timeout) as respuesta:
+        cuerpo = respuesta.read()
+    try:
+        return json.loads(cuerpo) if cuerpo else None
+    except ValueError:
+        return None

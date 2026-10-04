@@ -451,28 +451,36 @@
       <span class="jm-widget-option-icon jm-widget-icon-chatbot">
         <i class="fas fa-robot"></i>
       </span>
-      <span>Chatboot</span>
+      <span>Asistente virtual</span>
     </button>
   </div>
 
-  <!-- Ventana del chatbot (placeholder, listo para conectar con n8n) -->
+  <!-- Ventana del chatbot (core/static/js/widget.js → /chatbot/mensaje/ → n8n) -->
   <div class="jm-chat-window" id="jmChatWindow">
     <div class="jm-chat-header">
       <span><i class="fas fa-robot"></i> Asistente Premium Eventos JM</span>
-      <button type="button" id="jmChatClose" aria-label="Cerrar chat">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="jm-chat-body" id="jmChatBody">
-      <div class="jm-chat-msg jm-chat-msg-bot">
-        ¡Hola! 👋 Soy el asistente virtual de Premium Eventos JM.
-        Muy pronto podré ayudarte a resolver dudas y armar tu cotización
-        aquí mismo. Mientras tanto, cuéntame qué necesitas o escríbenos
-        por WhatsApp.
+      <div class="jm-chat-header-acciones">
+        <button type="button" id="jmChatReiniciar" aria-label="Nueva conversación" title="Nueva conversación">
+          <i class="fas fa-rotate-right"></i>
+        </button>
+        <button type="button" id="jmChatClose" aria-label="Cerrar chat">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
-    <form class="jm-chat-input" id="jmChatForm">
-      <input type="text" id="jmChatInput" placeholder="Escribe tu mensaje..." autocomplete="off">
+    <div class="jm-chat-body" id="jmChatBody">
+      <div class="jm-chat-msg jm-chat-msg-bot" id="jmChatSaludo">¡Hola{% if request.session.usuario_nombre %}, {{ request.session.usuario_nombre }}{% endif %}! 👋 Soy el asistente virtual de Premium Eventos JM.
+Puedo contarte sobre nuestros servicios, estimar el precio de tu evento o consultar tu cotización con tu código de seguimiento. ¿En qué te ayudo?</div>
+      <div class="jm-chat-sugerencias" id="jmChatSugerencias">
+        <button type="button">¿Qué servicios ofrecen?</button>
+        <button type="button">¿Cuánto cuesta mi evento?</button>
+        <button type="button">Consultar mi cotización</button>
+        <button type="button">Hablar con un asesor</button>
+      </div>
+    </div>
+    <form class="jm-chat-input" id="jmChatForm" data-url="{% url 'chatbot_mensaje' %}" data-url-reiniciar="{% url 'chatbot_reiniciar' %}">
+      {% csrf_token %}
+      <input type="text" id="jmChatInput" placeholder="Escribe tu mensaje..." autocomplete="off" maxlength="500">
       <button type="submit" aria-label="Enviar mensaje">
         <i class="fas fa-paper-plane"></i>
       </button>

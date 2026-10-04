@@ -184,6 +184,8 @@ N8N_WEBHOOK_COTIZACION_URL = config('N8N_WEBHOOK_COTIZACION_URL', default='')
 # Recordatorios diarios (python manage.py enviar_recordatorios) y avisos de cotización
 # aprobada/rechazada desde el panel. Sin esta URL no se envía ninguno de esos correos.
 N8N_WEBHOOK_RECORDATORIOS_URL = config('N8N_WEBHOOK_RECORDATORIOS_URL', default='')
+# Chatbot de la burbuja "JM" (IA en n8n). Sin esta URL el chat responde con un texto fijo.
+N8N_WEBHOOK_CHATBOT_URL = config('N8N_WEBHOOK_CHATBOT_URL', default='')
 N8N_WEBHOOK_SECRET = config('N8N_WEBHOOK_SECRET', default='')
 
 # Dirección pública del sitio, para los enlaces de los correos que no salen
