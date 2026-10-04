@@ -5,13 +5,20 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
+from django.conf import settings
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 import json
+import logging
+
+from panel_admin.utils import formatear_miles
 
 from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
 from .forms import TestimonioForm
+from .n8n import enviar_a_n8n
 from . import limpieza
+
+logger = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────────────────────────────────
 # Lógica de negocio: cálculo del precio estimado según cantidad de
@@ -239,6 +246,51 @@ def logout_view(request):
     return redirect('inicio')
 
 
+def _notificar_cotizacion(request, cotizacion, detalle, servicios, sugerencias_sede, observaciones):
+    """
+    Le pasa a n8n los datos de la cotización recién creada; n8n le envía
+    el detalle a la administradora y la confirmación al cliente. Si no hay
+    URL configurada no se hace nada, y si n8n falla solo se deja el error
+    en la consola: la cotización ya quedó guardada y el cliente no debe
+    ver un error por culpa del correo.
+    """
+    if not settings.N8N_WEBHOOK_COTIZACION_URL:
+        return
+
+    def si_no(valor):
+        return 'Sí' if valor == 'si' else 'No' if valor == 'no' else 'Sin especificar'
+
+    servicios_legibles = [s.replace('_', ' ').capitalize() for s in servicios]
+    datos = {
+        'codigo_seguimiento': cotizacion.codigo_seguimiento,
+        'nombre': cotizacion.nombre_cliente,
+        'correo': cotizacion.correo_cliente,
+        'telefono': cotizacion.telefono_cliente,
+        'tipo_evento': detalle.evento.capitalize(),
+        'fecha_evento': cotizacion.fecha_evento.strftime('%d/%m/%Y'),
+        'hora_inicio': cotizacion.hora_inicio.strftime('%H:%M'),
+        'hora_fin': cotizacion.hora_fin.strftime('%H:%M'),
+        'invitados': cotizacion.cantidad_invitados,
+        'ubicacion': cotizacion.ubicacion,
+        'tema_estilo': cotizacion.tema_estilo,
+        'tiene_salon': 'Sí' if detalle.salon else 'No',
+        'desea_sugerencias_sede': si_no(sugerencias_sede),
+        'servicios': servicios_legibles,
+        'servicios_texto': ', '.join(servicios_legibles) or 'Ninguno seleccionado',
+        'presupuesto': f'${formatear_miles(detalle.presupuesto)}',
+        'precio_estimado': f'${formatear_miles(detalle.precio_cotizado)}',
+        'observaciones': observaciones or 'Sin observaciones',
+        'enlace_panel': request.build_absolute_uri(
+            reverse('panel_admin:cotizacion_edit', args=[cotizacion.pk])
+        ),
+    }
+    try:
+        enviar_a_n8n(settings.N8N_WEBHOOK_COTIZACION_URL, datos)
+    except Exception:
+        logger.exception('n8n no respondió; no se enviaron los correos de la cotización %s.',
+                         cotizacion.codigo_seguimiento)
+
+
 def cotizacion_view(request):
     """
     Procesa el formulario de la modal "Solicita tu cotización" (en
@@ -359,7 +411,7 @@ def cotizacion_view(request):
         'observaciones': mensaje,
         'hora_fin_estimada': 'Calculada automáticamente (+4h desde la hora de inicio)',
     }
-    DetalleCotizacion.objects.create(
+    detalle = DetalleCotizacion.objects.create(
         cotizacion=cotizacion,
         cantidad_personas_aplica=cantidad_invitados,
         salon=(salon == 'si'),
@@ -368,6 +420,9 @@ def cotizacion_view(request):
         presupuesto=presupuesto_dec,
         precio_cotizado=precio_estimado,  # calculado según la tabla de paquetes por invitados
     )
+
+    # ---- Correos (administradora + cliente) a través de n8n ----
+    _notificar_cotizacion(request, cotizacion, detalle, servicios, sugerencias_sede, mensaje)
 
     messages.success(
         request,
