@@ -12,6 +12,7 @@ from Bd_PremiumEventos.models import (
     Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria,Testimonio
 )
 from Bd_PremiumEventos import limpieza
+from Bd_PremiumEventos.recordatorios import enviar_correo_estado
 from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
 from .forms import UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, SubirFotosGaleriaForm
@@ -383,10 +384,23 @@ def cotizacion_edit(request, pk):
     if request.method == 'POST':
         if not es_admin(request):
             return HttpResponseForbidden('Solo un administrador puede validar el estado de una cotización.')
+        estado_anterior = cotizacion.estado
         form = CotizacionEstadoForm(request.POST, instance=cotizacion)
         if form.is_valid():
-            form.save()
+            cotizacion = form.save()
             messages.success(request, 'Cotización validada correctamente.')
+
+            # Si pasó a aprobada o rechazada, se le avisa al cliente por
+            # correo (n8n). Solo cuando el estado cambia, para no repetir el
+            # correo si el admin vuelve a guardar solo para editar las notas.
+            if cotizacion.estado != estado_anterior and cotizacion.estado in (
+                    Cotizacion.ESTADO_APROBADA, Cotizacion.ESTADO_RECHAZADA):
+                if enviar_correo_estado(cotizacion):
+                    messages.success(request, f'Se le envió un correo a {cotizacion.correo_cliente} '
+                                              f'informando que la cotización fue {cotizacion.get_estado_display().lower()}.')
+                else:
+                    messages.error(request, 'No se pudo enviar el correo al cliente (revisa n8n y '
+                                              'N8N_WEBHOOK_RECORDATORIOS_URL). El estado sí quedó guardado.')
             return redirect('panel_admin:cotizaciones_list')
     else:
         form = CotizacionEstadoForm(instance=cotizacion)

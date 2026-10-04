@@ -117,9 +117,12 @@ class CotizacionEstadoForm(forms.ModelForm):
     """
     class Meta:
         model = Cotizacion
-        fields = ['estado', 'notas_admin']
+        fields = ['estado', 'notas_admin', 'motivo_rechazo']
+        labels = {'motivo_rechazo': 'Motivo del rechazo (se le envía al cliente)'}
         widgets = {
             'estado': forms.Select(attrs={'class': 'form-control'}),
             'notas_admin': forms.Textarea(attrs={'class': 'form-control', 'rows': 4,
                                                 'placeholder': 'Notas internas (no visibles para el cliente)'}),
+            'motivo_rechazo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3,
+                                                   'placeholder': 'Opcional. Solo se usa si el estado es "Rechazada".'}),
         }
