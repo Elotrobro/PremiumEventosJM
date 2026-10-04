@@ -1,0 +1,33 @@
+{% comment %}
+Base de los correos de recordatorio (ver Bd_PremiumEventos/recordatorios.py).
+Los estilos van en línea y el diseño con tablas porque Gmail y Outlook
+ignoran casi todo el CSS de <style> y no soportan flexbox ni grid.
+{% endcomment %}<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premium Eventos JM</title>
+</head>
+<body style="margin:0;padding:0;background:#f5ede4;font-family:Arial,Helvetica,sans-serif;color:#2c2a29;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5ede4;">
+  <tr><td align="center" style="padding:24px 12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(74,58,44,0.12);">
+      {% block encabezado %}
+      <tr><td bgcolor="#c17b3c" style="background:#c17b3c;padding:28px 32px;text-align:center;">
+        <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#f5ede4;">Premium Eventos JM</div>
+        <div style="font-size:24px;font-weight:bold;color:#ffffff;margin-top:8px;">{% block titulo %}{% endblock %}</div>
+      </td></tr>
+      {% endblock %}
+      <tr><td style="padding:28px 32px;font-size:15px;line-height:1.6;">
+        {% block contenido %}{% endblock %}
+      </td></tr>
+      <tr><td style="background:#4a3a2c;padding:18px 32px;text-align:center;font-size:12px;line-height:1.6;color:#e4d3bf;">
+        Premium Eventos JM · Momentos únicos, celebraciones inolvidables<br>
+        info@premiumeventosjm.com · WhatsApp 311 775 81 62
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

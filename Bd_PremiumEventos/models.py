@@ -346,3 +346,20 @@ class Testimonio(models.Model):
 
     def __str__(self):
         return f"{self.usuario} - {self.calificacion} estrellas"
+
+class RecordatorioEnviado(models.Model):
+    """
+    Registro de cada recordatorio ya enviado por n8n (ver recordatorios.py).
+    Sirve para no repetir un correo si la tarea diaria se corre más de una
+    vez el mismo día. `clave` identifica el recordatorio, por ejemplo
+    "cliente_3_dias:15" (tipo + id de la cotización) o
+    "resumen_admin:2026-10-04" (el resumen diario de la administradora).
+    """
+    clave = models.CharField(max_length=60, unique=True)
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.clave
+
+    class Meta:
+        db_table = 'recordatorio_enviado'

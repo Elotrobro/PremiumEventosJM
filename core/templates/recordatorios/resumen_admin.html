@@ -1,0 +1,53 @@
+{% extends 'recordatorios/base.html' %}
+{% block titulo %}Resumen del {{ hoy }}{% endblock %}
+{% block contenido %}
+<p style="margin:0 0 18px;">Buenos días. Esto es lo que necesita tu atención hoy:</p>
+
+<h3 style="margin:0 0 10px;font-size:17px;color:#a5632a;">📅 Eventos de los próximos {{ dias_resumen }} días ({{ proximos|length }})</h3>
+{% if proximos %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;margin-bottom:24px;">
+  <tr style="background:#f5ede4;color:#4a3a2c;">
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Fecha</th>
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Cliente</th>
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Evento</th>
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Estado</th>
+  </tr>
+  {% for e in proximos %}
+  <tr>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;white-space:nowrap;">{{ e.fecha_corta }}<br><span style="color:#7a6856;">{{ e.hora_inicio }}</span></td>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;">{{ e.nombre }}<br><span style="color:#7a6856;">{{ e.telefono }}</span></td>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;">{{ e.tipo_evento }} · {{ e.invitados }} inv.<br><span style="color:#7a6856;">{{ e.ubicacion }}</span></td>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;"><a href="{{ e.enlace_panel }}" style="color:#a5632a;">{{ e.estado }}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p style="margin:0 0 24px;color:#7a6856;">No hay eventos aprobados o pagados en los próximos {{ dias_resumen }} días.</p>
+{% endif %}
+
+<h3 style="margin:0 0 10px;font-size:17px;color:#a5632a;">⏳ Pendientes con {{ dias_pendiente }} días o más sin atender ({{ sin_atender|length }})</h3>
+{% if sin_atender %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;margin-bottom:24px;">
+  <tr style="background:#f5ede4;color:#4a3a2c;">
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Código</th>
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Cliente</th>
+    <th align="left" style="padding:8px;border-bottom:2px solid #e4d3bf;">Evento</th>
+  </tr>
+  {% for e in sin_atender %}
+  <tr>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;"><a href="{{ e.enlace_panel }}" style="color:#a5632a;">{{ e.codigo }}</a></td>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;">{{ e.nombre }}<br><span style="color:#7a6856;">{{ e.telefono }}</span></td>
+    <td style="padding:8px;border-bottom:1px solid #e4d3bf;">{{ e.tipo_evento }} · {{ e.fecha_corta }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p style="margin:0 0 24px;color:#7a6856;">No hay cotizaciones pendientes atrasadas. ¡Bien!</p>
+{% endif %}
+
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
+  <tr><td bgcolor="#c17b3c" style="background:#c17b3c;border-radius:30px;">
+    <a href="{{ enlace_cotizaciones }}" style="display:inline-block;padding:12px 26px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">Abrir cotizaciones en el panel</a>
+  </td></tr>
+</table>
+{% endblock %}

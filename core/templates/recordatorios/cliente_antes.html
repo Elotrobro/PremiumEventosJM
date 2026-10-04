@@ -1,0 +1,12 @@
+{% extends 'recordatorios/base.html' %}
+{% block titulo %}{% if dias == 1 %}¡Mañana es el día!{% else %}¡Faltan {{ dias }} días!{% endif %}{% endblock %}
+{% block contenido %}
+<p style="margin:0 0 12px;">Hola {{ evento.primer_nombre }},</p>
+<p style="margin:0 0 12px;">
+  {% if dias == 1 %}Mañana celebramos tu <b>{{ evento.tipo_evento|lower }}</b> y ya tenemos todo listo para que sea inolvidable.
+  {% else %}En {{ dias }} días celebramos tu <b>{{ evento.tipo_evento|lower }}</b>. ¡Ya estamos preparando cada detalle!{% endif %}
+</p>
+{% include 'recordatorios/_tarjeta_evento.html' %}
+<p style="margin:0 0 12px;">Si necesitas ajustar algo (hora, número de invitados o algún detalle de la decoración), escríbenos por WhatsApp al <b>311 775 81 62</b> lo antes posible.</p>
+<p style="margin:0;">¡Nos vemos {% if dias == 1 %}mañana{% else %}pronto{% endif %}!<br><b>Equipo Premium Eventos JM</b></p>
+{% endblock %}

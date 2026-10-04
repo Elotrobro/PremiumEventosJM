@@ -1,0 +1,13 @@
+{% extends 'recordatorios/base.html' %}
+{% block titulo %}¡Gracias por celebrar con nosotros!{% endblock %}
+{% block contenido %}
+<p style="margin:0 0 12px;">Hola {{ evento.primer_nombre }},</p>
+<p style="margin:0 0 12px;">Fue un honor ser parte de tu <b>{{ evento.tipo_evento|lower }}</b> del {{ evento.fecha }}. Esperamos que tú y tus invitados lo hayan disfrutado tanto como nosotros preparándolo.</p>
+<p style="margin:0 0 20px;">¿Nos regalas un minuto para contarnos cómo te fue? Tu opinión ayuda a otras familias a elegirnos y a nosotros a seguir mejorando.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 20px;">
+  <tr><td bgcolor="#c17b3c" style="background:#c17b3c;border-radius:30px;">
+    <a href="{{ enlace_testimonios }}" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">⭐ Dejar mi testimonio</a>
+  </td></tr>
+</table>
+<p style="margin:0;">Con cariño,<br><b>Equipo Premium Eventos JM</b></p>
+{% endblock %}
