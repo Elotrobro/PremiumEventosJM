@@ -6,67 +6,118 @@
 <link rel="stylesheet" href="{% static 'css/cotizacion.css' %}">
 
 <section class="carousel-section">
-<div class="container">
-    <div id="eventosCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Foto 1"></button>
-        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="1" aria-label="Foto 2"></button>
-        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="2" aria-label="Foto 3"></button>
-        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="3" aria-label="Foto 4"></button>
-        <button type="button" data-bs-target="#eventosCarousel" data-bs-slide-to="4" aria-label="Foto 5"></button>
+    <div class="container">
+
+        <div class="premium-carousel" id="eventosCarousel">
+
+            <div class="premium-carousel-track">
+
+                <div class="premium-slide active">
+                    <div class="premium-slide-bg">
+                        <img src="{% static 'images/carrusel/boda_bienvenida.jpg' %}" alt="">
+                    </div>
+
+                    <div class="premium-slide-content">
+                        <img src="{% static 'images/carrusel/boda_bienvenida.jpg' %}"
+                             alt="Espejo de bienvenida con arreglo de rosas blancas">
+                    </div>
+                </div>
+
+
+                <div class="premium-slide">
+                    <div class="premium-slide-bg">
+                        <img src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}" alt="">
+                    </div>
+
+                    <div class="premium-slide-content">
+                        <img src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}"
+                             alt="Mesa auxiliar con velas sobre madera y eucalipto">
+                    </div>
+                </div>
+
+
+                <div class="premium-slide">
+                    <div class="premium-slide-bg">
+                        <img src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}" alt="">
+                    </div>
+
+                    <div class="premium-slide-content">
+                        <img src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}"
+                             alt="Mesa de invitados con camino de yute, copas y centro de mesa">
+                    </div>
+                </div>
+
+
+                <div class="premium-slide">
+                    <div class="premium-slide-bg">
+                        <img src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}" alt="">
+                    </div>
+
+                    <div class="premium-slide-content">
+                        <img src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}"
+                             alt="Biblia blanca con los anillos de matrimonio">
+                    </div>
+                </div>
+
+
+                <div class="premium-slide">
+                    <div class="premium-slide-bg">
+                        <img src="{% static 'images/Carrusel11.png' %}" alt="">
+                    </div>
+
+                    <div class="premium-slide-content">
+                        <img src="{% static 'images/Carrusel11.png' %}"
+                             alt="Decoración de evento Premium Eventos JM">
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Botón anterior -->
+            <button class="premium-carousel-btn premium-prev"
+                    type="button"
+                    aria-label="Imagen anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+
+            <!-- Botón siguiente -->
+            <button class="premium-carousel-btn premium-next"
+                    type="button"
+                    aria-label="Imagen siguiente">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+
+            <!-- Indicadores -->
+            <div class="premium-carousel-indicators">
+
+                <button class="premium-indicator active"
+                        type="button"
+                        aria-label="Ir a la imagen 1"></button>
+
+                <button class="premium-indicator"
+                        type="button"
+                        aria-label="Ir a la imagen 2"></button>
+
+                <button class="premium-indicator"
+                        type="button"
+                        aria-label="Ir a la imagen 3"></button>
+
+                <button class="premium-indicator"
+                        type="button"
+                        aria-label="Ir a la imagen 4"></button>
+
+                <button class="premium-indicator"
+                        type="button"
+                        aria-label="Ir a la imagen 5"></button>
+
+            </div>
+
+        </div>
+
     </div>
-
-    {# Cada foto se muestra completa (object-fit: contain) y los lados se  #}
-    {# rellenan con la misma foto difuminada (.carrusel-fondo), así sirven #}
-    {# tanto fotos verticales como horizontales sin recortarlas.           #}
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-        <div class="carrusel-slide">
-            <img class="carrusel-fondo" src="{% static 'images/carrusel/boda_bienvenida.jpg' %}" alt="" aria-hidden="true">
-            <img class="carrusel-foto" src="{% static 'images/carrusel/boda_bienvenida.jpg' %}" alt="Espejo de bienvenida con arreglo de rosas blancas">
-        </div>
-        </div>
-
-        <div class="carousel-item">
-        <div class="carrusel-slide">
-            <img class="carrusel-fondo" src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}" alt="" aria-hidden="true" loading="lazy">
-            <img class="carrusel-foto" src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}" alt="Mesa auxiliar con velas sobre madera y eucalipto" loading="lazy">
-        </div>
-        </div>
-
-    <div class="carousel-item">
-        <div class="carrusel-slide">
-            <img class="carrusel-fondo" src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}" alt="" aria-hidden="true" loading="lazy">
-            <img class="carrusel-foto" src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}" alt="Mesa de invitados con camino de yute, copas y centro de mesa" loading="lazy">
-        </div>
-        </div>
-
-    <div class="carousel-item">
-        <div class="carrusel-slide">
-            <img class="carrusel-fondo" src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}" alt="" aria-hidden="true" loading="lazy">
-            <img class="carrusel-foto" src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}" alt="Biblia blanca con los anillos de matrimonio" loading="lazy">
-    </div>
-        </div>
-
-    <div class="carousel-item">
-        <div class="carrusel-slide">
-            <img class="carrusel-fondo" src="{% static 'images/Carrusel11.png' %}" alt="" aria-hidden="true" loading="lazy">
-            <img class="carrusel-foto" src="{% static 'images/Carrusel11.png' %}" alt="Decoración de evento Premium Eventos JM" loading="lazy">
-        </div>
-    </div>
-    </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#eventosCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Anterior</span>
-    </button>
-
-    <button class="carousel-control-next" type="button" data-bs-target="#eventosCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Siguiente</span>
-    </button>
-    </div>
-</div>
 </section>
 
 <section class="momentos">

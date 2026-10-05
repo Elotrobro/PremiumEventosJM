@@ -182,52 +182,321 @@
 }
 
 
+/* =========================================================
+   CARRUSEL PREMIUM
+   ========================================================= */
+
 .carousel-section {
-        padding: 4rem 0;
-        background: #ffffff;
-    }
+    padding: 3.5rem 0;
+    background: #ffffff;
+}
 
-.carousel {
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-.carousel-item {
-        height: 500px;
-        background: #d4c5b5;
-    }
-
-/* Foto completa al centro (.carrusel-foto) sobre una copia difuminada de
-   la misma foto que llena los lados (.carrusel-fondo): sirve igual para
-   fotos verticales y horizontales sin recortarlas. */
-.carrusel-slide {
+.premium-carousel {
     position: relative;
-    height: 100%;
+    width: 100%;
+    height: 560px;
     overflow: hidden;
-    background: #d4c5b5;
+    border-radius: 24px;
+    background: #241f1b;
+    box-shadow: 0 18px 50px rgba(44, 42, 41, 0.18);
 }
 
-.carrusel-fondo {
-    position: absolute;
-    inset: -30px;
-    width: calc(100% + 60px);
-    height: calc(100% + 60px);
-    object-fit: cover;
-    filter: blur(22px) brightness(0.8);
-}
+/* Contenedor de las diapositivas */
 
-.carrusel-foto {
+.premium-carousel-track {
     position: relative;
-    display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
 }
 
+
+/* =========================================================
+   SLIDES
+   ========================================================= */
+
+.premium-slide {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: scale(1.02);
+
+    transition:
+        opacity 0.6s ease,
+        visibility 0.6s ease,
+        transform 0.8s ease;
+}
+
+.premium-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+
+/* =========================================================
+   FONDO DESENFOCADO
+   ========================================================= */
+
+.premium-slide-bg {
+    position: absolute;
+    inset: 0;
+
+    overflow: hidden;
+
+    background: #241f1b;
+}
+
+.premium-slide-bg img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter:
+        blur(28px)
+        brightness(0.55);
+
+    transform: scale(1.15);
+
+    opacity: 0.85;
+}
+
+
+/* Capa oscura para darle profundidad */
+
+.premium-slide-bg::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(24, 20, 17, 0.45),
+            rgba(24, 20, 17, 0.15),
+            rgba(24, 20, 17, 0.45)
+        );
+}
+
+
+/* =========================================================
+   IMAGEN PRINCIPAL
+   ========================================================= */
+
+.premium-slide-content {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 28px 90px;
+}
+
+.premium-slide-content img {
+    display: block;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.35);
+
+    user-select: none;
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.premium-carousel-btn {
+    position: absolute;
+
+    top: 50%;
+    z-index: 5;
+
+    transform: translateY(-50%);
+
+    width: 52px;
+    height: 52px;
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+
+    background: rgba(25, 22, 19, 0.45);
+
+    backdrop-filter: blur(8px);
+
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.premium-carousel-btn:hover {
+    background: #c17b3c;
+    border-color: #c17b3c;
+
+    transform: translateY(-50%) scale(1.08);
+}
+
+.premium-prev {
+    left: 22px;
+}
+
+.premium-next {
+    right: 22px;
+}
+
+
+/* =========================================================
+   INDICADORES
+   ========================================================= */
+
+.premium-carousel-indicators {
+    position: absolute;
+
+    z-index: 6;
+
+    left: 50%;
+    bottom: 20px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    border-radius: 999px;
+
+    background: rgba(20, 17, 14, 0.45);
+
+    backdrop-filter: blur(8px);
+}
+
+.premium-indicator {
+    width: 8px;
+    height: 8px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    cursor: pointer;
+
+    transition:
+        width 0.3s ease,
+        background 0.3s ease;
+}
+
+.premium-indicator.active {
+    width: 26px;
+
+    border-radius: 999px;
+
+    background: #c17b3c;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
 @media (max-width: 767.98px) {
-    .carousel-item {
-        height: 380px;
+
+    .carousel-section {
+        padding: 2rem 0;
+    }
+
+    .premium-carousel {
+        height: 430px;
+
+        border-radius: 18px;
+    }
+
+    .premium-slide-content {
+        padding: 25px 60px;
+    }
+
+    .premium-carousel-btn {
+        width: 42px;
+        height: 42px;
+
+        font-size: 0.85rem;
+    }
+
+    .premium-prev {
+        left: 12px;
+    }
+
+    .premium-next {
+        right: 12px;
+    }
+
+    .premium-carousel-indicators {
+        bottom: 14px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .premium-carousel {
+        height: 360px;
+
+        border-radius: 14px;
+    }
+
+    .premium-slide-content {
+        padding: 20px 48px;
+    }
+
+    .premium-carousel-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .premium-indicator {
+        width: 7px;
+        height: 7px;
+    }
+
+    .premium-indicator.active {
+        width: 21px;
     }
 }
 
