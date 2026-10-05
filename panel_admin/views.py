@@ -9,8 +9,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from Bd_PremiumEventos.models import (
-    Usuario, ContactoSimple, ItemDecoracion, Cotizacion, DetalleCotizacion, FotoGaleria, Testimonio,
-    ConfiguracionPrecios, PaquetePrecio,
+    Usuario,
+    ContactoSimple,
+    ItemDecoracion,
+    Cotizacion,
+    DetalleCotizacion,
+    FotoGaleria,
+    Testimonio,
+    ConfiguracionPrecios,
+    PaquetePrecio,
+    ServicioPrecio,
 )
 from Bd_PremiumEventos import limpieza
 from Bd_PremiumEventos.recordatorios import enviar_correo_estado
@@ -18,8 +26,13 @@ from Bd_PremiumEventos.precios import calcular_precio_estimado, tabla_precios
 from core.galeria_data import CATEGORIAS
 from .decorators import admin_required, staff_required, es_admin
 from .forms import (
-    UsuarioAdminForm, ItemDecoracionForm, CotizacionEstadoForm, SubirFotosGaleriaForm,
-    TablaPreciosFormSet, ConfiguracionPreciosForm,
+    UsuarioAdminForm,
+    ItemDecoracionForm,
+    CotizacionEstadoForm,
+    SubirFotosGaleriaForm,
+    TablaPreciosFormSet,
+    ConfiguracionPreciosForm,
+    ServiciosPreciosFormSet,
 )
 from .utils import formatear_miles
 
@@ -639,6 +652,98 @@ EJEMPLOS_INVITADOS = [15, 45, 75, 95, 100, 150]
 
 @staff_required
 def precios_edit(request):
+    """
+    Tabla de precios por número de invitados +
+    tarifa por invitado adicional +
+    precios aproximados de los servicios.
+    """
+
+    configuracion = ConfiguracionPrecios.actual()
+
+    if request.method == 'POST':
+
+        if not es_admin(request):
+            return HttpResponseForbidden(
+                'Solo un administrador puede cambiar los precios.'
+            )
+
+        formset = TablaPreciosFormSet(
+            request.POST,
+            queryset=PaquetePrecio.objects.all()
+        )
+
+        form_config = ConfiguracionPreciosForm(
+            request.POST,
+            instance=configuracion
+        )
+
+        formset_servicios = ServiciosPreciosFormSet(
+            request.POST,
+            queryset=ServicioPrecio.objects.all()
+        )
+
+        if (
+            formset.is_valid()
+            and form_config.is_valid()
+            and formset_servicios.is_valid()
+        ):
+
+            formset.save()
+            form_config.save()
+            formset_servicios.save()
+
+            messages.success(
+                request,
+                'Precios actualizados correctamente. '
+                'Las nuevas cotizaciones utilizarán estos valores.'
+            )
+
+            return redirect(
+                'panel_admin:precios_edit'
+            )
+
+    else:
+
+        formset = TablaPreciosFormSet(
+            queryset=PaquetePrecio.objects.all()
+        )
+
+        form_config = ConfiguracionPreciosForm(
+            instance=configuracion
+        )
+
+        formset_servicios = ServiciosPreciosFormSet(
+            queryset=ServicioPrecio.objects.all()
+        )
+
+    tabla, tarifa = tabla_precios()
+
+    return render(
+        request,
+        'panel_admin/precios_form.html',
+        {
+            'formset': formset,
+            'form_config': form_config,
+            'formset_servicios': formset_servicios,
+
+            'puede_editar': es_admin(request),
+
+            'ejemplos': [
+                (
+                    n,
+                    calcular_precio_estimado(
+                        n,
+                        tabla,
+                        tarifa
+                    )
+                )
+                for n in EJEMPLOS_INVITADOS
+            ],
+
+            'actualizado':
+                configuracion.fecha_actualizacion,
+        }
+    )
     """
     Tabla de precios por número de invitados + valor por invitado
     adicional. De aquí salen el estimado del formulario de cotización, el

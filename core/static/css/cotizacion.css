@@ -829,3 +829,17 @@ dialog::backdrop {
 .modal-panel-resumen .alert-light i {
     color: #c17b3c;
 }
+
+.servicio-aprox-modal {
+    display: block;
+    margin-left: 1.65rem;
+    font-size: 0.78rem;
+    color: #856404;
+    font-weight: 600;
+}
+
+.resumen-servicio-modal strong {
+    display: inline-block;
+    margin-left: 6px;
+    font-weight: 700;
+}

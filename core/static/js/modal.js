@@ -302,6 +302,7 @@ if (inputFechaEvento) {
     const DATOS_PRECIOS = elementoTablaPrecios ? JSON.parse(elementoTablaPrecios.textContent) : null;
     const TABLA_PAQUETES = DATOS_PRECIOS ? DATOS_PRECIOS.paquetes : [];
     const TARIFA_INVITADO_ADICIONAL = DATOS_PRECIOS ? DATOS_PRECIOS.tarifa_adicional : 0;
+    const PRECIOS_SERVICIOS = DATOS_PRECIOS ? DATOS_PRECIOS.servicios : {};
 
     function calcularPrecioEstimado(cantidadInvitados) {
       const n = Number(cantidadInvitados);
@@ -348,7 +349,10 @@ if (inputFechaEvento) {
     function actualizarEstimado() {
       if (!inputInvitados || !cajaEstimado || !textoEstimado || !inputPrecioEstimado) return;
 
-      const precio = calcularPrecioEstimado(inputInvitados.value);
+      const precio =
+    calcularTotalCotizacion(
+        inputInvitados.value
+    );
 
       if (precio === null) {
         cajaEstimado.classList.add("d-none");
@@ -365,6 +369,16 @@ if (inputFechaEvento) {
       inputInvitados.addEventListener("input", actualizarEstimado);
     }
 
+    document
+    .querySelectorAll('input[name="servicios"]')
+    .forEach(servicio => {
+
+        servicio.addEventListener(
+            "change",
+            actualizarEstimado
+        );
+
+    });
     // ============================================================
 // RESUMEN EN TIEMPO REAL DE LA COTIZACIÓN
 // ============================================================
@@ -534,10 +548,25 @@ function actualizarResumenModal() {
                     ? label.textContent.trim()
                     : servicio.value;
 
+            const precioServicio =
+                Number(
+                    PRECIOS_SERVICIOS[servicio.value] || 0
+                );
+
             serviciosHTML += `
                 <div class="resumen-servicio-modal">
                     <i class="fas fa-check-circle"></i>
-                    <span>${nombre}</span>
+
+                    <span>
+                        ${nombre}
+                        <strong>
+                            ${formatearCOP(precioServicio)}
+                        </strong>
+
+                        <small class="servicio-aprox-modal">
+                            aprox.
+                        </small>
+                    </span>
                 </div>
             `;
         });
@@ -664,9 +693,9 @@ function actualizarResumenModal() {
     if (inputInvitados && inputInvitados.value) {
 
         const precio =
-            calcularPrecioEstimado(
-                inputInvitados.value
-            );
+        calcularTotalCotizacion(
+            inputInvitados.value
+        );
 
         if (precio !== null) {
 
@@ -980,3 +1009,39 @@ document.addEventListener("DOMContentLoaded", function () {
     iniciarAutoplay();
 
 });
+
+function calcularPrecioServicios() {
+
+    const serviciosSeleccionados =
+        document.querySelectorAll(
+            'input[name="servicios"]:checked'
+        );
+
+    let total = 0;
+
+    serviciosSeleccionados.forEach(servicio => {
+
+        total += Number(
+            PRECIOS_SERVICIOS[servicio.value] || 0
+        );
+
+    });
+
+    return total;
+}
+
+
+function calcularTotalCotizacion(cantidadInvitados) {
+
+    const precioBase =
+        calcularPrecioEstimado(cantidadInvitados);
+
+    if (precioBase === null) {
+        return null;
+    }
+
+    const precioServicios =
+        calcularPrecioServicios();
+
+    return precioBase + precioServicios;
+}

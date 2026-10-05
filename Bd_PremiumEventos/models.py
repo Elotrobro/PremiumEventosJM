@@ -406,3 +406,37 @@ class ConfiguracionPrecios(models.Model):
 
     class Meta:
         db_table = 'configuracion_precios'
+
+class ServicioPrecio(models.Model):
+    """
+    Precio aproximado de cada servicio adicional que puede seleccionar
+    el cliente en el formulario de cotización.
+    """
+
+    CATEGORIA_PRINCIPAL = 'principal'
+    CATEGORIA_OTROS = 'otros'
+
+    CATEGORIA_CHOICES = [
+        (CATEGORIA_PRINCIPAL, 'Servicio que desea cotizar'),
+        (CATEGORIA_OTROS, 'Otros Servicios'),
+    ]
+
+    clave = models.CharField(max_length=80, unique=True)
+    nombre = models.CharField(max_length=150)
+    categoria = models.CharField(
+        max_length=20,
+        choices=CATEGORIA_CHOICES,
+        default=CATEGORIA_PRINCIPAL
+    )
+    precio = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    def __str__(self):
+        return f'{self.nombre} - ${self.precio:,.0f}'
+
+    class Meta:
+        db_table = 'servicio_precio'
+        ordering = ['categoria', 'nombre']

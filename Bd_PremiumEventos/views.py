@@ -16,7 +16,10 @@ from panel_admin.utils import formatear_miles
 from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
 from .forms import TestimonioForm
 from .n8n import enviar_a_n8n
-from .precios import calcular_precio_estimado  # la tabla de precios se edita en el panel
+from .precios import (
+    calcular_precio_estimado,
+    calcular_total_cotizacion,
+)
 from . import limpieza
 
 logger = logging.getLogger(__name__)
@@ -343,7 +346,6 @@ def cotizacion_view(request):
     cliente.telefono_whatsapp = telefono
     cliente.save()
 
-    # ---- Cotizacion ----
         # ---- Cotizacion ----
     cotizacion = Cotizacion.objects.create(
         cliente=cliente,
@@ -359,26 +361,43 @@ def cotizacion_view(request):
     )
 
     # ---- DetalleCotizacion ----
-    precio_estimado = calcular_precio_estimado(cantidad_invitados)
+
+    # Calcula el precio base + los servicios seleccionados
+    precio_estimado = calcular_total_cotizacion(
+        cantidad_invitados,
+        servicios
+    )
 
     detalles_extra = {
         'servicios_solicitados': servicios,
         'desea_sugerencias_sede': sugerencias_sede,
         'observaciones': mensaje,
-        'hora_fin_estimada': 'Calculada automáticamente (+4h desde la hora de inicio)',
+        'hora_fin_estimada':
+            'Calculada automáticamente (+4h desde la hora de inicio)',
     }
+
     detalle = DetalleCotizacion.objects.create(
         cotizacion=cotizacion,
         cantidad_personas_aplica=cantidad_invitados,
         salon=(salon == 'si'),
-        detalles=json.dumps(detalles_extra, ensure_ascii=False),
+        detalles=json.dumps(
+            detalles_extra,
+            ensure_ascii=False
+        ),
         evento=tipo_evento,
         presupuesto=presupuesto_dec,
-        precio_cotizado=precio_estimado,  # calculado según la tabla de paquetes por invitados
+        precio_cotizado=precio_estimado,
     )
 
     # ---- Correos (administradora + cliente) a través de n8n ----
-    _notificar_cotizacion(request, cotizacion, detalle, servicios, sugerencias_sede, mensaje)
+    _notificar_cotizacion(
+        request,
+        cotizacion,
+        detalle,
+        servicios,
+        sugerencias_sede,
+        mensaje
+    )
 
     messages.success(
         request,
@@ -387,6 +406,7 @@ def cotizacion_view(request):
         '. Esta es una cotización aproximada; te contactaremos pronto para confirmar los detalles. '
         f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} — consérvalo para futuras consultas.'
     )
+
     return redirect('inicio')
 
 

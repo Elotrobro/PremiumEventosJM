@@ -7,82 +7,623 @@
   <h1><i class="fas fa-tags"></i> Tabla de precios</h1>
 </div>
 
+<!-- ========================================================= -->
+
+<!-- PRECIOS SEGÚN NÚMERO DE INVITADOS -->
+
+<!-- ========================================================= -->
+
 <div class="pa-card">
+
   <p class="pa-help" style="font-size:0.9rem; margin-top:0;">
-    Precio estimado de un evento según el número de invitados. Lo usan el formulario de cotización
-    de la página, el precio que se guarda en cada cotización nueva y el chatbot.
+    Precio estimado de un evento según el número de invitados.
+    Lo usan el formulario de cotización de la página, el precio que
+    se guarda en cada cotización nueva y el chatbot.
     Las cotizaciones que ya existen conservan su precio.
   </p>
+
   <p class="pa-help" style="font-size:0.9rem;">
-    Entre dos tramos el precio se calcula en proporción (ej. 45 invitados queda entre el de 40 y el de 50).
-    Por debajo del primer tramo se cobra el primero; por encima del último se suma el valor por invitado adicional.
+    Entre dos tramos el precio se calcula en proporción
+    (ej. 45 invitados queda entre el de 40 y el de 50).
+    Por debajo del primer tramo se cobra el primero;
+    por encima del último se suma el valor por invitado adicional.
   </p>
 
-  {% if puede_editar %}
+{% if puede_editar %}
+
   <form method="post" novalidate>
-    {% csrf_token %}
-    {{ formset.management_form }}
 
-    {% for error in formset.non_form_errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+```
+{% csrf_token %}
 
-    <div style="overflow-x:auto;">
-      <table class="pa-table">
-        <thead>
-          <tr><th>Invitados</th><th>Precio del paquete (COP)</th><th>Eliminar</th></tr>
-        </thead>
-        <tbody>
-          {% for form in formset %}
-          <tr>
-            <td>
-              {{ form.id }}{{ form.invitados }}
-              {% for error in form.invitados.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
-            </td>
-            <td>
-              {{ form.precio }}
-              {% for error in form.precio.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
-            </td>
-            <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}<span class="pa-help">Fila nueva</span>{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <p class="pa-help">Para agregar un tramo llena la última fila ("Fila nueva") y guarda; aparecerá otra vacía.</p>
+{{ formset.management_form }}
 
-    <div class="pa-form-group" style="max-width:360px; margin-top:1.2rem;">
-      <label for="{{ form_config.tarifa_invitado_adicional.id_for_label }}">{{ form_config.tarifa_invitado_adicional.label }}</label>
-      {{ form_config.tarifa_invitado_adicional }}
-      <div class="pa-help">{{ form_config.tarifa_invitado_adicional.help_text }}</div>
-      {% for error in form_config.tarifa_invitado_adicional.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
-    </div>
+{% for error in formset.non_form_errors %}
+  <div class="pa-alert pa-alert-error">
+    {{ error }}
+  </div>
+{% endfor %}
 
-    <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar precios</button>
-  </form>
-  {% else %}
+
+<div style="overflow-x:auto;">
+
   <table class="pa-table">
-    <thead><tr><th>Invitados</th><th>Precio del paquete</th></tr></thead>
+
+    <thead>
+      <tr>
+        <th>Invitados</th>
+        <th>Precio del paquete (COP)</th>
+        <th>Eliminar</th>
+      </tr>
+    </thead>
+
     <tbody>
-      {% for form in formset %}{% if form.instance.pk %}
-      <tr><td>{{ form.instance.invitados }}</td><td>${{ form.instance.precio|miles }}</td></tr>
-      {% endif %}{% endfor %}
+
+      {% for form in formset %}
+
+      <tr>
+
+        <td>
+          {{ form.id }}
+          {{ form.invitados }}
+
+          {% for error in form.invitados.errors %}
+            <div class="pa-alert pa-alert-error">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </td>
+
+
+        <td>
+
+          {{ form.precio }}
+
+          {% for error in form.precio.errors %}
+            <div class="pa-alert pa-alert-error">
+              {{ error }}
+            </div>
+          {% endfor %}
+
+        </td>
+
+
+        <td>
+
+          {% if form.instance.pk %}
+
+            {{ form.DELETE }}
+
+          {% else %}
+
+            <span class="pa-help">
+              Fila nueva
+            </span>
+
+          {% endif %}
+
+        </td>
+
+      </tr>
+
+      {% endfor %}
+
     </tbody>
+
   </table>
-  <p style="margin-top:1rem;"><strong>Valor por invitado adicional:</strong> ${{ form_config.instance.tarifa_invitado_adicional|miles }}</p>
-  <p class="pa-help"><i class="fas fa-lock"></i> Solo un administrador puede cambiar los precios.</p>
-  {% endif %}
+
 </div>
 
-<div class="pa-card">
-  <h5 class="pa-card-titulo">Así quedan algunos ejemplos con los precios guardados</h5>
+
+<p class="pa-help">
+
+  Para agregar un tramo llena la última fila
+  ("Fila nueva") y guarda; aparecerá otra vacía.
+
+</p>
+
+
+<!-- TARIFA POR INVITADO ADICIONAL -->
+
+<div
+  class="pa-form-group"
+  style="max-width:360px; margin-top:1.2rem;"
+>
+
+  <label
+    for="{{ form_config.tarifa_invitado_adicional.id_for_label }}"
+  >
+    {{ form_config.tarifa_invitado_adicional.label }}
+  </label>
+
+  {{ form_config.tarifa_invitado_adicional }}
+
+  <div class="pa-help">
+    {{ form_config.tarifa_invitado_adicional.help_text }}
+  </div>
+
+  {% for error in form_config.tarifa_invitado_adicional.errors %}
+
+    <div class="pa-alert pa-alert-error">
+      {{ error }}
+    </div>
+
+  {% endfor %}
+
+</div>
+
+
+<button
+  type="submit"
+  class="pa-btn"
+>
+
+  <i class="fas fa-floppy-disk"></i>
+
+  Guardar precios
+
+</button>
+```
+
+  </form>
+
+{% else %}
+
+  <!-- VISTA PARA USUARIOS SIN PERMISO DE EDICIÓN -->
+
   <table class="pa-table">
-    <thead><tr><th>Invitados</th><th>Precio estimado</th></tr></thead>
-    <tbody>
-      {% for invitados, precio in ejemplos %}
-      <tr><td>{{ invitados }}</td><td>${{ precio|miles }}</td></tr>
-      {% endfor %}
-    </tbody>
+
+```
+<thead>
+
+  <tr>
+    <th>Invitados</th>
+    <th>Precio del paquete</th>
+  </tr>
+
+</thead>
+
+
+<tbody>
+
+  {% for form in formset %}
+
+    {% if form.instance.pk %}
+
+    <tr>
+
+      <td>
+        {{ form.instance.invitados }}
+      </td>
+
+      <td>
+        ${{ form.instance.precio|miles }}
+      </td>
+
+    </tr>
+
+    {% endif %}
+
+  {% endfor %}
+
+</tbody>
+```
+
   </table>
-  <p class="pa-help">Última modificación: {{ actualizado|date:'Y-m-d H:i' }}</p>
+
+  <p style="margin-top:1rem;">
+
+```
+<strong>
+  Valor por invitado adicional:
+</strong>
+
+${{ form_config.instance.tarifa_invitado_adicional|miles }}
+```
+
+  </p>
+
+  <p class="pa-help">
+
+```
+<i class="fas fa-lock"></i>
+
+Solo un administrador puede cambiar los precios.
+```
+
+  </p>
+
+{% endif %}
+
+</div>
+
+<!-- ========================================================= -->
+
+<!-- PRECIOS DE SERVICIOS -->
+
+<!-- ========================================================= -->
+
+<div class="pa-card">
+
+  <h5 class="pa-card-titulo">
+
+```
+<i class="fas fa-concierge-bell"></i>
+
+Precios de servicios
+```
+
+  </h5>
+
+  <p class="pa-help" style="font-size:0.9rem;">
+
+```
+Estos valores se suman automáticamente al precio base
+de la cotización cuando el cliente selecciona uno o
+varios servicios.
+```
+
+  </p>
+
+  <!-- AVISO DE PRECIOS APROXIMADOS -->
+
+  <div
+    class="pa-alert"
+    style="
+      margin: 1rem 0;
+      border-left: 4px solid #f0ad4e;
+      background: #fff8e5;
+      color: #856404;
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+    "
+  >
+
+```
+<i class="fas fa-triangle-exclamation"></i>
+
+<strong> Importante:</strong>
+
+Los precios de los servicios son
+<strong>aproximados</strong>.
+El valor final puede variar dependiendo de las
+características, cantidad, duración y requerimientos
+específicos de cada evento.
+```
+
+  </div>
+
+{% if puede_editar %}
+
+  <!-- FORMULARIO DE PRECIOS DE SERVICIOS -->
+
+  <form method="post" novalidate>
+
+```
+{% csrf_token %}
+
+{{ formset_servicios.management_form }}
+
+
+{% for error in formset_servicios.non_form_errors %}
+
+  <div class="pa-alert pa-alert-error">
+    {{ error }}
+  </div>
+
+{% endfor %}
+
+
+<div style="overflow-x:auto;">
+
+  <table class="pa-table">
+
+    <thead>
+
+      <tr>
+
+        <th>
+          Servicio
+        </th>
+
+        <th>
+          Categoría
+        </th>
+
+        <th>
+          Precio aproximado (COP)
+        </th>
+
+      </tr>
+
+    </thead>
+
+
+    <tbody>
+
+      {% for form in formset_servicios %}
+
+      <tr>
+
+        <!-- ID OCULTO -->
+
+        {{ form.id }}
+
+
+        <!-- NOMBRE DEL SERVICIO -->
+
+        <td>
+
+          {{ form.nombre }}
+
+          {% for error in form.nombre.errors %}
+
+            <div class="pa-alert pa-alert-error">
+              {{ error }}
+            </div>
+
+          {% endfor %}
+
+        </td>
+
+
+        <!-- CATEGORÍA -->
+
+        <td>
+
+          {% if form.instance.categoria == 'principal' %}
+
+            <span>
+              Servicio principal
+            </span>
+
+          {% elif form.instance.categoria == 'otros' %}
+
+            <span>
+              Otros servicios
+            </span>
+
+          {% else %}
+
+            <span>
+              {{ form.instance.categoria }}
+            </span>
+
+          {% endif %}
+
+        </td>
+
+
+        <!-- PRECIO -->
+
+        <td>
+
+          <div style="display:flex; align-items:center; gap:6px;">
+
+            <span>
+              $
+            </span>
+
+            {{ form.precio }}
+
+          </div>
+
+
+          {% for error in form.precio.errors %}
+
+            <div class="pa-alert pa-alert-error">
+              {{ error }}
+            </div>
+
+          {% endfor %}
+
+        </td>
+
+      </tr>
+
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+
+<p class="pa-help">
+
+  <i class="fas fa-circle-info"></i>
+
+  El precio que coloques aquí será utilizado
+  automáticamente en las nuevas cotizaciones.
+
+</p>
+
+
+<p class="pa-help">
+
+  <i class="fas fa-triangle-exclamation"></i>
+
+  Recuerda que estos valores son solamente
+  <strong>precios aproximados</strong>.
+
+</p>
+
+
+<button
+  type="submit"
+  class="pa-btn"
+  style="margin-top:0.5rem;"
+>
+
+  <i class="fas fa-floppy-disk"></i>
+
+  Guardar precios de servicios
+
+</button>
+```
+
+  </form>
+
+{% else %}
+
+  <!-- ===================================================== -->
+
+  <!-- VISTA SIN PERMISOS DE EDICIÓN -->
+
+  <!-- ===================================================== -->
+
+  <table class="pa-table">
+
+```
+<thead>
+
+  <tr>
+
+    <th>
+      Servicio
+    </th>
+
+    <th>
+      Categoría
+    </th>
+
+    <th>
+      Precio aproximado
+    </th>
+
+  </tr>
+
+</thead>
+
+
+<tbody>
+
+  {% for form in formset_servicios %}
+
+  <tr>
+
+    <td>
+      {{ form.instance.nombre }}
+    </td>
+
+
+    <td>
+
+      {% if form.instance.categoria == 'principal' %}
+
+        Servicio principal
+
+      {% elif form.instance.categoria == 'otros' %}
+
+        Otros servicios
+
+      {% else %}
+
+        {{ form.instance.categoria }}
+
+      {% endif %}
+
+    </td>
+
+
+    <td>
+
+      ${{ form.instance.precio|miles }}
+
+    </td>
+
+  </tr>
+
+  {% endfor %}
+
+</tbody>
+```
+
+  </table>
+
+  <p class="pa-help" style="margin-top:1rem;">
+
+```
+<i class="fas fa-lock"></i>
+
+Solo un administrador puede cambiar los precios.
+```
+
+  </p>
+
+{% endif %}
+
+</div>
+
+<!-- ========================================================= -->
+
+<!-- EJEMPLOS DE COTIZACIÓN -->
+
+<!-- ========================================================= -->
+
+<div class="pa-card">
+
+  <h5 class="pa-card-titulo">
+
+```
+Así quedan algunos ejemplos con los precios guardados
+```
+
+  </h5>
+
+  <table class="pa-table">
+
+```
+<thead>
+
+  <tr>
+
+    <th>
+      Invitados
+    </th>
+
+    <th>
+      Precio estimado
+    </th>
+
+  </tr>
+
+</thead>
+
+
+<tbody>
+
+  {% for invitados, precio in ejemplos %}
+
+  <tr>
+
+    <td>
+      {{ invitados }}
+    </td>
+
+    <td>
+      ${{ precio|miles }}
+    </td>
+
+  </tr>
+
+  {% endfor %}
+
+</tbody>
+```
+
+  </table>
+
+  <p class="pa-help">
+
+```
+Última modificación:
+{{ actualizado|date:'Y-m-d H:i' }}
+```
+
+  </p>
+
 </div>
 
 {% endblock %}

@@ -16,7 +16,11 @@ Reglas:
 
 from decimal import ROUND_HALF_UP, Decimal
 
-from .models import ConfiguracionPrecios, PaquetePrecio
+from .models import (
+    ConfiguracionPrecios,
+    PaquetePrecio,
+    ServicioPrecio,
+)
 
 
 def tabla_precios():
@@ -58,9 +62,65 @@ def calcular_precio_estimado(cantidad_invitados, tabla=None, tarifa=None):
 
 
 def tabla_para_js():
-    """La tabla en el formato que espera modal.js (se pasa con json_script)."""
+    """
+    Envía al frontend tanto los precios por invitados
+    como los precios aproximados de los servicios.
+    """
+
     tabla, tarifa = tabla_precios()
+
     return {
-        'paquetes': [{'invitados': inv, 'precio': int(precio)} for inv, precio in tabla],
+        'paquetes': [
+            {
+                'invitados': inv,
+                'precio': int(precio)
+            }
+            for inv, precio in tabla
+        ],
+
         'tarifa_adicional': int(tarifa),
+
+        'servicios': precios_servicios(),
     }
+
+def precios_servicios():
+    """
+    Devuelve los precios de los servicios en formato:
+
+    {
+        'decoracion': 800000,
+        'mobiliario': 500000,
+        ...
+    }
+    """
+
+    return {
+        servicio.clave: int(servicio.precio)
+        for servicio in ServicioPrecio.objects.all()
+    }
+
+
+def calcular_total_cotizacion(cantidad_invitados, servicios=None):
+    """
+    Calcula:
+
+        precio base por invitados
+        +
+        precio de cada servicio seleccionado
+
+    Los precios de servicios son aproximados.
+    """
+
+    precio_base = calcular_precio_estimado(cantidad_invitados)
+
+    if not servicios:
+        return precio_base
+
+    precios = precios_servicios()
+
+    total_servicios = sum(
+        precios.get(servicio, 0)
+        for servicio in servicios
+    )
+
+    return precio_base + total_servicios
