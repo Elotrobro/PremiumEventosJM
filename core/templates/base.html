@@ -125,19 +125,18 @@
 
 
 <main>
-    {% if messages %}
-      <div class="container">
-        {% for message in messages %}
-           <!-- Los errores de login y de registro no se muestran aquí: van
-             dentro de su pestaña en la modal, junto al formulario. Los de la
-             verificación del correo van dentro de su tarjeta. -->
-          {% if 'login-error' not in message.tags and 'registro-error' not in message.tags and 'verificacion' not in message.tags %}
-            <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
-              {{ message }}
+      {% if messages %}
+        <div class="mensajes-wrapper">
+            <div class="container mensajes-container">
+                {% for message in messages %}
+                    {% if 'login-error' not in message.tags and 'registro-error' not in message.tags and 'verificacion' not in message.tags %}
+                        <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-          {% endif %}
-        {% endfor %}
-      </div>
+        </div>
     {% endif %}
     {% block content %}{% endblock %}
 </main>

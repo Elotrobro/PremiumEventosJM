@@ -1669,3 +1669,31 @@ input[type="email"].correo-invalido {
     box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.15) !important;
 }
 
+/* =========================================================
+   FONDO DEL ÁREA DE MENSAJES
+   Control propio - no depende de Bootstrap
+   ========================================================= */
+
+.mensajes-wrapper {
+    width: 100%;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 20px 0 !important;
+    position: relative;
+    z-index: 1;
+}
+
+.mensajes-container {
+    background: transparent !important;
+}
+
+/*
+   IMPORTANTE:
+   No modificar .global-alert-success aquí.
+   La tarjeta verde mantiene su diseño original.
+ */
+
+.mensajes-container .global-alert {
+    position: relative;
+    z-index: 2;
+}
