@@ -34,7 +34,7 @@
       {% for foto in categoria.fotos %}
         <div class="pa-galeria-item">
           <img src="{{ foto.imagen.url }}" alt="{{ categoria.nombre }}">
-          <a href="{% url 'panel_admin:galeria_delete' foto.pk %}" class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar">
+          <a href="{% url 'panel_admin:galeria_delete' foto.pk %}" data-pa-modal class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar">
             <i class="fas fa-trash"></i>
           </a>
         </div>

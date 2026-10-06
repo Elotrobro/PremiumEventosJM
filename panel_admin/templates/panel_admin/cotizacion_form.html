@@ -1,4 +1,4 @@
-{% extends 'panel_admin/base_admin.html' %}
+{% extends base_template|default:'panel_admin/base_admin.html' %}
 {% load panel_extras %}
 {% block title %}Cotización {{ cotizacion.codigo_seguimiento }}{% endblock %}
 {% block content %}
@@ -66,7 +66,7 @@
       {% endfor %}
 
       <button type="submit" class="pa-btn"><i class="fas fa-check"></i> Validar</button>
-      <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+      <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary" data-pa-cerrar><i class="fas fa-xmark"></i> Cancelar</a>
     </form>
   {% else %}
     <p class="pa-help">
@@ -74,7 +74,7 @@
       Solo un administrador puede cambiar el estado o las notas internas de una cotización.
       Notas actuales: {{ cotizacion.notas_admin|default:'(sin notas)' }}
     </p>
-    <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+    <a href="{% url 'panel_admin:cotizaciones_list' %}" class="pa-btn pa-btn-secondary" data-pa-cerrar><i class="fas fa-arrow-left"></i> Volver</a>
   {% endif %}
 </div>
 
