@@ -27,6 +27,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .models import Usuario
 from .n8n import enviar_a_n8n
+from .validaciones import errores_contrasena
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +106,8 @@ def restablecer_password(request, uidb64, token):
         nueva = request.POST.get('new_password1', '')
         confirmacion = request.POST.get('new_password2', '')
 
-        # Mismas reglas que al crear la cuenta (ver registro_view).
-        if len(nueva) < 8:
-            errores.append('La contraseña debe tener al menos 8 caracteres.')
+        # Mismas reglas que al crear la cuenta (ver validaciones.py).
+        errores.extend(errores_contrasena(nueva))
         if nueva != confirmacion:
             errores.append('Las contraseñas no coinciden.')
 

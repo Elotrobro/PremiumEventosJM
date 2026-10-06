@@ -20,7 +20,8 @@ from .precios import (
     calcular_precio_estimado,
     calcular_total_cotizacion,
 )
-from . import limpieza
+from . import limpieza, verificacion
+from .validaciones import errores_contrasena
 
 logger = logging.getLogger(__name__)
 
@@ -163,10 +164,7 @@ def registro_view(request):
                 errores.append('Ya existe una cuenta registrada con ese correo electrónico.')
 
     if contrasena:
-        if len(contrasena) < 8:
-            errores.append('La contraseña debe tener al menos 8 caracteres.')
-        elif contrasena.isdigit():
-            errores.append('La contraseña no puede ser solo números.')
+        errores.extend(errores_contrasena(contrasena))  # reglas en validaciones.py
         if contrasena != confirmacion:
             errores.append('Las contraseñas no coinciden.')
 
@@ -177,23 +175,10 @@ def registro_view(request):
 
     # La contraseña se guarda siempre hasheada, igual que en el admin y en
     # el comando crear_admin (nunca en texto plano).
-    usuario = Usuario.objects.create(
-        nombre_completo=nombre,
-        correo_electronico=correo,
-        contrasena=make_password(contrasena),
-        rol='cliente',
-        ultimo_acceso=timezone.now(),
-    )
-
-    # Se deja la sesión iniciada de una vez: quien se registra normalmente
-    # viene de intentar cotizar, así que puede seguir sin volver a entrar.
-    request.session['usuario_id'] = usuario.id_usuario
-    request.session['usuario_nombre'] = usuario.nombre_completo
-    request.session['usuario_rol'] = usuario.rol
-    request.session.pop('registro_prefill', None)
-
-    messages.success(request, f'¡Bienvenido, {usuario.nombre_completo}! Tu cuenta fue creada correctamente.')
-    return redirect('inicio')
+    # La cuenta todavía no se crea: primero se envía un código al correo y
+    # se crea cuando la persona lo confirma (ver verificacion.py).
+    verificacion.iniciar_verificacion(request, nombre, correo, make_password(contrasena))
+    return redirect('verificar_correo')
 
 
 def logout_view(request):

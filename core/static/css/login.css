@@ -391,3 +391,58 @@
 .toggle-password i {
     font-size: 0.95rem;
 }
+/* ── Requisitos de contraseña segura (core/static/js/contrasena.js) ── */
+.contrasena-reglas {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    font-size: 0.8rem;
+    color: #8a7a6a;
+}
+
+.contrasena-reglas li::before {
+    content: "✗ ";
+    color: #b5483f;
+    font-weight: bold;
+}
+
+.contrasena-reglas li.cumple {
+    color: #2e7d4f;
+}
+
+.contrasena-reglas li.cumple::before {
+    content: "✓ ";
+    color: #2e7d4f;
+}
+
+/* ── Verificación del correo (registro/verificar_correo.html) ────────── */
+.codigo-verificacion {
+    font-size: 1.6rem;
+    letter-spacing: 0.5em;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+}
+
+.verificacion-ayuda {
+    display: block;
+    margin-top: 6px;
+    color: #8a7a6a;
+    font-size: 0.8rem;
+}
+
+.verificacion-acciones {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.verificacion-acciones form {
+    margin: 0;
+}
+
+.verificacion-acciones .auth-enlace:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    text-decoration: none;
+}

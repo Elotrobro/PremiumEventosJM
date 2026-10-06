@@ -12,6 +12,7 @@ from Bd_PremiumEventos.models import (
     ConfiguracionPrecios,
     ServicioPrecio,
 )
+from Bd_PremiumEventos.validaciones import REGLAS_CONTRASENA, errores_contrasena
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -32,7 +33,7 @@ class UsuarioAdminForm(forms.ModelForm):
             render_value=False
         ),
         required=False,
-        help_text='Déjalo en blanco para mantener la contraseña actual.',
+        help_text=f'Debe tener {REGLAS_CONTRASENA}. Al editar, déjalo en blanco para mantener la contraseña actual.',
     )
 
     class Meta:
@@ -81,6 +82,12 @@ class UsuarioAdminForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Debes asignar una contraseña al crear un usuario nuevo.'
             )
+
+        # Mismas reglas de contraseña segura que el registro (validaciones.py).
+        if contrasena:
+            errores = errores_contrasena(contrasena)
+            if errores:
+                raise forms.ValidationError(errores)
 
         return contrasena
 

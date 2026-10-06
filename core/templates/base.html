@@ -129,8 +129,9 @@
       <div class="container">
         {% for message in messages %}
            <!-- Los errores de login y de registro no se muestran aquí: van
-             dentro de su pestaña en la modal, junto al formulario. -->
-          {% if 'login-error' not in message.tags and 'registro-error' not in message.tags %}
+             dentro de su pestaña en la modal, junto al formulario. Los de la
+             verificación del correo van dentro de su tarjeta. -->
+          {% if 'login-error' not in message.tags and 'registro-error' not in message.tags and 'verificacion' not in message.tags %}
             <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
               {{ message }}
             </div>
@@ -395,8 +396,9 @@
               type="password"
               id="registroPassword"
               name="contrasena"
-              placeholder="Mínimo 8 caracteres"
+              placeholder="Mínimo 8, con un número y una mayúscula"
               minlength="8"
+              data-contrasena-fuerte
               required
           >
         </div>
@@ -497,5 +499,6 @@ Puedo contarte sobre nuestros servicios, estimar el precio de tu evento o consul
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/widget.js' %}"></script>
 <script src="{% static 'js/login-modal.js' %}"></script>
+<script src="{% static 'js/contrasena.js' %}"></script>
 </body>
 </html>

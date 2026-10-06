@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% comment %}
+Paso 2 del registro: escribir el código que llegó al correo.
+Ver Bd_PremiumEventos/verificacion.py.
+{% endcomment %}
+{% block content %}
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-title">
+      <h2>Verifica tu correo</h2>
+      <p>Te enviamos un código de 6 dígitos a <strong>{{ correo_oculto }}</strong>. Escríbelo para terminar de crear tu cuenta.</p>
+    </div>
+
+    {% for message in messages %}
+      {% if 'verificacion' in message.tags %}
+        <div class="login-alert {% if 'success' in message.tags %}login-alert-success{% else %}login-alert-error{% endif %}">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+
+    <form method="post" action="{% url 'verificar_correo' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="codigoVerificacion">Código de verificación</label>
+        <input
+            type="text"
+            id="codigoVerificacion"
+            name="codigo"
+            class="codigo-verificacion"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            pattern="[0-9 ]{6,7}"
+            maxlength="7"
+            placeholder="000000"
+            title="El código tiene 6 números"
+            required
+            autofocus
+        >
+        <small class="verificacion-ayuda">El código vence en {{ minutos }} minutos. Si no lo ves, revisa la carpeta de spam.</small>
+      </div>
+      <button type="submit" class="btn-login">Verificar y crear mi cuenta</button>
+    </form>
+
+    <div class="verificacion-acciones">
+      {% if puede_reenviar %}
+      <form method="post" action="{% url 'reenviar_codigo' %}">
+        {% csrf_token %}
+        <button type="submit" class="auth-enlace" id="btnReenviar" data-espera="{{ espera_reenvio }}">Reenviar código</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{% url 'cancelar_registro' %}">
+        {% csrf_token %}
+        <button type="submit" class="auth-enlace">Usar otro correo</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Deshabilita "Reenviar código" con una cuenta regresiva hasta que se pueda usar.
+document.addEventListener('DOMContentLoaded', function () {
+    const boton = document.getElementById('btnReenviar');
+    if (!boton) return;
+    let espera = parseInt(boton.dataset.espera, 10) || 0;
+    const texto = boton.textContent;
+    const actualizar = function () {
+        if (espera > 0) {
+            boton.disabled = true;
+            boton.textContent = texto + ' (' + espera + ' s)';
+            espera -= 1;
+            setTimeout(actualizar, 1000);
+        } else {
+            boton.disabled = false;
+            boton.textContent = texto;
+        }
+    };
+    actualizar();
+});
+</script>
+
+{% endblock %}

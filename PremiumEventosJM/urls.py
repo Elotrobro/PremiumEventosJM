@@ -7,6 +7,7 @@ from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que s
 from Bd_PremiumEventos import recuperacion
 from Bd_PremiumEventos import recordatorios
 from Bd_PremiumEventos import chatbot
+from Bd_PremiumEventos import verificacion
 
 # ═══════════════════════════════════════════════════════════════════════
 # Tabla de rutas del proyecto (URLconf principal).
@@ -32,6 +33,10 @@ urlpatterns = [
     path('contacto/enviar/', auth_views.guardar_contacto, name='guardar_contacto'),  # procesa el formulario de contacto.html
     path('login/', auth_views.login_view, name='login'),
     path('registro/', auth_views.registro_view, name='registro'),  # crea cuentas de cliente desde la modal
+    # Verificación del correo con un código (Bd_PremiumEventos/verificacion.py)
+    path('registro/verificar/', verificacion.verificar_correo, name='verificar_correo'),
+    path('registro/verificar/reenviar/', verificacion.reenviar_codigo, name='reenviar_codigo'),
+    path('registro/verificar/cancelar/', verificacion.cancelar_registro, name='cancelar_registro'),
     path('logout/', auth_views.logout_view, name='logout'),
     path('testimonios/', auth_views.testimonios, name='testimonios'),  # lista testimonios aprobados y recibe nuevos (requiere sesión para opinar)
 

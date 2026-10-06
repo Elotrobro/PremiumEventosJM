@@ -1,0 +1,11 @@
+Hola{% if nombre %} {{ nombre }}{% endif %},
+
+Para terminar de crear tu cuenta en Premium Eventos JM, escribe este código en la página:
+
+    {{ codigo }}
+
+El código vence en {{ minutos }} minutos.
+
+Si no fuiste tú quien intentó crear la cuenta, puedes ignorar este mensaje: sin el código no se crea ninguna cuenta con tu correo.
+
+Equipo Premium Eventos JM
