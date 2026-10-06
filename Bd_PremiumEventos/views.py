@@ -21,7 +21,9 @@ from .precios import (
     calcular_total_cotizacion,
 )
 from . import limpieza, verificacion
-from .validaciones import errores_contrasena, errores_nombre, limpiar_nombre
+from .validaciones import (
+    errores_contrasena, errores_nombre, errores_telefono, limpiar_nombre, limpiar_telefono,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -290,7 +292,8 @@ def cotizacion_view(request):
         messages.error(request, 'Faltan campos obligatorios en el formulario de cotización.')
         return redirect('inicio')
 
-    errores = errores_nombre(nombre, 'el nombre completo')
+    errores = errores_nombre(nombre, 'el nombre completo') + errores_telefono(telefono)
+    telefono = limpiar_telefono(telefono)
     try:
         validate_email(correo)
     except ValidationError:
@@ -427,6 +430,9 @@ def guardar_contacto(request):
         return redirect('contacto')
 
     errores = errores_nombre(nombre, 'el nombre') + errores_nombre(apellidos, 'los apellidos')
+    if telefono:
+        errores += errores_telefono(telefono)
+        telefono = limpiar_telefono(telefono)
     try:
         validate_email(email)
     except ValidationError:

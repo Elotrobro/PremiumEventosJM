@@ -156,8 +156,8 @@
 
         <div class="col-md-6">
             <label for="telefono" class="form-label">Número de celular / WhatsApp</label>
-            <input type="number" class="form-control" id="telefono" name="telefono"
-                required>
+            <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ej. 300 123 4567"
+                inputmode="tel" autocomplete="tel" maxlength="20" pattern="[0-9 +\(\)\-]{7,20}" title="Solo números (7 a 15 dígitos). Puedes usar espacios, guiones o +" required>
         </div>
 
         <div class="col-md-6">

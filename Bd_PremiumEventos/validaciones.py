@@ -54,3 +54,33 @@ def errores_nombre(valor, campo='el nombre'):
     if sum(c.isalpha() for c in valor) < 2:
         return [f'Escribe al menos 2 letras en {campo}.']
     return []
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Teléfono / WhatsApp (contacto y cotización)
+# ─────────────────────────────────────────────────────────────────────────
+# Se aceptan los separadores con que la gente suele escribir un número
+# ("+57 300 123-4567", "(604) 444 5555"), pero se guardan solo los dígitos.
+# Entre 7 (fijo local) y 15 dígitos (máximo internacional, y el tamaño de
+# los campos de teléfono en la base de datos). En las plantillas, el
+# <input type="tel"> lleva pattern="[0-9 +\(\)\-]{7,20}" para avisar antes de enviar.
+SEPARADORES_TELEFONO = ' +-()'
+MIN_DIGITOS_TELEFONO, MAX_DIGITOS_TELEFONO = 7, 15
+
+
+def limpiar_telefono(valor):
+    """'+57 300 123-4567' → '573001234567' (solo dígitos)."""
+    return ''.join(c for c in valor if c.isdigit())
+
+
+def errores_telefono(valor):
+    """Lista de errores del teléfono tal como lo escribió la persona (vacía si es válido)."""
+    valor = valor.strip()
+    if not valor:
+        return ['Escribe un número de teléfono.']
+    if not all(c.isdigit() or c in SEPARADORES_TELEFONO for c in valor):
+        return ['El teléfono solo puede tener números (y si quieres, espacios, guiones, paréntesis o +).']
+    digitos = len(limpiar_telefono(valor))
+    if not MIN_DIGITOS_TELEFONO <= digitos <= MAX_DIGITOS_TELEFONO:
+        return [f'El teléfono debe tener entre {MIN_DIGITOS_TELEFONO} y {MAX_DIGITOS_TELEFONO} dígitos.']
+    return []
