@@ -1,4 +1,4 @@
-{% extends 'panel_admin/base_admin.html' %}
+{% extends base_template|default:'panel_admin/base_admin.html' %}
 {% block title %}Eliminar{% endblock %}
 {% block content %}
 
@@ -14,7 +14,7 @@
   <form method="post">
     {% csrf_token %}
     <button type="submit" class="pa-btn pa-btn-danger"><i class="fas fa-trash"></i> Sí, eliminar</button>
-    <a href="{% url cancelar_url %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+    <a href="{% url cancelar_url %}" class="pa-btn pa-btn-secondary" data-pa-cerrar><i class="fas fa-xmark"></i> Cancelar</a>
   </form>
 </div>
 

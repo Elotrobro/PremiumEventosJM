@@ -82,7 +82,7 @@
 
                     {% if request.session.usuario_rol == 'admin' %}
 
-                    <a href="{% url 'panel_admin:testimonio_delete' testimonio.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                    <a href="{% url 'panel_admin:testimonio_delete' testimonio.pk %}" data-pa-modal class="btn btn-sm btn-outline-danger" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </a>
                     {% endif %}

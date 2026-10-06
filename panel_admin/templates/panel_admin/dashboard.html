@@ -55,7 +55,7 @@
       <ul class="pa-lista-novedades">
         {% for detalle in cotizaciones_recientes %}
           <li>
-            <a href="{% url 'panel_admin:cotizacion_edit' detalle.cotizacion.id_cotizacion %}">
+            <a href="{% url 'panel_admin:cotizacion_edit' detalle.cotizacion.id_cotizacion %}" data-pa-modal="lg">
               <strong>{{ detalle.cotizacion.nombre_cliente }}</strong> — {{ detalle.evento }}
             </a>
             <span class="pa-help">{{ detalle.fecha_cotizacion|date:'Y-m-d H:i' }} · {{ detalle.cotizacion.codigo_seguimiento }}</span>
@@ -73,7 +73,7 @@
       <ul class="pa-lista-novedades">
         {% for cotizacion in eventos_proximos %}
           <li>
-            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.id_cotizacion %}">
+            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.id_cotizacion %}" data-pa-modal="lg">
               <strong>{{ cotizacion.nombre_cliente }}</strong> — {{ cotizacion.tema_estilo }}
             </a>
             <span class="pa-help">{{ cotizacion.fecha_evento|date:'Y-m-d' }} · {{ cotizacion.ubicacion }}</span>

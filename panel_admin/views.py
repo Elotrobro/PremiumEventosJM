@@ -36,6 +36,29 @@ from .forms import (
 )
 from .utils import formatear_miles
 
+
+# ─────────────────── Formularios en ventana modal ───────────────────
+#
+# Crear/editar/eliminar ya no abren una página aparte: el listado abre la
+# misma URL dentro de una ventana modal (ver el script al final de
+# base_admin.html). Para eso el JS pide la vista con la cabecera
+# "X-Pa-Modal: 1" y la plantilla se arma sobre _modal.html (solo el
+# contenido, sin barra lateral ni menú) en vez de base_admin.html. Si se
+# entra a la URL directamente (sin JS), se sigue viendo como página
+# completa, así que nada se rompe.
+#
+# Los redirect() de las vistas no cambian: el JS los detecta y recarga
+# el listado, donde aparece el mensaje de éxito o error.
+
+def es_modal(request):
+    return request.headers.get('X-Pa-Modal') == '1'
+
+
+def render_panel(request, plantilla, contexto):
+    contexto['base_template'] = 'panel_admin/_modal.html' if es_modal(request) else 'panel_admin/base_admin.html'
+    return render(request, plantilla, contexto)
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # Panel de administrador a medida (no es el admin genérico de Django).
 #
@@ -135,7 +158,7 @@ def usuario_create(request):
             return redirect('panel_admin:usuarios_list')
     else:
         form = UsuarioAdminForm(actor_rol=actor_rol)
-    return render(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'crear'})
+    return render_panel(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'crear'})
 
 
 @admin_required
@@ -154,7 +177,7 @@ def usuario_edit(request, pk):
             return redirect('panel_admin:usuarios_list')
     else:
         form = UsuarioAdminForm(instance=usuario, actor_rol='admin')
-    return render(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'editar', 'usuario': usuario})
+    return render_panel(request, 'panel_admin/usuario_form.html', {'form': form, 'modo': 'editar', 'usuario': usuario})
 
 
 @staff_required
@@ -178,7 +201,7 @@ def usuario_delete(request, pk):
         usuario.delete()
         messages.success(request, 'Usuario eliminado correctamente.')
         return redirect('panel_admin:usuarios_list')
-    return render(request, 'panel_admin/confirmar_eliminar.html', {
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': usuario, 'titulo': 'usuario', 'cancelar_url': 'panel_admin:usuarios_list',
     })
 
@@ -201,7 +224,7 @@ def catalogo_create(request):
             return redirect('panel_admin:catalogo_list')
     else:
         form = ItemDecoracionForm()
-    return render(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'crear'})
+    return render_panel(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'crear'})
 
 
 @staff_required
@@ -215,7 +238,7 @@ def catalogo_edit(request, pk):
             return redirect('panel_admin:catalogo_list')
     else:
         form = ItemDecoracionForm(instance=item)
-    return render(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'editar', 'item': item})
+    return render_panel(request, 'panel_admin/catalogo_form.html', {'form': form, 'modo': 'editar', 'item': item})
 
 
 @admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
@@ -227,7 +250,7 @@ def catalogo_delete(request, pk):
         item.delete()
         messages.success(request, 'Ítem de decoración eliminado correctamente.')
         return redirect('panel_admin:catalogo_list')
-    return render(request, 'panel_admin/confirmar_eliminar.html', {
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': item, 'titulo': 'ítem de decoración', 'cancelar_url': 'panel_admin:catalogo_list',
     })
 
@@ -276,7 +299,7 @@ def galeria_delete(request, pk):
         foto.delete()
         messages.success(request, 'Foto eliminada correctamente.')
         return redirect('panel_admin:galeria_list')
-    return render(request, 'panel_admin/confirmar_eliminar.html', {
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': foto, 'titulo': 'foto de la galería', 'cancelar_url': 'panel_admin:galeria_list',
     })
 
@@ -296,7 +319,7 @@ def mensaje_delete(request, pk):
         mensaje.delete()
         messages.success(request, 'Mensaje eliminado correctamente.')
         return redirect('panel_admin:mensajes_list')
-    return render(request, 'panel_admin/confirmar_eliminar.html', {
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': mensaje, 'titulo': 'mensaje de contacto', 'cancelar_url': 'panel_admin:mensajes_list',
     })
 
@@ -352,7 +375,7 @@ def testimonio_delete(request, pk):
 
         return redirect('panel_admin:testimonios_list')
 
-    return render(
+    return render_panel(
         request,
         'panel_admin/confirmar_eliminar.html',
         {
@@ -423,7 +446,7 @@ def cotizacion_edit(request, pk):
     else:
         form = CotizacionEstadoForm(instance=cotizacion)
 
-    return render(request, 'panel_admin/cotizacion_form.html', {
+    return render_panel(request, 'panel_admin/cotizacion_form.html', {
         'form': form,
         'cotizacion': cotizacion,
         'detalle': detalle,
@@ -452,7 +475,7 @@ def cotizacion_delete(request, pk):
         cotizacion.delete()
         messages.success(request, 'Cotización eliminada correctamente.')
         return redirect('panel_admin:cotizaciones_list')
-    return render(request, 'panel_admin/confirmar_eliminar.html', {
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': cotizacion, 'titulo': 'cotización', 'cancelar_url': 'panel_admin:cotizaciones_list',
     })
 

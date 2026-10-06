@@ -1,4 +1,4 @@
-{% extends 'panel_admin/base_admin.html' %}
+{% extends base_template|default:'panel_admin/base_admin.html' %}
 {% block title %}{% if modo == 'crear' %}Nuevo ítem{% else %}Editar ítem{% endif %}{% endblock %}
 {% block content %}
 
@@ -48,7 +48,7 @@
     </div>
 
     <button type="submit" class="pa-btn"><i class="fas fa-floppy-disk"></i> Guardar</button>
-    <a href="{% url 'panel_admin:catalogo_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-xmark"></i> Cancelar</a>
+    <a href="{% url 'panel_admin:catalogo_list' %}" class="pa-btn pa-btn-secondary" data-pa-cerrar><i class="fas fa-xmark"></i> Cancelar</a>
   </form>
 </div>
 
