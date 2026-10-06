@@ -261,14 +261,14 @@
 }
 
 /* ---- Panel de cotización (carrito lateral) ---- */
-
 .panel-cotizacion {
     border-radius: 18px;
     overflow: hidden;
 }
 
-.panel-cotizacion .card-header {
-    border-bottom: none;
+/* Mantiene el carrito debajo de la navbar fija/sticky */
+.panel-cotizacion.sticky-top {
+    top: 100px !important;
 }
 
 .aviso-login-cotizacion {

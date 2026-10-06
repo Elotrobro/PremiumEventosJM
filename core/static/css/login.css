@@ -342,3 +342,52 @@
         font-size: 1.4rem;
     }
 }
+
+/* ── Mostrar / ocultar contraseña ─────────────────────────────── */
+
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper input {
+    width: 100%;
+    padding-right: 3rem;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+
+    transform: translateY(-50%);
+
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    background: transparent;
+
+    color: #7a6856;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #c17b3c;
+    background: #f5ede4;
+}
+
+.toggle-password i {
+    font-size: 0.95rem;
+}
