@@ -33,7 +33,6 @@
 
   <form method="post" novalidate>
 
-```
 {% csrf_token %}
 
 {{ formset.management_form }}
@@ -163,7 +162,6 @@
   Guardar precios
 
 </button>
-```
 
   </form>
 
@@ -173,7 +171,6 @@
 
   <table class="pa-table">
 
-```
 <thead>
 
   <tr>
@@ -207,29 +204,24 @@
   {% endfor %}
 
 </tbody>
-```
 
   </table>
 
   <p style="margin-top:1rem;">
 
-```
 <strong>
   Valor por invitado adicional:
 </strong>
 
 ${{ form_config.instance.tarifa_invitado_adicional|miles }}
-```
 
   </p>
 
   <p class="pa-help">
 
-```
 <i class="fas fa-lock"></i>
 
 Solo un administrador puede cambiar los precios.
-```
 
   </p>
 
@@ -247,21 +239,17 @@ Solo un administrador puede cambiar los precios.
 
   <h5 class="pa-card-titulo">
 
-```
 <i class="fas fa-concierge-bell"></i>
 
 Precios de servicios
-```
 
   </h5>
 
   <p class="pa-help" style="font-size:0.9rem;">
 
-```
 Estos valores se suman automáticamente al precio base
 de la cotización cuando el cliente selecciona uno o
 varios servicios.
-```
 
   </p>
 
@@ -279,7 +267,6 @@ varios servicios.
     "
   >
 
-```
 <i class="fas fa-triangle-exclamation"></i>
 
 <strong> Importante:</strong>
@@ -289,7 +276,6 @@ Los precios de los servicios son
 El valor final puede variar dependiendo de las
 características, cantidad, duración y requerimientos
 específicos de cada evento.
-```
 
   </div>
 
@@ -299,7 +285,6 @@ específicos de cada evento.
 
   <form method="post" novalidate>
 
-```
 {% csrf_token %}
 
 {{ formset_servicios.management_form }}
@@ -461,7 +446,6 @@ específicos de cada evento.
   Guardar precios de servicios
 
 </button>
-```
 
   </form>
 
@@ -475,7 +459,6 @@ específicos de cada evento.
 
   <table class="pa-table">
 
-```
 <thead>
 
   <tr>
@@ -538,17 +521,14 @@ específicos de cada evento.
   {% endfor %}
 
 </tbody>
-```
 
   </table>
 
   <p class="pa-help" style="margin-top:1rem;">
 
-```
 <i class="fas fa-lock"></i>
 
 Solo un administrador puede cambiar los precios.
-```
 
   </p>
 
@@ -566,15 +546,12 @@ Solo un administrador puede cambiar los precios.
 
   <h5 class="pa-card-titulo">
 
-```
 Así quedan algunos ejemplos con los precios guardados
-```
 
   </h5>
 
   <table class="pa-table">
 
-```
 <thead>
 
   <tr>
@@ -611,16 +588,13 @@ Así quedan algunos ejemplos con los precios guardados
   {% endfor %}
 
 </tbody>
-```
 
   </table>
 
   <p class="pa-help">
 
-```
 Última modificación:
 {{ actualizado|date:'Y-m-d H:i' }}
-```
 
   </p>
 
