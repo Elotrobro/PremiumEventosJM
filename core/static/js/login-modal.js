@@ -128,9 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Registro: el formulario no lleva novalidate, así que el navegador ya
-    // exige los campos obligatorios, el formato del correo y el mínimo de
-    // 8 caracteres. Aquí solo se agrega lo que el HTML no puede comprobar:
-    // que las dos contraseñas coincidan. El correo repetido lo valida el
+    // exige los campos obligatorios y el formato del correo. Las reglas de
+    // contraseña segura las revisa contrasena.js. Aquí solo se agrega que
+    // las dos contraseñas coincidan. El correo repetido lo valida el
     // servidor (ver registro_view), que es quien consulta la base de datos.
     const formRegistro = document.getElementById('registroForm');
     if (formRegistro) {

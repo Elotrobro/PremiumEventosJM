@@ -1,0 +1,15 @@
+{% extends 'recordatorios/base.html' %}
+{% comment %}Correo con el código para verificar la cuenta (ver Bd_PremiumEventos/verificacion.py).{% endcomment %}
+{% block titulo %}Verifica tu correo{% endblock %}
+{% block contenido %}
+<p style="margin:0 0 12px;">Hola{% if nombre %} {{ nombre }}{% endif %},</p>
+<p style="margin:0 0 18px;">Para terminar de crear tu cuenta en Premium Eventos JM, escribe este código en la página:</p>
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;">
+  <tr><td style="background:#f5ede4;border:2px dashed #c17b3c;border-radius:12px;padding:16px 34px;text-align:center;">
+    <div style="font-size:36px;font-weight:bold;letter-spacing:10px;color:#a5632a;font-family:'Courier New',monospace;">{{ codigo }}</div>
+  </td></tr>
+</table>
+<p style="margin:0 0 12px;text-align:center;color:#7a6856;font-size:13px;">El código vence en {{ minutos }} minutos.</p>
+<p style="margin:0 0 12px;">Si no fuiste tú quien intentó crear la cuenta, puedes ignorar este mensaje: sin el código no se crea ninguna cuenta con tu correo.</p>
+<p style="margin:0;">— Equipo Premium Eventos JM</p>
+{% endblock %}

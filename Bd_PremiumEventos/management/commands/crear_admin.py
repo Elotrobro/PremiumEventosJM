@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand, CommandError
 
 from Bd_PremiumEventos.models import Usuario
+from Bd_PremiumEventos.validaciones import errores_contrasena
 
 
 class Command(BaseCommand):
@@ -15,7 +16,7 @@ class Command(BaseCommand):
     del /admin/ nativo de Django. Se ejecuta así:
 
         python manage.py crear_admin
-        python manage.py crear_admin --correo admin@premiumeventosjm.com --nombre "Admin" --password "algo-seguro"
+        python manage.py crear_admin --correo admin@premiumeventosjm.com --nombre "Admin" --password "AlgoSeguro2026"
     """
     help = 'Crea un usuario con rol "admin" para poder entrar al panel de administrador (/panel-admin/).'
 
@@ -40,6 +41,9 @@ class Command(BaseCommand):
 
         if not password:
             raise CommandError('La contraseña no puede estar vacía.')
+        errores = errores_contrasena(password)
+        if errores:
+            raise CommandError(' '.join(errores))
 
         usuario, creado = Usuario.objects.get_or_create(
             correo_electronico__iexact=correo,
