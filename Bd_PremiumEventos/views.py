@@ -21,7 +21,7 @@ from .precios import (
     calcular_total_cotizacion,
 )
 from . import limpieza, verificacion
-from .validaciones import errores_contrasena
+from .validaciones import errores_contrasena, errores_nombre, limpiar_nombre
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +136,7 @@ def registro_view(request):
     if request.method != 'POST':
         return redirect(url_con_modal)
 
-    nombre = request.POST.get('nombre_completo', '').strip()
+    nombre = limpiar_nombre(request.POST.get('nombre_completo', ''))
     correo = request.POST.get('correo_electronico', '').strip().lower()
     contrasena = request.POST.get('contrasena', '')
     confirmacion = request.POST.get('contrasena_confirmacion', '')
@@ -149,6 +149,8 @@ def registro_view(request):
 
     if not nombre or not correo or not contrasena:
         errores.append('Completa todos los campos obligatorios.')
+    elif nombre:
+        errores.extend(errores_nombre(nombre, 'el nombre completo'))
 
     if correo:
         try:
@@ -260,7 +262,7 @@ def cotizacion_view(request):
     # Se leen todos los campos del <form id="formCotizacion"> de inicio.html.
     # request.POST.getlist() se usa para 'servicios' porque son varios
     # checkboxes con el mismo `name="servicios"`.
-    nombre = request.POST.get('nombre', '').strip()
+    nombre = limpiar_nombre(request.POST.get('nombre', ''))
     telefono = request.POST.get('telefono', '').strip()
     correo = request.POST.get('correo', '').strip()
     tipo_evento = request.POST.get('tipo_evento', '').strip()
@@ -286,6 +288,16 @@ def cotizacion_view(request):
     faltantes = [campo for campo, valor in campos_obligatorios.items() if not valor]
     if faltantes:
         messages.error(request, 'Faltan campos obligatorios en el formulario de cotización.')
+        return redirect('inicio')
+
+    errores = errores_nombre(nombre, 'el nombre completo')
+    try:
+        validate_email(correo)
+    except ValidationError:
+        errores.append('El correo electrónico no tiene un formato válido.')
+    if errores:
+        for error in errores:
+            messages.error(request, error)
         return redirect('inicio')
 
     # El input type="date"/"time" del HTML siempre manda estos formatos
@@ -404,14 +416,24 @@ def guardar_contacto(request):
     if request.method != 'POST':
         return redirect('contacto')
 
-    nombre = request.POST.get('nombre', '').strip()
-    apellidos = request.POST.get('apellidos', '').strip()
+    nombre = limpiar_nombre(request.POST.get('nombre', ''))
+    apellidos = limpiar_nombre(request.POST.get('apellidos', ''))
     email = request.POST.get('email', '').strip()
     telefono = request.POST.get('telefono', '').strip()
     mensaje = request.POST.get('mensaje', '').strip()
 
     if not nombre or not apellidos or not email or not mensaje:
         messages.error(request, 'Por favor completa los campos obligatorios del formulario.')
+        return redirect('contacto')
+
+    errores = errores_nombre(nombre, 'el nombre') + errores_nombre(apellidos, 'los apellidos')
+    try:
+        validate_email(email)
+    except ValidationError:
+        errores.append('El correo electrónico no tiene un formato válido.')
+    if errores:
+        for error in errores:
+            messages.error(request, error)
         return redirect('contacto')
 
     ContactoSimple.objects.create(

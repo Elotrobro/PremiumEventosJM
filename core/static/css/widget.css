@@ -15,6 +15,12 @@
     flex-direction: column;
     align-items: flex-end;
     font-family: inherit;
+    /* El contenedor ocupa un rectángulo grande e invisible (el espacio del
+       panel y de la ventana del chat aunque estén cerrados). Sin esto, ese
+       rectángulo se "come" los clics de lo que hay debajo, como la tarjeta
+       "Tu cotización" del catálogo. Solo reciben clics el botón JM y el
+       panel/chat cuando están abiertos (ver .is-open más abajo). */
+    pointer-events: none;
 }
 
 /* ── Botón circular principal ("JM") ───────────────────────────────── */
@@ -32,6 +38,7 @@
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
+    pointer-events: auto; /* el contenedor .jm-widget no recibe clics; el botón sí */
 }
 
 .jm-widget-toggle:hover {

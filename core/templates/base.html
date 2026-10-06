@@ -371,6 +371,7 @@
               id="registroNombre"
               name="nombre_completo"
               placeholder="Tu nombre y apellido"
+              pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)"
               value="{{ request.session.registro_prefill.nombre|default:'' }}"
               maxlength="150"
               required

@@ -26,11 +26,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nombre <span class="required">*</span></label>
-                                <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+                                <input type="text" name="nombre" class="form-control" placeholder="Nombre" maxlength="100" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Apellidos <span class="required">*</span></label>
-                                <input type="text" name="apellidos" class="form-control" placeholder="Apellidos" required>
+                                <input type="text" name="apellidos" class="form-control" placeholder="Apellidos" maxlength="100" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Correo <span class="required">*</span></label>

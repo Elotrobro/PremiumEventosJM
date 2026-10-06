@@ -151,7 +151,7 @@
     <div class="row g-3">
         <div class="col-md-6">
             <label for="nombre" class="form-label">Nombre completo</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" required>
+            <input type="text" class="form-control" id="nombre" name="nombre" maxlength="150" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)" required>
         </div>
 
         <div class="col-md-6">

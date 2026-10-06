@@ -23,3 +23,34 @@ def errores_contrasena(contrasena):
     if not any(c.isupper() for c in contrasena):
         errores.append('La contraseña debe tener al menos una letra mayúscula.')
     return errores
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Nombres y apellidos (registro, contacto, cotización y panel)
+# ─────────────────────────────────────────────────────────────────────────
+# Además de letras (con tildes y ñ) se permiten espacios y los signos que
+# aparecen en nombres reales: María-José, O'Neil, Ma. Fernanda.
+SIGNOS_PERMITIDOS_NOMBRE = " '-."
+
+# En las plantillas, los <input> de nombre llevan el mismo filtro en
+# pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" para que el navegador avise antes de
+# enviar; el servidor siempre vuelve a revisar con errores_nombre.
+
+
+def limpiar_nombre(valor):
+    """Quita espacios sobrantes: '  ana   maría ' → 'ana maría'."""
+    return ' '.join(valor.split())
+
+
+def errores_nombre(valor, campo='el nombre'):
+    """
+    Lista de errores del nombre (vacía si es válido). Recibe el valor ya
+    limpio; `campo` va en minúscula y con artículo ("el nombre", "los apellidos").
+    """
+    if not valor:
+        return [f'Completa {campo}.']
+    if not all(c.isalpha() or c in SIGNOS_PERMITIDOS_NOMBRE for c in valor):
+        return [f'En {campo} solo se permiten letras y espacios (sin números, @ ni otros símbolos).']
+    if sum(c.isalpha() for c in valor) < 2:
+        return [f'Escribe al menos 2 letras en {campo}.']
+    return []

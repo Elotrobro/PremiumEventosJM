@@ -12,7 +12,7 @@ from Bd_PremiumEventos.models import (
     ConfiguracionPrecios,
     ServicioPrecio,
 )
-from Bd_PremiumEventos.validaciones import REGLAS_CONTRASENA, errores_contrasena
+from Bd_PremiumEventos.validaciones import REGLAS_CONTRASENA, errores_contrasena, errores_nombre, limpiar_nombre
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -46,7 +46,11 @@ class UsuarioAdminForm(forms.ModelForm):
         ]
         widgets = {
             'nombre_completo': forms.TextInput(
-                attrs={'class': 'form-control'}
+                attrs={
+                    'class': 'form-control',
+                    'pattern': "[A-Za-zÀ-ÖØ-öø-ÿ' .\\-]+",
+                    'title': 'Solo letras y espacios (sin números, @ ni otros símbolos)',
+                }
             ),
             'correo_electronico': forms.EmailInput(
                 attrs={'class': 'form-control'}
@@ -74,6 +78,13 @@ class UsuarioAdminForm(forms.ModelForm):
             self.fields['rol'].initial = Usuario.ROL_CLIENTE
         else:
             self.fields['rol'].choices = Usuario.ROL_CHOICES
+
+    def clean_nombre_completo(self):
+        nombre = limpiar_nombre(self.cleaned_data.get('nombre_completo', ''))
+        errores = errores_nombre(nombre, 'el nombre completo')
+        if errores:
+            raise forms.ValidationError(errores)
+        return nombre
 
     def clean_contrasena(self):
         contrasena = self.cleaned_data.get('contrasena')
