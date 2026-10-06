@@ -284,3 +284,7 @@
     gap: 0.5rem;
 }
 
+/* El carrito permanece debajo del chatbot y WhatsApp */
+.panel-cotizacion.sticky-top {
+    z-index: 1020;
+}
