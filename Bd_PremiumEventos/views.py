@@ -16,10 +16,7 @@ from panel_admin.utils import formatear_miles
 from .models import Usuario, Cliente, Cotizacion, DetalleCotizacion, ContactoSimple,Testimonio
 from .forms import TestimonioForm
 from .n8n import enviar_a_n8n
-from .precios import (
-    calcular_precio_estimado,
-    calcular_total_cotizacion,
-)
+from .precios import calcular_total_cotizacion  # la tabla de precios se edita en el panel
 from . import limpieza, verificacion
 from .validaciones import (
     errores_contrasena, errores_nombre, errores_telefono, limpiar_nombre, limpiar_telefono,

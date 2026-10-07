@@ -4,131 +4,61 @@
 
 <link rel="stylesheet" href="{% static 'css/base.css' %}">
 <link rel="stylesheet" href="{% static 'css/cotizacion.css' %}">
+<link rel="stylesheet" href="{% static 'css/inicio.css' %}">
+{# Sin JavaScript el texto de la portada se muestra igual (no queda invisible). #}
+<noscript><style>.hero-aparece { opacity: 1 !important; transform: none !important; filter: none !important; }</style></noscript>
 
-<section class="carousel-section">
-    <div class="container">
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   Portada (hero): fotos de fondo que se desvanecen una tras otra, frase
+   principal con aparición suave y el botón "Cotizar mi evento" como lo
+   primero que ve el visitante. Estilos en css/inicio.css y animación en
+   js/inicio.js. El botón abre la misma ventana de cotización de siempre
+   (abrirModalCotizacion, en js/modal.js).
+   ═══════════════════════════════════════════════════════════════════ {% endcomment %}
+<section class="hero-inicio" id="heroInicio" aria-label="Premium Eventos JM">
 
-        <div class="premium-carousel" id="eventosCarousel">
-
-            <div class="premium-carousel-track">
-
-                <div class="premium-slide active">
-                    <div class="premium-slide-bg">
-                        <img src="{% static 'images/carrusel/boda_bienvenida.jpg' %}" alt="">
-                    </div>
-
-                    <div class="premium-slide-content">
-                        <img src="{% static 'images/carrusel/boda_bienvenida.jpg' %}"
-                             alt="Espejo de bienvenida con arreglo de rosas blancas">
-                    </div>
-                </div>
-
-
-                <div class="premium-slide">
-                    <div class="premium-slide-bg">
-                        <img src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}" alt="">
-                    </div>
-
-                    <div class="premium-slide-content">
-                        <img src="{% static 'images/carrusel/boda_mesa_velas.jpg' %}"
-                             alt="Mesa auxiliar con velas sobre madera y eucalipto">
-                    </div>
-                </div>
-
-
-                <div class="premium-slide">
-                    <div class="premium-slide-bg">
-                        <img src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}" alt="">
-                    </div>
-
-                    <div class="premium-slide-content">
-                        <img src="{% static 'images/carrusel/boda_mesa_principal.jpg' %}"
-                             alt="Mesa de invitados con camino de yute, copas y centro de mesa">
-                    </div>
-                </div>
-
-
-                <div class="premium-slide">
-                    <div class="premium-slide-bg">
-                        <img src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}" alt="">
-                    </div>
-
-                    <div class="premium-slide-content">
-                        <img src="{% static 'images/carrusel/boda_biblia_anillos.jpg' %}"
-                             alt="Biblia blanca con los anillos de matrimonio">
-                    </div>
-                </div>
-
-
-                <div class="premium-slide">
-                    <div class="premium-slide-bg">
-                        <img src="{% static 'images/Carrusel11.png' %}" alt="">
-                    </div>
-
-                    <div class="premium-slide-content">
-                        <img src="{% static 'images/Carrusel11.png' %}"
-                             alt="Decoración de evento Premium Eventos JM">
-                    </div>
-                </div>
-
-            </div>
-
-
-            <!-- Botón anterior -->
-            <button class="premium-carousel-btn premium-prev"
-                    type="button"
-                    aria-label="Imagen anterior">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-
-
-            <!-- Botón siguiente -->
-            <button class="premium-carousel-btn premium-next"
-                    type="button"
-                    aria-label="Imagen siguiente">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-
-
-            <!-- Indicadores -->
-            <div class="premium-carousel-indicators">
-
-                <button class="premium-indicator active"
-                        type="button"
-                        aria-label="Ir a la imagen 1"></button>
-
-                <button class="premium-indicator"
-                        type="button"
-                        aria-label="Ir a la imagen 2"></button>
-
-                <button class="premium-indicator"
-                        type="button"
-                        aria-label="Ir a la imagen 3"></button>
-
-                <button class="premium-indicator"
-                        type="button"
-                        aria-label="Ir a la imagen 4"></button>
-
-                <button class="premium-indicator"
-                        type="button"
-                        aria-label="Ir a la imagen 5"></button>
-
-            </div>
-
-        </div>
-
+    <div class="hero-fondos" aria-hidden="true">
+        {% comment %} La primera foto carga de inmediato; las demás las carga js/inicio.js
+           después, para que la portada aparezca rápido. {% endcomment %}
+        <img class="hero-fondo activo" src="{% static 'images/hero/hero_ceremonia_jardin.jpg' %}" alt="" fetchpriority="high">
+        <img class="hero-fondo" data-src="{% static 'images/hero/hero_salon.jpg' %}" alt="">
+        <img class="hero-fondo" data-src="{% static 'images/hero/hero_quince.jpg' %}" alt="">
+        <img class="hero-fondo" data-src="{% static 'images/hero/hero_altar.jpg' %}" alt="">
+        <img class="hero-fondo" data-src="{% static 'images/hero/hero_noche.jpg' %}" alt="">
+        <img class="hero-fondo" data-src="{% static 'images/hero/hero_grado.jpg' %}" alt="">
     </div>
-</section>
+    <div class="hero-velo" aria-hidden="true"></div>
 
-<section class="momentos">
-  <div class="container text-center">
-    <h2>Momentos Únicos</h2>
-    <p>Celebraciones Inolvidables</p>
+    <div class="hero-contenido">
+        <span class="hero-insignia hero-aparece">15 años de experiencia</span>
 
-    <button type="button" class="btn-style" onclick="abrirModalCotizacion()">
-      Cotizar mi evento
-    </button>
-  </div>
+        <h1 class="hero-titulo">
+            <span class="hero-aparece">Momentos únicos,</span>
+            <span class="hero-titulo-acento hero-aparece">celebraciones inolvidables.</span>
+        </h1>
+
+        <div class="hero-separador hero-aparece" aria-hidden="true"><span></span></div>
+
+        <p class="hero-texto hero-aparece">
+            Diseñamos y organizamos cada detalle de tu evento: decoración, mobiliario,
+            banquete y ambientación para bodas, 15 años, grados, bautizos y eventos empresariales.
+        </p>
+
+        <div class="hero-acciones hero-aparece">
+            <button type="button" class="hero-btn hero-btn-principal" onclick="abrirModalCotizacion()">
+                Cotizar mi evento <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </button>
+            <a href="{% url 'galeria' %}" class="hero-btn hero-btn-secundario">
+                Ver nuestros eventos <i class="fas fa-images" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-puntos" role="tablist" aria-label="Fotos de fondo">
+        {% for n in "123456" %}
+        <button type="button" class="hero-punto{% if forloop.first %} activo{% endif %}" aria-label="Ver foto {{ n }}"></button>
+        {% endfor %}
+    </div>
 </section>
 
 <!-- Ventana modal con dialog -->
@@ -447,6 +377,7 @@
 {# Tabla de precios del panel (Bd_PremiumEventos/precios.py); modal.js la lee de aquí #}
 {{ tabla_precios|json_script:"tabla-precios" }}
 <script src="{% static 'js/modal.js' %}"></script>
+<script src="{% static 'js/inicio.js' %}"></script>
 
 
 
