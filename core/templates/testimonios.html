@@ -10,6 +10,11 @@
 <div class="testimonios-header">
     <div class="container">
         <h2>Testimonios</h2>
+        <div class="hero-separador my-3" aria-hidden="true" style="display: flex; align-items: center; justify-content: center; gap: 0.8rem;">
+            <span style="width: 50px; height: 1px; background: rgba(232, 178, 61, 0.5);"></span>
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #e8b23d; box-shadow: 0 0 8px #e8b23d;"></span>
+            <span style="width: 50px; height: 1px; background: rgba(232, 178, 61, 0.5);"></span>
+        </div>
         <p class="reseñas">OPINIONES DE NUESTROS CLIENTES</p>
     </div>
 </div>
@@ -69,7 +74,7 @@
                         </div>
 
                         <p class="testimonio-texto">
-                            Aún no hay testimonios publicados.
+                            Aún no hay testimonios publicados.<br>
                             ¡Sé el primero en compartir tu experiencia!
                         </p>
 
@@ -80,17 +85,26 @@
         {% endif %}
 
 
+        <!-- Separador ornamental entre testimonios y formulario -->
+        <div class="testimonios-decorador-seccion" aria-hidden="true">
+            <span class="linea"></span>
+            <span class="diamante"></span>
+            <span class="linea"></span>
+        </div>
+
+
         <!-- Dejar una opinión -->
         <div class="row">
             <div class="col-lg-8 mx-auto">
 
                 <div class="formulario-testimonio">
 
-                    <h3>Déjanos tu opinión</h3>
-
-                    <p class="formulario-descripcion">
-                        Cuéntanos cómo fue tu experiencia con Premium Eventos JM.
-                    </p>
+                    <div class="formulario-header-box">
+                        <h3>Déjanos tu opinión</h3>
+                        <p class="formulario-descripcion">
+                            Cuéntanos cómo fue tu experiencia con Premium Eventos JM. Tu opinión inspira a nuestros futuros clientes.
+                        </p>
+                    </div>
 
                     {% if usuario_logueado %}
 
@@ -98,48 +112,35 @@
 
                             {% csrf_token %}
 
-                            <div class="campo-testimonio">
-
-                                <label>
-                                Calificación
-                                </label>
+                            <div class="campo-testimonio text-center mb-4">
+                                <label class="d-block mb-2">Tu Calificación</label>
 
                                 <div class="selector-estrellas" id="selectorEstrellas">
-
                                     <button type="button" class="estrella-btn" data-valor="1">
                                         <i class="far fa-star"></i>
                                     </button>
-
                                     <button type="button" class="estrella-btn" data-valor="2">
                                         <i class="far fa-star"></i>
                                     </button>
-
                                     <button type="button" class="estrella-btn" data-valor="3">
                                         <i class="far fa-star"></i>
                                     </button>
-
                                     <button type="button" class="estrella-btn" data-valor="4">
                                         <i class="far fa-star"></i>
                                     </button>
-
                                     <button type="button" class="estrella-btn" data-valor="5">
                                         <i class="far fa-star"></i>
                                     </button>
-
                                 </div>
 
                                 {{ form.calificacion }}
-
                             </div>
 
                             <div class="campo-testimonio">
-
                                 <label for="{{ form.comentario.id_for_label }}">
-                                    Tu opinión
+                                    Tu mensaje u opinión
                                 </label>
-
                                 {{ form.comentario }}
-
                             </div>
 
                             {% if form.errors %}
@@ -148,24 +149,24 @@
                                 </div>
                             {% endif %}
 
-                            <button type="submit" class="btn-enviar-testimonio">
-                                Enviar opinión
-                            </button>
+                            <div class="btn-enviar-container">
+                                <button type="submit" class="btn-enviar-testimonio">
+                                    <span>Enviar opinión</span>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
 
                         </form>
 
                     {% else %}
 
                         <div class="login-testimonio">
-
                             <p>
-                                Debes iniciar sesión para dejar una opinión.
+                                "Para garantizar la autenticidad de nuestras reseñas, debes iniciar sesión para dejar un comentario."
                             </p>
-
                             <a href="?login=1" class="btn-login-testimonio">
-                                Iniciar sesión
+                                <i class="fas fa-user-lock"></i> Iniciar sesión
                             </a>
-
                         </div>
 
                     {% endif %}
@@ -178,5 +179,5 @@
     </div>
 </div>
 
-<script src= "{% static 'js/testimonios.js' %}"></script>
+<script src="{% static 'js/testimonios.js' %}"></script>
 {% endblock %}
