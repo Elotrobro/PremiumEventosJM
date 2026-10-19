@@ -55,6 +55,7 @@
       {% endfor %}
     </tbody>
   </table>
+  {% include "panel_admin/_paginacion.html" %}
   {% else %}
   <p class="pa-empty">No hay usuarios registrados todavía.</p>
   {% endif %}

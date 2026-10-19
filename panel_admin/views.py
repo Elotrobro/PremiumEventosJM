@@ -8,6 +8,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
+from django.core import paginator
+
 from Bd_PremiumEventos.models import (
     Usuario,
     ContactoSimple,
@@ -58,6 +60,9 @@ def render_panel(request, plantilla, contexto):
     contexto['base_template'] = 'panel_admin/_modal.html' if es_modal(request) else 'panel_admin/base_admin.html'
     return render(request, plantilla, contexto)
 
+def _paginar(request, objetos, por_pagina=10):
+    paginator = Paginator(objetos, por_pagina)
+    return paginator.get_page(request.GET.get('page'))
 
 # ═══════════════════════════════════════════════════════════════════════
 # Panel de administrador a medida (no es el admin genérico de Django).
@@ -129,18 +134,21 @@ def dashboard(request):
 @staff_required
 def usuarios_list(request):
     # tiene_cotizacion se anota para que la plantilla sepa, sin consultas
-    # extra por fila, a qué clientes puede eliminar un 'empleado' (solo
-    # los que todavía no han hecho ninguna cotización).
-    usuarios = list(Usuario.objects.annotate(
+    # extra por fila, a qué clientes puede eliminar un 'empleado'.
+    usuarios = Usuario.objects.annotate(
         tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
-    ).order_by('nombre_completo'))
-    # Días que le quedan a cada cliente sin cotizaciones antes de que el
-    # sistema lo elimine solo (ver Bd_PremiumEventos/limpieza.py).
-    for usuario in usuarios:
+    ).order_by('nombre_completo')
+
+    pagina = _paginar(request, usuarios)
+
+    # Días que le quedan a cada cliente sin cotizaciones (solo de la página actual).
+    for usuario in pagina.object_list:
         if usuario.rol == Usuario.ROL_CLIENTE and not usuario.tiene_cotizacion:
             usuario.dias_para_eliminar = limpieza.dias_para_eliminar(usuario)
+
     return render(request, 'panel_admin/usuarios_list.html', {
-        'usuarios': usuarios,
+        'usuarios': pagina.object_list,
+        'page_obj': pagina,
         'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
     })
 
@@ -211,8 +219,11 @@ def usuario_delete(request, pk):
 @staff_required
 def catalogo_list(request):
     items = ItemDecoracion.objects.all().order_by('nombre')
-    return render(request, 'panel_admin/catalogo_list.html', {'items': items})
-
+    pagina = _paginar(request, items)
+    return render(request, 'panel_admin/catalogo_list.html', {
+        'items': pagina.object_list,
+        'page_obj': pagina,
+    })
 
 @staff_required
 def catalogo_create(request):
@@ -301,7 +312,7 @@ def galeria_delete(request, pk):
         return redirect('panel_admin:galeria_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': foto, 'titulo': 'foto de la galería', 'cancelar_url': 'panel_admin:galeria_list',
-    })
+    });
 
 
 # ─────────────────── Mensajes de contacto (ContactoSimple) ───────────────────
@@ -309,7 +320,11 @@ def galeria_delete(request, pk):
 @staff_required
 def mensajes_list(request):
     mensajes = ContactoSimple.objects.all().order_by('-fecha_contacto')
-    return render(request, 'panel_admin/mensajes_list.html', {'mensajes': mensajes})
+    pagina = _paginar(request, mensajes)
+    return render(request, 'panel_admin/mensajes_list.html', {
+        'mensajes': pagina.object_list,
+        'page_obj': pagina,
+    });
 
 
 @admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
@@ -332,13 +347,16 @@ def testimonios_list(request):
         'usuario'
     ).order_by('-fecha_creacion')
 
+    pagina = _paginar(request, testimonios)
+
     return render(
         request,
         'panel_admin/testimonios_list.html',
         {
-            'testimonios': testimonios,
+            'testimonios': pagina.object_list,
+            'page_obj': pagina,
         }
-    )
+    );
 
 
 @staff_required
@@ -394,8 +412,10 @@ def cotizaciones_list(request):
     cotizaciones, contexto_filtro = _filtrar_cotizaciones(
         request, cotizaciones, 'detallecotizacion__fecha_cotizacion', 'estado',
     )
+    pagina = _paginar(request, cotizaciones.distinct().order_by('-id_cotizacion'))
     return render(request, 'panel_admin/cotizaciones_list.html', {
-        'cotizaciones': cotizaciones.distinct().order_by('-id_cotizacion'),
+        'cotizaciones': pagina.object_list,
+        'page_obj': pagina,
         **contexto_filtro,
     })
 
