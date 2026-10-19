@@ -42,6 +42,7 @@
       {% endfor %}
     </tbody>
   </table>
+  {% include "panel_admin/_paginacion.html" %}
   {% else %}
   <p class="pa-empty">No hay cotizaciones para el filtro seleccionado.</p>
   {% endif %}
