@@ -22,66 +22,55 @@
 <div class="testimonios-section">
     <div class="container">
 
-        <!-- Testimonios aprobados -->
-        {% if testimonios %}
-
-            {% for testimonio in testimonios %}
-
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <div class="testimonio-card">
-
-                        <div class="estrellas">
-                            {% for estrella in "12345" %}
-                                {% if forloop.counter <= testimonio.calificacion %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
+        <!-- Reseñas aprobadas: solo se envían las primeras cinco al cargar la página -->
+        <div id="listaTestimonios" class="testimonios-lista" data-next-page="2" data-has-more="{{ tiene_mas|yesno:'true,false' }}">
+            {% if testimonios %}
+                {% for testimonio in testimonios %}
+                    <div class="row testimonio-item" data-testimonio-card>
+                        <div class="col-lg-8 mx-auto">
+                            <div class="testimonio-card" data-reveal>
+                                <div class="estrellas" aria-label="Calificación: {{ testimonio.calificacion }} de 5 estrellas">
+                                    {% for estrella in "12345" %}
+                                        {% if forloop.counter <= testimonio.calificacion %}
+                                            <i class="fas fa-star" aria-hidden="true"></i>
+                                        {% else %}
+                                            <i class="far fa-star" aria-hidden="true"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="testimonio-texto">“{{ testimonio.comentario }}”</p>
+                                <p class="testimonio-autor">{{ testimonio.usuario.nombre_completo }}</p>
+                                <p class="testimonio-fecha">Cliente de Premium Eventos JM</p>
+                            </div>
                         </div>
-
-                        <p class="testimonio-texto">
-                            "{{ testimonio.comentario }}"
-                        </p>
-
-                        <p class="testimonio-autor">
-                            {{ testimonio.usuario.nombre_completo }}
-                        </p>
-
-                        <p class="testimonio-fecha">
-                            Cliente de Premium Eventos JM
-                        </p>
-
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="testimonio-card text-center">
+                            <div class="estrellas" aria-hidden="true">
+                                <i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                            </div>
+                            <p class="testimonio-texto">Aún no hay testimonios publicados.<br>¡Sé el primero en compartir tu experiencia!</p>
+                        </div>
                     </div>
                 </div>
+            {% endif %}
+        </div>
+
+        {% if total_testimonios > 5 %}
+            <div class="testimonios-paginacion" id="controlesTestimonios">
+                <button type="button" class="btn-resenas" id="verMasResenas">
+                    <span>Ver más reseñas</span>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn-resenas btn-resenas-secundario" id="verMenosResenas" hidden>
+                    <span>Ver menos</span>
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                </button>
+                <p class="resenas-contador" id="contadorResenas">Mostrando {{ testimonios|length }} de {{ total_testimonios }} reseñas</p>
             </div>
-
-            {% endfor %}
-
-        {% else %}
-
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <div class="testimonio-card text-center">
-
-                        <div class="estrellas">
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-
-                        <p class="testimonio-texto">
-                            Aún no hay testimonios publicados.<br>
-                            ¡Sé el primero en compartir tu experiencia!
-                        </p>
-
-                    </div>
-                </div>
-            </div>
-
         {% endif %}
 
 

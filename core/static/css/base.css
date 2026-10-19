@@ -1361,3 +1361,316 @@ input[type="email"].correo-invalido {
     position: relative;
     z-index: 2;
 }
+
+/* =========================================================
+   CORRECCIÓN RESPONSIVE NAVBAR - PREMIUM EVENTOS JM
+   Sobrescribe desplazamientos inline del base.html sin cambiar
+   la identidad visual del sitio.
+   ========================================================= */
+
+nav.navbar {
+    width: 100%;
+    background: #fff !important;
+    z-index: 1030;
+}
+
+nav.navbar > .container {
+    width: 100%;
+    max-width: 1440px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Elimina los desplazamientos que sacaban elementos de la pantalla. */
+#navbarNav,
+#navbarNav.navbar-collapse,
+.nav-link2,
+.nav-acciones .nav-admin,
+.nav-acciones .user-chip-btn,
+.nav-acciones .user-chip-menu {
+    transform: none !important;
+}
+
+/* Escritorio: logo, enlaces y acciones en una fila flexible. */
+@media (min-width: 1200px) {
+    #navbarNav {
+        flex: 1 1 0%;
+        min-width: 0;
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    #navbarNav > .navbar-nav {
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: center;
+        gap: 0.15rem;
+    }
+
+    #navbarNav .nav-acciones {
+        flex: 0 0 auto;
+        margin-left: 0.5rem;
+        gap: 0.55rem;
+        align-items: center;
+    }
+
+    .navbar-brand {
+        margin-right: 1rem;
+    }
+
+    .navbar-brand img {
+        max-width: 210px;
+        height: 66px;
+        object-fit: contain;
+    }
+
+    .navbar .nav-link {
+        padding-left: 0.65rem !important;
+        padding-right: 0.65rem !important;
+    }
+
+    .nav-link2 {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Portátiles: reduce espacios para que no se pierdan enlaces ni botones. */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .navbar > .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        max-width: 100%;
+    }
+
+    .navbar-brand {
+        margin-right: 0.45rem;
+    }
+
+    .navbar-brand img {
+        height: 52px;
+        max-width: 155px;
+        object-fit: contain;
+    }
+
+    #navbarNav {
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 0.15rem;
+    }
+
+    #navbarNav > .navbar-nav {
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 0;
+    }
+
+    .navbar .nav-link {
+        padding: 0.45rem 0.38rem !important;
+        font-size: 0.82rem;
+    }
+
+    #navbarNav .nav-acciones {
+        margin-left: 0.25rem;
+        gap: 0.3rem;
+    }
+
+    .nav-link2 {
+        padding: 0.45rem 0.55rem;
+        font-size: 0.8rem;
+    }
+
+    .user-chip-btn {
+        padding: 0.35rem 0.5rem;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+    }
+
+    .user-chip-nombre {
+        max-width: 92px;
+    }
+
+    .nav-admin {
+        font-size: 0.8rem !important;
+    }
+
+    .servicios-menu {
+        width: min(680px, calc(100vw - 32px));
+    }
+}
+
+/* Tablet y celular: menú hamburguesa y acciones visibles dentro del menú. */
+@media (max-width: 991.98px) {
+    nav.navbar > .container {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+
+    .navbar-brand {
+        margin-right: auto;
+        max-width: calc(100% - 64px);
+    }
+
+    .navbar-brand img {
+        height: 50px;
+        max-width: min(220px, 65vw);
+        object-fit: contain;
+    }
+
+    .navbar-toggler {
+        flex: 0 0 auto;
+        padding: 0.35rem 0.55rem;
+        border-color: #e4d3bf;
+        box-shadow: none !important;
+    }
+
+    #navbarNav {
+        flex-basis: 100%;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0.65rem 0 0.35rem;
+        transform: none !important;
+    }
+
+    #navbarNav > .navbar-nav {
+        width: 100%;
+        align-items: stretch;
+        gap: 0.1rem;
+    }
+
+    #navbarNav .navbar-nav .nav-link {
+        width: 100%;
+        min-height: 42px;
+        padding: 0.65rem 0.75rem !important;
+        white-space: normal;
+    }
+
+    #navbarNav .nav-acciones {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.55rem;
+        margin: 0.65rem 0 0 !important;
+        padding: 0.8rem 0 0.25rem;
+        border-top: 1px solid #eee5df;
+    }
+
+    #navbarNav .nav-acciones > a,
+    #navbarNav .nav-acciones .user-chip,
+    #navbarNav .nav-acciones .user-chip-btn {
+        width: 100%;
+        max-width: 100%;
+        justify-content: flex-start;
+        box-sizing: border-box;
+    }
+
+    #navbarNav .nav-acciones .nav-link2 {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 0.75rem;
+        white-space: normal;
+    }
+
+    #navbarNav .user-chip-nombre {
+        max-width: calc(100vw - 115px);
+    }
+
+    #navbarNav .user-chip-menu {
+        transform: none !important;
+    }
+
+    /* El menú de servicios se integra en la navegación desplegada. */
+    .servicios-dropdown {
+        width: 100%;
+    }
+
+    .servicios-menu {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: none !important;
+        padding: 0.35rem 0 0.55rem 0.65rem;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .servicios-menu::before {
+        display: none;
+    }
+
+    .servicios-header {
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .servicios-header p {
+        margin-bottom: 0;
+    }
+
+    .servicios-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.2rem;
+    }
+
+    .servicio-item {
+        padding: 0.55rem;
+        gap: 0.65rem;
+    }
+
+    .servicio-icon {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+    }
+
+    .servicio-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .servicio-info p {
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .navbar-brand img {
+        height: 44px;
+        max-width: 190px;
+    }
+
+    nav.navbar > .container {
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+    }
+
+    .servicios-menu {
+        padding-left: 0.25rem;
+    }
+
+    .servicio-item {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar *,
+    .servicios-menu,
+    .servicio-item {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -385,3 +385,88 @@ body {
     background-size: cover;
     background-position: center;
 }
+
+/* ── Carga progresiva de reseñas (inspirada en la galería) ───────── */
+.testimonios-lista .testimonio-card[data-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .55s ease, transform .55s cubic-bezier(.22,.75,.25,1), box-shadow .35s ease, border-color .35s ease;
+    will-change: opacity, transform;
+}
+.testimonios-lista .testimonio-card[data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    will-change: auto;
+}
+.testimonios-paginacion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .85rem;
+    margin: .5rem auto 1rem;
+    text-align: center;
+}
+.btn-resenas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .7rem;
+    min-width: 205px;
+    padding: .9rem 1.8rem;
+    border: 1px solid rgba(193,123,60,.55);
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2a1a17 0%, #5c2029 100%);
+    color: #fffaf5;
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: .02em;
+    box-shadow: 0 8px 22px rgba(42,26,23,.14);
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.btn-resenas:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(42,26,23,.2);
+    background: linear-gradient(135deg, #3d231e 0%, #70402e 100%);
+}
+.btn-resenas:focus-visible { outline: 3px solid rgba(232,178,61,.65); outline-offset: 4px; }
+.btn-resenas:disabled { opacity: .65; cursor: wait; }
+.btn-resenas-secundario { background: #fff; color: #4a3027; box-shadow: none; }
+.btn-resenas-secundario:hover:not(:disabled) { background: #f5ede4; color: #2a1a17; }
+.btn-resenas[hidden] { display: none !important; }
+.resenas-contador { margin: 0; color: #8c7d70; font-size: .82rem; letter-spacing: .035em; }
+@media (prefers-reduced-motion: reduce) {
+    .testimonios-lista .testimonio-card[data-reveal] { opacity: 1; transform: none; transition: none; }
+    .btn-resenas { transition: none; }
+}
+@media (max-width: 576px) {
+    .testimonios-paginacion { margin-top: .25rem; }
+    .btn-resenas { width: min(100%, 280px); }
+}
+
+
+/* Animación de aparición al hacer scroll */
+.testimonio-card.reveal-testimonio {
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+        opacity 0.65s ease,
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+.testimonio-card.reveal-testimonio.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .testimonio-card.reveal-testimonio {
+        opacity: 1;
+        transform: none;
+        transition: none;
+        will-change: auto;
+    }
+}
