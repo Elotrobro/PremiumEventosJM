@@ -1,9 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    Animaciones del sitio público (todas las páginas que extienden base.html)
 
-   - Transición entre módulos: telón con el logo al salir de una página y
-     al entrar a la siguiente.
-   - Entrada de la página: el contenido aparece suave y el navbar baja.
    - Aparición progresiva al hacer scroll: core/static/js/animaciones.js
      marca los bloques con [data-anim] y les pone .anim-visible cuando
      entran en pantalla.
@@ -20,101 +17,17 @@
 
 :root {
     --anim-dorado: #c79a40;
-    --anim-crema: #fffaf5;
     --anim-curva: cubic-bezier(0.22, 1, 0.36, 1);
     --anim-duracion: 0.95s;
-}
-
-
-/* ── Telón de transición entre módulos ─────────────────────────────── */
-
-.pagina-transicion {
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.4rem;
-    background:
-        radial-gradient(circle at 50% 45%, #ffffff 0%, var(--anim-crema) 45%, #efe4d6 100%);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.55s var(--anim-curva), visibility 0s linear 0.55s;
-}
-
-.pagina-transicion img {
-    width: min(190px, 45vw);
-    height: auto;
-    opacity: 0;
-    scale: 0.92;
-    transition: opacity 0.5s var(--anim-curva), scale 0.7s var(--anim-curva);
-}
-
-.pagina-transicion-linea {
-    position: relative;
-    width: min(160px, 40vw);
-    height: 2px;
-    overflow: hidden;
-    background: rgba(199, 154, 64, 0.2);
-    border-radius: 2px;
-}
-
-.pagina-transicion-linea::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--anim-dorado);
-    translate: -100% 0;
-    animation: anim-cargando 1.1s var(--anim-curva) infinite;
-}
-
-/* Saliendo de la página: el telón cubre todo antes de navegar. */
-.anim-saliendo .pagina-transicion,
-/* Entrando desde otro módulo: el telón ya está puesto y se retira. */
-.anim-entrando:not(.anim-listo) .pagina-transicion {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transition: opacity 0.45s var(--anim-curva), visibility 0s;
-}
-
-.anim-saliendo .pagina-transicion img,
-.anim-entrando:not(.anim-listo) .pagina-transicion img {
-    opacity: 1;
-    scale: 1;
-}
-
-@keyframes anim-cargando {
-    0%   { translate: -100% 0; }
-    60%  { translate: 0 0; }
-    100% { translate: 100% 0; }
 }
 
 
 /* ── Entrada de la página ──────────────────────────────────────────── */
 
 /* Mientras animaciones.js prepara los bloques, el contenido espera
-   oculto para que no "parpadee". Solo opacidad: un transform en <main>
-   rompería los modales (position: fixed) que viven dentro. */
+   oculto un instante para que no "parpadee" (sin animación propia). */
 .anim-on:not(.anim-listo) main {
     opacity: 0;
-}
-
-.anim-on.anim-listo main {
-    animation: anim-aparecer 0.7s var(--anim-curva) backwards;
-}
-
-/* El navbar baja solo en la primera visita; al venir de otro módulo
-   ya lo tapó el telón y basta con que el telón se retire. */
-.anim-on.anim-listo:not(.anim-entrando) nav.navbar {
-    animation: anim-navbar 0.9s var(--anim-curva) backwards;
-}
-
-@keyframes anim-navbar {
-    from { opacity: 0; translate: 0 -100%; }
 }
 
 
@@ -207,13 +120,11 @@
 /* ── Accesibilidad ─────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-    .pagina-transicion,
     .anim-progreso {
         display: none !important;
     }
 
     .anim-on main,
-    .anim-on nav.navbar,
     .anim-on [data-anim] {
         opacity: 1 !important;
         animation: none !important;

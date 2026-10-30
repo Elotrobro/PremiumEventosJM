@@ -11,18 +11,11 @@
   <link rel="stylesheet" href="{% static 'css/animaciones.css' %}">
   <script>
     // Activa las animaciones (core/static/js/animaciones.js) antes de pintar
-    // la página, salvo que el sistema pida reducir el movimiento. Si se llega
-    // desde otro módulo del sitio, la página arranca con el telón puesto.
+    // la página, salvo que el sistema pida reducir el movimiento.
     (function () {
       var html = document.documentElement;
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       html.classList.add('anim-on');
-      try {
-        if (sessionStorage.getItem('pe-transicion') === '1') {
-          html.classList.add('anim-entrando');
-          sessionStorage.removeItem('pe-transicion');
-        }
-      } catch (e) { /* sin sessionStorage: entra sin telón */ }
       // Red de seguridad: si animaciones.js no carga, el contenido se muestra igual.
       setTimeout(function () { html.classList.add('anim-listo'); }, 3000);
     })();
@@ -34,12 +27,6 @@
 <body data-logged-in="{% if request.session.usuario_id %}true{% else %}false{% endif %}"
       data-open-login="{% if request.GET.login or request.GET.registro %}true{% else %}false{% endif %}"
       data-open-tab="{% if request.GET.registro %}registro{% else %}login{% endif %}">
-
-<!-- Telón de transición entre módulos (core/static/css/animaciones.css) -->
-<div class="pagina-transicion" aria-hidden="true">
-  <img src="{% static 'images/Logo_nav.png' %}" alt="">
-  <span class="pagina-transicion-linea"></span>
-</div>
 
 <!-- Navbar: logo a la izquierda, enlaces centrados y acciones de cuenta a la
      derecha. Tamaños y espaciados en core/static/css/base.css ("NAVBAR PRINCIPAL"). -->

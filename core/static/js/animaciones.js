@@ -4,11 +4,7 @@
 // 1. Aparición progresiva al hacer scroll: cada bloque de la lista
 //    REVELAR recibe [data-anim] y, cuando entra en pantalla, la clase
 //    .anim-visible. Los que entran juntos aparecen en cascada.
-// 2. Transición entre módulos: al hacer clic en un enlace interno, el
-//    telón con el logo cubre la página y luego se navega; la página
-//    nueva arranca con el telón puesto y lo retira (ver el <head> de
-//    base.html, que lee la marca de sessionStorage).
-// 3. Barra de progreso de lectura arriba de la página.
+// 2. Barra de progreso de lectura arriba de la página.
 //
 // Solo corre si el <head> de base.html puso .anim-on en <html> (no lo
 // pone cuando el sistema pide reducir el movimiento).
@@ -95,7 +91,6 @@
 
     const PASO_CASCADA = 0.09;   // segundos entre un bloque y el siguiente
     const MAX_CASCADA = 0.6;     // tope para que nada espere demasiado
-    const DURACION_SALIDA = 450; // ms del telón antes de navegar
 
     // ── 1. Aparición progresiva al hacer scroll ───────────────────────
 
@@ -182,51 +177,7 @@
         });
     });
 
-    // ── 2. Transición entre módulos ───────────────────────────────────
-
-    function esNavegacionInterna(event, enlace) {
-        if (event.defaultPrevented || event.button !== 0) return false;
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
-        if (enlace.target && enlace.target !== "_self") return false;
-        if (enlace.hasAttribute("download") || enlace.hasAttribute("data-bs-toggle")) return false;
-
-        const destino = enlace.getAttribute("href");
-        if (!destino || destino.startsWith("#") || destino.startsWith("javascript:")) return false;
-
-        const url = new URL(enlace.href, window.location.href);
-        if (url.origin !== window.location.origin) return false;
-        if (!/^https?:$/.test(url.protocol)) return false;
-        // Mismo documento con otro #ancla: lo resuelve el scroll suave.
-        if (url.pathname === window.location.pathname &&
-            url.search === window.location.search && url.hash) return false;
-        // El panel de administrador y el admin de Django no usan base.html.
-        if (/^\/(panel-admin|admin)\//.test(url.pathname)) return false;
-        return true;
-    }
-
-    // En window (y no en document) para correr después de los demás
-    // scripts: si alguno canceló el clic (p. ej. abrir la modal de login),
-    // event.defaultPrevented ya lo indica y no se hace la transición.
-    window.addEventListener("click", (event) => {
-        const enlace = event.target.closest && event.target.closest("a[href]");
-        if (!enlace || !esNavegacionInterna(event, enlace)) return;
-
-        event.preventDefault();
-        try { sessionStorage.setItem("pe-transicion", "1"); } catch (e) { /* sin storage: entra sin telón */ }
-        html.classList.add("anim-saliendo");
-        setTimeout(() => { window.location.href = enlace.href; }, DURACION_SALIDA);
-    });
-
-    // Al volver con el botón "atrás" el navegador puede restaurar la
-    // página tal como quedó (con el telón puesto): se retira.
-    window.addEventListener("pageshow", (event) => {
-        if (event.persisted) {
-            html.classList.remove("anim-saliendo");
-            try { sessionStorage.removeItem("pe-transicion"); } catch (e) { /* nada */ }
-        }
-    });
-
-    // ── 3. Barra de progreso de lectura ───────────────────────────────
+    // ── 2. Barra de progreso de lectura ───────────────────────────────
 
     const barra = document.createElement("div");
     barra.className = "anim-progreso";
@@ -252,6 +203,6 @@
     window.addEventListener("resize", pedirActualizacion);
     actualizarBarra();
 
-    // Todo listo: se muestra el contenido y se retira el telón.
+    // Todo listo: se muestra el contenido.
     requestAnimationFrame(() => html.classList.add("anim-listo"));
 })();
