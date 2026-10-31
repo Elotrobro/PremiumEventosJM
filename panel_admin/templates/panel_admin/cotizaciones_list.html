@@ -1,51 +1,261 @@
 {% extends 'panel_admin/base_admin.html' %}
 {% load panel_extras %}
+
 {% block title %}Cotizaciones{% endblock %}
+
 {% block content %}
 
 <div class="pa-page-header">
-  <h1><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</h1>
-  <a href="{% url 'panel_admin:historial_list' %}" class="pa-btn pa-btn-secondary"><i class="fas fa-clock-rotate-left"></i> Ver historial</a>
+    <h1>
+        <i class="fas fa-file-invoice-dollar"></i>
+        Cotizaciones
+    </h1>
+
+    <a href="{% url 'panel_admin:historial_list' %}"
+       class="pa-btn pa-btn-secondary">
+        <i class="fas fa-clock-rotate-left"></i>
+        Ver historial
+    </a>
 </div>
 
 {% include 'panel_admin/_filtros_cotizaciones.html' %}
 
-<div class="pa-card" style="padding:0; overflow-x:auto;">
-  {% if cotizaciones %}
-  <table class="pa-table">
-    <thead>
-      <tr>
-        <th>Código</th><th>Cliente</th><th>Correo</th><th>Fecha evento</th><th>Invitados</th><th>Tema</th><th>Estado</th><th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for cotizacion in cotizaciones %}
-      <tr>
-        <td class="pa-codigo">{{ cotizacion.codigo_seguimiento }}</td>
-        <td>{{ cotizacion.nombre_cliente }}</td>
-        <td>{{ cotizacion.correo_cliente }}</td>
-        <td>{{ cotizacion.fecha_evento|date:'Y-m-d' }}</td>
-        <td>{{ cotizacion.cantidad_invitados|miles }}</td>
-        <td>{{ cotizacion.tema_estilo }}</td>
-        <td><span class="pa-badge pa-badge-{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></td>
-        <td>
-          {% if request.session.usuario_rol == 'admin' %}
-            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" data-pa-modal="lg" class="pa-btn pa-btn-sm" title="Editar"><i class="fas fa-pen"></i></a>
-            {% if cotizacion.estado != 'pagado' %}
-              <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}" data-pa-modal class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar"><i class="fas fa-trash"></i></a>
-            {% endif %}
-          {% else %}
-            <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}" data-pa-modal="lg" class="pa-btn pa-btn-sm pa-btn-secondary" title="Ver detalle"><i class="fas fa-eye"></i></a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% include "panel_admin/_paginacion.html" %}
-  {% else %}
-  <p class="pa-empty">No hay cotizaciones para el filtro seleccionado.</p>
-  {% endif %}
+<!-- Controles de visualización -->
+<div class="pa-view-controls">
+    <span class="pa-view-label">Modo de visualización:</span>
+
+    <div class="pa-view-buttons">
+        <button type="button"
+                class="pa-btn {% if vista_actual == 'tabla' %}pa-btn-active{% else %}pa-btn-secondary{% endif %}"
+                onclick="cambiarVistaCotizaciones('tabla')">
+            <i class="fas fa-table"></i>
+            Tabla
+        </button>
+
+        <button type="button"
+                class="pa-btn {% if vista_actual == 'cards' %}pa-btn-active{% else %}pa-btn-secondary{% endif %}"
+                onclick="cambiarVistaCotizaciones('cards')">
+            <i class="fas fa-grip"></i>
+            Cards
+        </button>
+    </div>
 </div>
+
+{% if page_obj %}
+
+    {% if page_obj.object_list %}
+
+        <!-- VISTA TABLA -->
+        {% if vista_actual == 'tabla' %}
+
+        <div class="pa-card pa-table-container">
+            <table class="pa-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Correo</th>
+                        <th>Fecha evento</th>
+                        <th>Invitados</th>
+                        <th>Tema</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for cotizacion in page_obj %}
+                    <tr>
+                        <td class="pa-codigo">
+                            {{ cotizacion.codigo_seguimiento }}
+                        </td>
+
+                        <td>{{ cotizacion.nombre_cliente }}</td>
+                        <td>{{ cotizacion.correo_cliente }}</td>
+
+                        <td>
+                            {{ cotizacion.fecha_evento|date:'Y-m-d' }}
+                        </td>
+
+                        <td>
+                            {{ cotizacion.cantidad_invitados|miles }}
+                        </td>
+
+                        <td>{{ cotizacion.tema_estilo }}</td>
+
+                        <td>
+                            <span class="pa-badge pa-badge-{{ cotizacion.estado }}">
+                                {{ cotizacion.get_estado_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if request.session.usuario_rol == 'admin' %}
+
+                                <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}"
+                                   data-pa-modal="lg"
+                                   class="pa-btn pa-btn-sm"
+                                   title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+
+                                {% if cotizacion.estado != 'pagado' %}
+                                <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}"
+                                   data-pa-modal
+                                   class="pa-btn pa-btn-sm pa-btn-danger"
+                                   title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                {% endif %}
+
+                            {% else %}
+
+                                <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}"
+                                   data-pa-modal="lg"
+                                   class="pa-btn pa-btn-sm pa-btn-secondary"
+                                   title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <!-- VISTA CARDS -->
+        <div class="pa-cotizaciones-grid">
+
+            {% for cotizacion in page_obj %}
+
+            <article class="pa-cotizacion-card">
+
+                <div class="pa-cotizacion-card-header">
+                    <div>
+                        <span class="pa-card-caption">Código de seguimiento</span>
+                        <h3 class="pa-codigo">
+                            {{ cotizacion.codigo_seguimiento }}
+                        </h3>
+                    </div>
+
+                    <span class="pa-badge pa-badge-{{ cotizacion.estado }}">
+                        {{ cotizacion.get_estado_display }}
+                    </span>
+                </div>
+
+                <div class="pa-cotizacion-card-body">
+
+                    <div class="pa-cotizacion-dato">
+                        <i class="fas fa-user"></i>
+                        <div>
+                            <span>Cliente</span>
+                            <strong>{{ cotizacion.nombre_cliente }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="pa-cotizacion-dato">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <span>Correo electrónico</span>
+                            <strong>{{ cotizacion.correo_cliente }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="pa-cotizacion-dato">
+                        <i class="fas fa-calendar"></i>
+                        <div>
+                            <span>Fecha del evento</span>
+                            <strong>{{ cotizacion.fecha_evento|date:'Y-m-d' }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="pa-cotizacion-dato">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <span>Invitados</span>
+                            <strong>{{ cotizacion.cantidad_invitados|miles }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="pa-cotizacion-dato">
+                        <i class="fas fa-palette"></i>
+                        <div>
+                            <span>Tema o estilo</span>
+                            <strong>{{ cotizacion.tema_estilo }}</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="pa-cotizacion-card-actions">
+
+                    {% if request.session.usuario_rol == 'admin' %}
+
+                        <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}"
+                           data-pa-modal="lg"
+                           class="pa-btn">
+                            <i class="fas fa-pen"></i>
+                            Editar
+                        </a>
+
+                        {% if cotizacion.estado != 'pagado' %}
+                        <a href="{% url 'panel_admin:cotizacion_delete' cotizacion.pk %}"
+                           data-pa-modal
+                           class="pa-btn pa-btn-danger">
+                            <i class="fas fa-trash"></i>
+                            Eliminar
+                        </a>
+                        {% endif %}
+
+                    {% else %}
+
+                        <a href="{% url 'panel_admin:cotizacion_edit' cotizacion.pk %}"
+                           data-pa-modal="lg"
+                           class="pa-btn pa-btn-secondary">
+                            <i class="fas fa-eye"></i>
+                            Ver detalle
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="pa-card">
+            <p class="pa-empty">
+                No hay cotizaciones para el filtro seleccionado.
+            </p>
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+<!-- Paginación -->
+{% include 'panel_admin/_paginacion.html' %}
+
+<script>
+function cambiarVistaCotizaciones(vista) {
+    const parametros = new URLSearchParams(window.location.search);
+
+    parametros.set('vista', vista);
+    parametros.delete('page');
+
+    window.location.search = parametros.toString();
+}
+</script>
 
 {% endblock %}

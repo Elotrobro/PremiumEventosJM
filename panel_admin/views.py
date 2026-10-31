@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
-from django.core import paginator
+
 
 from Bd_PremiumEventos.models import (
     Usuario,
@@ -133,25 +133,26 @@ def dashboard(request):
 
 @staff_required
 def usuarios_list(request):
-    # tiene_cotizacion se anota para que la plantilla sepa, sin consultas
-    # extra por fila, a qué clientes puede eliminar un 'empleado'.
-    usuarios = Usuario.objects.annotate(
-        tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
-    ).order_by('nombre_completo')
+    usuarios = list(Usuario.objects.annotate(
+        tiene_cotizacion=Exists(
+            Cotizacion.objects.filter(
+                cliente__usuario=OuterRef('pk')
+            )
+        )
+    ).order_by('nombre_completo'))
 
-    pagina = _paginar(request, usuarios)
-
-    # Días que le quedan a cada cliente sin cotizaciones (solo de la página actual).
-    for usuario in pagina.object_list:
+    for usuario in usuarios:
         if usuario.rol == Usuario.ROL_CLIENTE and not usuario.tiene_cotizacion:
             usuario.dias_para_eliminar = limpieza.dias_para_eliminar(usuario)
 
-    return render(request, 'panel_admin/usuarios_list.html', {
-        'usuarios': pagina.object_list,
-        'page_obj': pagina,
+    contexto = {
+        'usuarios': usuarios,
         'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
-    })
+    }
 
+    contexto.update(_paginar(request, usuarios))
+
+    return render(request, 'panel_admin/usuarios_list.html', contexto);
 
 @staff_required
 def usuario_create(request):
@@ -219,11 +220,15 @@ def usuario_delete(request, pk):
 @staff_required
 def catalogo_list(request):
     items = ItemDecoracion.objects.all().order_by('nombre')
-    pagina = _paginar(request, items)
-    return render(request, 'panel_admin/catalogo_list.html', {
-        'items': pagina.object_list,
-        'page_obj': pagina,
-    })
+
+    contexto = {
+        'items': items,
+        'vista_actual': _vista_actual(request),
+    }
+
+    contexto.update(_paginar(request, items))
+
+    return render(request, 'panel_admin/catalogo_list.html', contexto)
 
 @staff_required
 def catalogo_create(request):
@@ -320,11 +325,14 @@ def galeria_delete(request, pk):
 @staff_required
 def mensajes_list(request):
     mensajes = ContactoSimple.objects.all().order_by('-fecha_contacto')
-    pagina = _paginar(request, mensajes)
-    return render(request, 'panel_admin/mensajes_list.html', {
-        'mensajes': pagina.object_list,
-        'page_obj': pagina,
-    });
+
+    contexto = {
+        'mensajes': mensajes,
+    }
+
+    contexto.update(_paginar(request, mensajes))
+
+    return render(request, 'panel_admin/mensajes_list.html', contexto)
 
 
 @admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
@@ -347,15 +355,17 @@ def testimonios_list(request):
         'usuario'
     ).order_by('-fecha_creacion')
 
-    pagina = _paginar(request, testimonios)
+    contexto = {
+        'testimonios': testimonios,
+        'vista_actual': _vista_actual(request),
+    }
+
+    contexto.update(_paginar(request, testimonios))
 
     return render(
         request,
         'panel_admin/testimonios_list.html',
-        {
-            'testimonios': pagina.object_list,
-            'page_obj': pagina,
-        }
+        contexto
     );
 
 
@@ -409,15 +419,29 @@ def testimonio_delete(request, pk):
 @staff_required
 def cotizaciones_list(request):
     cotizaciones = Cotizacion.objects.select_related('cliente')
+
     cotizaciones, contexto_filtro = _filtrar_cotizaciones(
-        request, cotizaciones, 'detallecotizacion__fecha_cotizacion', 'estado',
+        request,
+        cotizaciones,
+        'detallecotizacion__fecha_cotizacion',
+        'estado',
     )
-    pagina = _paginar(request, cotizaciones.distinct().order_by('-id_cotizacion'))
-    return render(request, 'panel_admin/cotizaciones_list.html', {
-        'cotizaciones': pagina.object_list,
-        'page_obj': pagina,
+
+    cotizaciones = cotizaciones.distinct().order_by('-id_cotizacion')
+
+    contexto = {
+        'cotizaciones': cotizaciones,
+        'vista_actual': _vista_actual(request),
         **contexto_filtro,
-    })
+    }
+
+    contexto.update(_paginar(request, cotizaciones))
+
+    return render(
+        request,
+        'panel_admin/cotizaciones_list.html',
+        contexto
+    );
 
 
 @staff_required
@@ -604,17 +628,18 @@ def historial_list(request):
         suma_presupuesto=Sum('presupuesto'),
     )
 
-    paginator = Paginator(detalles, 15)
-    numero_pagina = request.GET.get('page')
-    pagina = paginator.get_page(numero_pagina)
-
     contexto = {
-        'pagina': pagina,
         'totales': totales,
         **contexto_filtro,
     }
-    return render(request, 'panel_admin/historial.html', contexto)
 
+    contexto.update(_paginar(request, detalles))
+
+    return render(
+        request,
+        'panel_admin/historial.html',
+        contexto
+    )
 
 @staff_required
 def historial_pdf(request):
@@ -817,3 +842,51 @@ def precios_edit(request):
         'ejemplos': [(n, calcular_precio_estimado(n, tabla, tarifa)) for n in EJEMPLOS_INVITADOS],
         'actualizado': configuracion.fecha_actualizacion,
     })
+
+
+# ───────────────────── Paginación dinámica ─────────────────────
+
+POR_PAGINA_OPCIONES = (5, 10, 15, 25, 50)
+POR_PAGINA_DEFECTO = 10
+
+
+def _paginar(request, objetos, page_param='page'):
+    """
+    Pagina una lista o queryset utilizando la cantidad indicada
+    en ?por_pagina=. Mantiene los demás parámetros GET.
+    """
+
+    try:
+        por_pagina = int(
+            request.GET.get('por_pagina', POR_PAGINA_DEFECTO)
+        )
+    except (TypeError, ValueError):
+        por_pagina = POR_PAGINA_DEFECTO
+
+    if por_pagina not in POR_PAGINA_OPCIONES:
+        por_pagina = POR_PAGINA_DEFECTO
+
+    paginador = Paginator(objetos, por_pagina)
+    page_obj = paginador.get_page(request.GET.get(page_param))
+
+    parametros = request.GET.copy()
+    parametros.pop(page_param, None)
+
+    return {
+        'page_obj': page_obj,
+        'por_pagina': por_pagina,
+        'opciones_por_pagina': POR_PAGINA_OPCIONES,
+        'page_param': page_param,
+        'querystring': parametros.urlencode(),
+    }
+
+
+def _vista_actual(request):
+    """Valida el modo de visualización solicitado."""
+
+    vista = request.GET.get('vista', 'tabla')
+
+    if vista not in ('tabla', 'cards'):
+        vista = 'tabla'
+
+    return vista

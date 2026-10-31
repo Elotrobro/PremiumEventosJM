@@ -601,3 +601,156 @@ body.panel-admin-body {
         transition: none;
     }
 }
+
+/* =========================================
+   MODOS DE VISUALIZACIÓN
+========================================= */
+
+.pa-view-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.pa-view-label {
+    color: #3c2e23;
+    font-weight: 600;
+}
+
+.pa-view-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pa-btn-active {
+    background: #c17b3c;
+    color: #fff;
+    border: 1px solid #c17b3c;
+}
+
+.pa-btn-active:hover {
+    background: #a9652e;
+    color: #fff;
+}
+
+/* =========================================
+   CARDS DE COTIZACIONES
+========================================= */
+
+.pa-cotizaciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.pa-cotizacion-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: #fffaf5;
+    border: 1px solid #e3d3bd;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 3px 12px rgba(60, 46, 35, 0.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.pa-cotizacion-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(60, 46, 35, 0.11);
+}
+
+.pa-cotizacion-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e3d3bd;
+}
+
+.pa-card-caption {
+    display: block;
+    color: #806d5c;
+    font-size: .78rem;
+    margin-bottom: 5px;
+}
+
+.pa-cotizacion-card-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+}
+
+.pa-cotizacion-card-body {
+    display: grid;
+    gap: 15px;
+    padding: 18px 0;
+}
+
+.pa-cotizacion-dato {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.pa-cotizacion-dato > i {
+    width: 18px;
+    margin-top: 3px;
+    color: #c17b3c;
+    text-align: center;
+}
+
+.pa-cotizacion-dato div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+
+.pa-cotizacion-dato span {
+    color: #806d5c;
+    font-size: .78rem;
+}
+
+.pa-cotizacion-dato strong {
+    color: #3c2e23;
+    font-size: .9rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.pa-cotizacion-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #e3d3bd;
+}
+
+.pa-table-container {
+    padding: 0;
+    overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+    .pa-view-controls {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .pa-cotizaciones-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pa-cotizacion-card {
+        padding: 15px;
+    }
+}

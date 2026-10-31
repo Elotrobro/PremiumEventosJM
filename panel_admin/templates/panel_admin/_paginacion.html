@@ -1,52 +1,84 @@
 
-{% if page_obj.paginator.num_pages > 1 %}
 <div class="pa-pagination-container">
-<div class="pa-pagination-info">
-    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-    · {{ page_obj.paginator.count }} registros
+
+    <div class="pa-pagination-info">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        · {{ page_obj.paginator.count }} registros
+    </div>
+
+    <div class="pa-pagination-size">
+        <label for="porPaginaSelect">Registros por página:</label>
+
+        <select id="porPaginaSelect" class="form-control">
+  <!-- Opciones... -->
+        </select>
+
+    <script>
+        document.getElementById('porPaginaSelect').addEventListener('change', function() {
+            // '{{ page_param|escapejs }}' se renderiza como un string seguro
+            const paramName = '{{ page_param|escapejs }}';
+            const params = new URLSearchParams(window.location.search);
+            params.set('por_pagina', this.value);
+            params.delete(paramName);
+            window.location.search = params.toString();
+        });
+    </script>
+            {% for cantidad in opciones_por_pagina %}
+                <option
+                    value="{{ cantidad }}"
+                    {% if por_pagina == cantidad %}selected{% endif %}
+                >
+                    {{ cantidad }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pa-pagination" aria-label="Paginación">
+
+            {% if page_obj.has_previous %}
+                <a class="pa-page-link"
+                   href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}=1"
+                   aria-label="Primera página">
+                    <i class="fas fa-angles-left"></i>
+                </a>
+
+                <a class="pa-page-link"
+                   href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.previous_page_number }}"
+                   aria-label="Página anterior">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+
+            {% for numero in page_obj.paginator.page_range %}
+                {% if numero == page_obj.number %}
+                    <span class="pa-page-link active" aria-current="page">
+                        {{ numero }}
+                    </span>
+                {% elif numero >= page_obj.number|add:"-2" and numero <= page_obj.number|add:"2" %}
+                    <a class="pa-page-link"
+                       href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ numero }}">
+                        {{ numero }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="pa-page-link"
+                   href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.next_page_number }}"
+                   aria-label="Página siguiente">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+
+                <a class="pa-page-link"
+                   href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.paginator.num_pages }}"
+                   aria-label="Última página">
+                    <i class="fas fa-angles-right"></i>
+                </a>
+            {% endif %}
+
+        </nav>
+    {% endif %}
+
 </div>
-
-<nav class="pa-pagination" aria-label="Paginación">
-    {% if page_obj.has_previous %}
-    <a class="pa-page-link"
-        href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}=1"
-        aria-label="Primera página">
-        <i class="fas fa-angles-left"></i>
-    </a>
-
-    <a class="pa-page-link"
-        href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.previous_page_number }}"
-        aria-label="Página anterior">
-        <i class="fas fa-angle-left"></i>
-    </a>
-    {% endif %}
-
-{% for numero in page_obj.paginator.page_range %}
-    {% if numero == page_obj.number %}
-        <span class="pa-page-link active" aria-current="page">
-        {{ numero }}
-        </span>
-    {% elif numero >= page_obj.number|add:"-2" and numero <= page_obj.number|add:"2" %}
-        <a class="pa-page-link"
-        href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ numero }}">
-        {{ numero }}
-        </a>
-    {% endif %}
-    {% endfor %}
-
-{% if page_obj.has_next %}
-    <a class="pa-page-link"
-        href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.next_page_number }}"
-        aria-label="Página siguiente">
-        <i class="fas fa-angle-right"></i>
-    </a>
-
-    <a class="pa-page-link"
-        href="?{% if querystring %}{{ querystring }}&amp;{% endif %}{{ page_param|default:'page' }}={{ page_obj.paginator.num_pages }}"
-        aria-label="Última página">
-        <i class="fas fa-angles-right"></i>
-    </a>
-    {% endif %}
-</nav>
-</div>
-{% endif %}
