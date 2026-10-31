@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum, Count, Exists, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 
 
@@ -387,7 +388,13 @@ def testimonio_aprobar(request, pk):
         testimonio.save(update_fields=['aprobado'])
         estado = 'aprobado y publicado' if testimonio.aprobado else 'marcado como no aprobado (ya no se publica)'
         messages.success(request, f'Testimonio de {testimonio.usuario.nombre_completo} {estado}.')
-    return redirect('panel_admin:testimonios_list')
+
+    # Se vuelve al listado con los mismos parámetros (vista, página y
+    # registros por página) que tenía, enviados por el formulario en
+    # "volver". Solo se agrega como querystring a la URL fija del listado.
+    url = reverse('panel_admin:testimonios_list')
+    volver = request.POST.get('volver', '')
+    return redirect(f'{url}?{volver}' if volver else url)
 
 
 @admin_required
