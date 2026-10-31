@@ -19,7 +19,7 @@
 </div>
 
 <div class="pa-card" style="padding:0; overflow-x:auto;">
-  {% if pagina.object_list %}
+  {% if page_obj.object_list %}
   <table class="pa-table">
     <thead>
       <tr>
@@ -28,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for detalle in pagina.object_list %}
+      {% for detalle in page_obj.object_list %}
       <tr>
         <td class="pa-codigo">{{ detalle.cotizacion.codigo_seguimiento }}</td>
         <td>{{ detalle.cotizacion.nombre_cliente }}</td>
@@ -48,22 +48,6 @@
   {% endif %}
 </div>
 
-{% if pagina.paginator.num_pages > 1 %}
-<div class="pa-pagination">
-  {% if pagina.has_previous %}
-    <a href="?{{ querystring }}&page={{ pagina.previous_page_number }}">« Anterior</a>
-  {% endif %}
-  {% for numero in pagina.paginator.page_range %}
-    {% if numero == pagina.number %}
-      <span class="pa-page-current">{{ numero }}</span>
-    {% else %}
-      <a href="?{{ querystring }}&page={{ numero }}">{{ numero }}</a>
-    {% endif %}
-  {% endfor %}
-  {% if pagina.has_next %}
-    <a href="?{{ querystring }}&page={{ pagina.next_page_number }}">Siguiente »</a>
-  {% endif %}
-</div>
-{% endif %}
+{% include 'panel_admin/_paginacion.html' %}
 
 {% endblock %}

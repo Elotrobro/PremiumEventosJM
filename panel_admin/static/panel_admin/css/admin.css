@@ -306,6 +306,24 @@ body.panel-admin-body {
     letter-spacing: 0.02em;
 }
 
+/* Selector "Registros por página" (sin esto el form-control ocupa todo el ancho). */
+.pa-pagination-size {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #7a6856;
+    font-size: 0.82rem;
+}
+
+.pa-pagination-size .form-control {
+    width: auto;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.85rem;
+    border-color: var(--pa-borde);
+    cursor: pointer;
+    appearance: auto; /* form-control de Bootstrap le quita la flecha */
+}
+
 .pa-pagination {
     display: flex;
     justify-content: center;

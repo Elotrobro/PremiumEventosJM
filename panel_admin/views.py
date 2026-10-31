@@ -60,10 +60,6 @@ def render_panel(request, plantilla, contexto):
     contexto['base_template'] = 'panel_admin/_modal.html' if es_modal(request) else 'panel_admin/base_admin.html'
     return render(request, plantilla, contexto)
 
-def _paginar(request, objetos, por_pagina=10):
-    paginator = Paginator(objetos, por_pagina)
-    return paginator.get_page(request.GET.get('page'))
-
 # ═══════════════════════════════════════════════════════════════════════
 # Panel de administrador a medida (no es el admin genérico de Django).
 #
@@ -145,12 +141,14 @@ def usuarios_list(request):
         if usuario.rol == Usuario.ROL_CLIENTE and not usuario.tiene_cotizacion:
             usuario.dias_para_eliminar = limpieza.dias_para_eliminar(usuario)
 
+    paginacion = _paginar(request, usuarios)
+
     contexto = {
-        'usuarios': usuarios,
+        'usuarios': paginacion['page_obj'].object_list,
         'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
     }
 
-    contexto.update(_paginar(request, usuarios))
+    contexto.update(paginacion)
 
     return render(request, 'panel_admin/usuarios_list.html', contexto);
 
@@ -221,12 +219,14 @@ def usuario_delete(request, pk):
 def catalogo_list(request):
     items = ItemDecoracion.objects.all().order_by('nombre')
 
+    paginacion = _paginar(request, items)
+
     contexto = {
-        'items': items,
+        'items': paginacion['page_obj'].object_list,
         'vista_actual': _vista_actual(request),
     }
 
-    contexto.update(_paginar(request, items))
+    contexto.update(paginacion)
 
     return render(request, 'panel_admin/catalogo_list.html', contexto)
 
@@ -326,11 +326,13 @@ def galeria_delete(request, pk):
 def mensajes_list(request):
     mensajes = ContactoSimple.objects.all().order_by('-fecha_contacto')
 
+    paginacion = _paginar(request, mensajes)
+
     contexto = {
-        'mensajes': mensajes,
+        'mensajes': paginacion['page_obj'].object_list,
     }
 
-    contexto.update(_paginar(request, mensajes))
+    contexto.update(paginacion)
 
     return render(request, 'panel_admin/mensajes_list.html', contexto)
 
@@ -355,12 +357,14 @@ def testimonios_list(request):
         'usuario'
     ).order_by('-fecha_creacion')
 
+    paginacion = _paginar(request, testimonios)
+
     contexto = {
-        'testimonios': testimonios,
+        'testimonios': paginacion['page_obj'].object_list,
         'vista_actual': _vista_actual(request),
     }
 
-    contexto.update(_paginar(request, testimonios))
+    contexto.update(paginacion)
 
     return render(
         request,

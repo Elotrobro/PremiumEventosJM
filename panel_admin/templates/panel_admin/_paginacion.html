@@ -10,19 +10,6 @@
         <label for="porPaginaSelect">Registros por página:</label>
 
         <select id="porPaginaSelect" class="form-control">
-  <!-- Opciones... -->
-        </select>
-
-    <script>
-        document.getElementById('porPaginaSelect').addEventListener('change', function() {
-            // '{{ page_param|escapejs }}' se renderiza como un string seguro
-            const paramName = '{{ page_param|escapejs }}';
-            const params = new URLSearchParams(window.location.search);
-            params.set('por_pagina', this.value);
-            params.delete(paramName);
-            window.location.search = params.toString();
-        });
-    </script>
             {% for cantidad in opciones_por_pagina %}
                 <option
                     value="{{ cantidad }}"
@@ -32,6 +19,17 @@
                 </option>
             {% endfor %}
         </select>
+
+        <script>
+            document.getElementById('porPaginaSelect').addEventListener('change', function() {
+                // '{{ page_param|escapejs }}' se renderiza como un string seguro
+                const paramName = '{{ page_param|escapejs }}';
+                const params = new URLSearchParams(window.location.search);
+                params.set('por_pagina', this.value);
+                params.delete(paramName);
+                window.location.search = params.toString();
+            });
+        </script>
     </div>
 
     {% if page_obj.paginator.num_pages > 1 %}
