@@ -13,8 +13,68 @@
     </div>
 </div>
 
+{% include "panel_admin/_modo_vista.html" %}
 
-{% if testimonios %}
+
+{% if testimonios and vista_actual == 'cards' %}
+
+<!-- VISTA CARDS (usa los estilos de las tarjetas de cotizaciones, admin.css) -->
+<div class="pa-cotizaciones-grid">
+
+    {% for testimonio in testimonios %}
+
+    <article class="pa-cotizacion-card">
+
+        <div class="pa-cotizacion-card-header">
+            <div>
+                <span class="pa-card-caption">{{ testimonio.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                <h3>{{ testimonio.usuario.nombre_completo }}</h3>
+                <small class="text-muted">{{ testimonio.usuario.correo_electronico }}</small>
+            </div>
+
+            <span class="text-warning text-nowrap" aria-label="Calificación: {{ testimonio.calificacion }} de 5">
+                {% for estrella in "12345" %}
+                    {% if forloop.counter <= testimonio.calificacion %}
+                        <i class="fas fa-star"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="pa-cotizacion-card-body">
+            <p class="pa-card-texto">{{ testimonio.comentario|truncatechars:240 }}</p>
+        </div>
+
+        <div class="pa-cotizacion-card-actions">
+            {# Al marcar/desmarcar se envía el formulario solo, sin botón extra #}
+            <form method="post" action="{% url 'panel_admin:testimonio_aprobar' testimonio.pk %}" class="form-check form-switch m-0 me-auto">
+                {% csrf_token %}
+                <input class="form-check-input" type="checkbox" role="switch" name="aprobado"
+                       id="aprobado-card-{{ testimonio.pk }}" onchange="this.form.submit()"
+                       {% if testimonio.aprobado %}checked{% endif %}>
+                <label class="form-check-label" for="aprobado-card-{{ testimonio.pk }}">
+                    {% if testimonio.aprobado %}Publicado{% else %}Pendiente{% endif %}
+                </label>
+            </form>
+
+            {% if request.session.usuario_rol == 'admin' %}
+            <a href="{% url 'panel_admin:testimonio_delete' testimonio.pk %}" data-pa-modal class="pa-btn pa-btn-danger pa-btn-sm" title="Eliminar">
+                <i class="fas fa-trash"></i> Eliminar
+            </a>
+            {% endif %}
+        </div>
+
+    </article>
+
+    {% endfor %}
+
+</div>
+
+{% include "panel_admin/_paginacion.html" %}
+
+{% elif testimonios %}
 
 <div class="table-responsive">
     <table class="table table-hover align-middle">

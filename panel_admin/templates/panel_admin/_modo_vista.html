@@ -1,0 +1,33 @@
+{# Botones para cambiar entre vista de tabla y de tarjetas (cards).         #}
+{# Mismo diseño que en cotizaciones_list.html: cambia ?vista= en la URL y  #}
+{# la vista lo valida con _vista_actual (panel_admin/views.py).            #}
+<div class="pa-view-controls">
+    <span class="pa-view-label">Modo de visualización:</span>
+
+    <div class="pa-view-buttons">
+        <button type="button"
+                class="pa-btn {% if vista_actual == 'tabla' %}pa-btn-active{% else %}pa-btn-secondary{% endif %}"
+                onclick="cambiarVistaPanel('tabla')">
+            <i class="fas fa-table"></i>
+            Tabla
+        </button>
+
+        <button type="button"
+                class="pa-btn {% if vista_actual == 'cards' %}pa-btn-active{% else %}pa-btn-secondary{% endif %}"
+                onclick="cambiarVistaPanel('cards')">
+            <i class="fas fa-grip"></i>
+            Cards
+        </button>
+    </div>
+</div>
+
+<script>
+function cambiarVistaPanel(vista) {
+    const parametros = new URLSearchParams(window.location.search);
+
+    parametros.set('vista', vista);
+    parametros.delete('page');
+
+    window.location.search = parametros.toString();
+}
+</script>

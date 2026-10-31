@@ -8,6 +8,58 @@
   <a href="{% url 'panel_admin:catalogo_create' %}" data-pa-modal="lg" class="pa-btn"><i class="fas fa-plus"></i> Nuevo ítem</a>
 </div>
 
+{% include "panel_admin/_modo_vista.html" %}
+
+{% if items and vista_actual == 'cards' %}
+
+<!-- VISTA CARDS (usa los estilos de las tarjetas de cotizaciones, admin.css) -->
+<div class="pa-cotizaciones-grid">
+  {% for item in items %}
+  <article class="pa-cotizacion-card">
+    {% if item.imagen %}
+      <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" class="pa-card-imagen">
+    {% else %}
+      <span class="pa-card-imagen pa-thumb-vacio"><i class="fas fa-image"></i></span>
+    {% endif %}
+
+    <div class="pa-cotizacion-card-header">
+      <div>
+        <span class="pa-card-caption">Ítem #{{ item.id_item }}</span>
+        <h3>{{ item.nombre }}</h3>
+      </div>
+      {% if item.estado %}<span class="pa-badge pa-badge-aprobada">Disponible</span>{% else %}<span class="pa-badge pa-badge-rechazada">No disponible</span>{% endif %}
+    </div>
+
+    <div class="pa-cotizacion-card-body">
+      <div class="pa-cotizacion-dato">
+        <i class="fas fa-layer-group"></i>
+        <div><span>Categoría</span><strong>{{ item.get_categoria_display }}</strong></div>
+      </div>
+      <div class="pa-cotizacion-dato">
+        <i class="fas fa-ruler"></i>
+        <div><span>Unidad</span><strong>{{ item.unidad }}</strong></div>
+      </div>
+      <div class="pa-cotizacion-dato">
+        <i class="fas fa-tag"></i>
+        <div><span>Precio</span><strong>${{ item.precio|miles }}</strong></div>
+      </div>
+    </div>
+
+    <div class="pa-cotizacion-card-actions">
+      <a href="{% url 'panel_admin:catalogo_edit' item.pk %}" data-pa-modal="lg" class="pa-btn"><i class="fas fa-pen"></i> Editar</a>
+      {% if request.session.usuario_rol == 'admin' %}
+        <a href="{% url 'panel_admin:catalogo_delete' item.pk %}" data-pa-modal class="pa-btn pa-btn-danger"><i class="fas fa-trash"></i> Eliminar</a>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{% include "panel_admin/_paginacion.html" %}
+
+{% else %}
+
+<!-- VISTA TABLA -->
 <div class="pa-card" style="padding:0; overflow-x:auto;">
   {% if items %}
   <table class="pa-table">
@@ -47,5 +99,7 @@
   <p class="pa-empty">No hay ítems en el catálogo todavía.</p>
   {% endif %}
 </div>
+
+{% endif %}
 
 {% endblock %}
