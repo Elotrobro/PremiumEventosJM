@@ -1,68 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="420" height="1100" viewBox="0 0 420 1100">
-  <!-- Ornamento del margen izquierdo (core/static/css/fondos.css). Se repite hacia abajo. -->
-  <defs>
-    <radialGradient id="brillo" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#e8c77d" stop-opacity=".55"/>
-      <stop offset=".55" stop-color="#e3b866" stop-opacity=".16"/>
-      <stop offset="1" stop-color="#e3b866" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="perla" cx="35%" cy="30%" r="75%">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset=".45" stop-color="#fbf3e6"/>
-      <stop offset="1" stop-color="#e2c9a0"/>
-    </radialGradient>
-    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e3be6e"/>
-      <stop offset="1" stop-color="#b9772f"/>
-    </linearGradient>
-    <filter id="sombra" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#7a5523" flood-opacity=".22"/>
-    </filter>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="1200" viewBox="0 0 360 1200">
+  <!-- Margen izquierdo (core/static/css/fondos.css): líneas finas y formas
+       geométricas sobrias. Sin filtros ni degradados para que pese poco.
+       Se repite hacia abajo; las dos líneas verticales empalman entre tiles. -->
+  <g fill="none" stroke="#b8955a" stroke-width="1">
+    <!-- Filete doble vertical -->
+    <path d="M40 0V1200M47 0V1200" opacity=".28"/>
 
-  <!-- Resplandor dorado -->
-  <circle cx="40" cy="190" r="190" fill="url(#brillo)"/>
+    <!-- Rombo doble -->
+    <path d="M47 150L197 300L47 450" opacity=".3"/>
+    <path d="M47 190L157 300L47 410" opacity=".18"/>
 
-  <!-- Aros finos -->
-  <g fill="none" stroke="url(#oro)" stroke-width="1.2" opacity=".55">
-    <circle cx="-10" cy="200" r="170"/>
-    <circle cx="-10" cy="200" r="128" stroke-dasharray="2 7" stroke-linecap="round"/>
-    <circle cx="-10" cy="200" r="210" opacity=".5"/>
+    <!-- Regla horizontal con remate -->
+    <path d="M47 700H214" opacity=".3"/>
+    <!-- Líneas escalonadas (estilo art déco) -->
+    <path d="M47 880H197M47 892H157M47 904H117" opacity=".26"/>
+
+    <!-- Marco de panel -->
+    <rect x="84" y="990" width="118" height="170" opacity=".22"/>
   </g>
 
-  <!-- Destellos -->
-  <g fill="url(#oro)">
-    <path d="M330 120 l4 13 13 4 -13 4 -4 13 -4 -13 -13 -4 13 -4z" opacity=".75"/>
-    <path d="M250 330 l2.5 8 8 2.5 -8 2.5 -2.5 8 -2.5 -8 -8 -2.5 8 -2.5z" opacity=".6"/>
-    <path d="M70 560 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3z" opacity=".65"/>
-    <path d="M300 860 l3.5 11 11 3.5 -11 3.5 -3.5 11 -3.5 -11 -11 -3.5 11 -3.5z" opacity=".7"/>
-  </g>
+  <!-- Formas planas apenas sombreadas -->
+  <path d="M47 230L117 300L47 370Z" fill="#3c2e23" opacity=".035"/>
+  <rect x="74" y="980" width="118" height="170" fill="#3c2e23" opacity=".03"/>
 
-  <!-- Rombos -->
-  <g transform="translate(290 500) rotate(45)">
-    <rect x="-34" y="-34" width="68" height="68" rx="4" fill="none" stroke="url(#oro)" stroke-width="1.2" opacity=".55"/>
-    <rect x="-16" y="-16" width="32" height="32" rx="3" fill="url(#perla)" filter="url(#sombra)" opacity=".95"/>
+  <!-- Remates en rombo -->
+  <g fill="#b8955a" opacity=".45">
+    <path d="M220 694l6 6-6 6-6-6z"/>
+    <path d="M44 296l3.5 4-3.5 4-3.5-4z"/>
   </g>
-
-  <!-- Arabesco -->
-  <path d="M-10 690 C 120 640, 230 700, 190 800 S 40 900, 120 1000" fill="none"
-        stroke="url(#oro)" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
-  <g fill="#c79a40" opacity=".45">
-    <circle cx="190" cy="800" r="3.2"/>
-    <circle cx="62" cy="662" r="2.4"/>
-    <circle cx="120" cy="1000" r="2.6"/>
-  </g>
-
-  <!-- Perlas sombreadas -->
-  <g filter="url(#sombra)">
-    <circle cx="110" cy="905" r="44" fill="url(#perla)"/>
-    <circle cx="175" cy="955" r="20" fill="url(#perla)"/>
-    <circle cx="70" cy="985" r="12" fill="url(#perla)"/>
-    <circle cx="360" cy="260" r="16" fill="url(#perla)"/>
-  </g>
-  <circle cx="110" cy="905" r="44" fill="none" stroke="#d6b27a" stroke-width="1" opacity=".5"/>
-
-  <!-- Toque vino -->
-  <circle cx="215" cy="420" r="4" fill="#7b2d26" opacity=".25"/>
-  <circle cx="35" cy="760" r="3" fill="#7b2d26" opacity=".22"/>
 </svg>

@@ -1,17 +1,18 @@
 /* ═══════════════════════════════════════════════════════════════════════
    FONDO ELEGANTE — Salones, Alquiler, Contacto y Testimonios
 
-   Base blanca con:
-     - resplandores suaves dorados y un toque vino en las esquinas,
-     - adornos en los márgenes (aros dorados de línea fina, rombos,
-       destellos y perlas sombreadas): core/static/images/fondos/*.svg,
-       que se repiten hacia abajo para cubrir páginas largas,
-     - una trama de puntos dorados que se desvanece hacia el centro,
-       para que el contenido siga leyéndose limpio.
+   Estilo sobrio y arquitectónico sobre base blanca:
+     - filetes dobles verticales, rombos, reglas con remate y líneas
+       escalonadas en dorado apagado, solo en los márgenes,
+     - un par de formas planas en marrón casi transparente que dan algo
+       de profundidad,
+     - dos degradados neutros muy tenues en las esquinas.
+
+   Pensado para no pesar: dos SVG de ~1 KB (core/static/images/fondos/),
+   sin filtros, sin máscaras ni animaciones; todo es estático.
 
    Se activa poniendo la clase .fondo-elegante en el bloque de contenido
-   de la página (debajo del encabezado). Los adornos flotan muy despacio;
-   con "reducir movimiento" quedan quietos.
+   de la página (debajo del encabezado).
    ═══════════════════════════════════════════════════════════════════════ */
 
 .fondo-elegante {
@@ -21,48 +22,24 @@
     display: flow-root;            /* contiene el margen de .my-5 del catálogo */
     background-color: #ffffff !important;
     background-image:
-        radial-gradient(ellipse 55% 40% at 0% 0%, rgba(232, 190, 110, 0.16), transparent 70%),
-        radial-gradient(ellipse 45% 35% at 100% 100%, rgba(155, 59, 51, 0.07), transparent 70%),
-        radial-gradient(ellipse 60% 45% at 100% 8%, rgba(245, 236, 224, 0.9), transparent 70%),
-        radial-gradient(ellipse 60% 45% at 0% 92%, rgba(245, 236, 224, 0.9), transparent 70%) !important;
+        linear-gradient(135deg, rgba(184, 149, 90, 0.06) 0%, transparent 35%),
+        linear-gradient(315deg, rgba(60, 46, 35, 0.04) 0%, transparent 35%) !important;
 }
 
-/* Adornos de los márgenes */
+/* Adornos de los márgenes (se repiten hacia abajo en páginas largas) */
 .fondo-elegante::before {
     content: "";
     position: absolute;
-    inset: -24px 0;
+    inset: 0;
     z-index: -1;
     pointer-events: none;
     background-image:
         url("../images/fondos/ornamento-izq.svg"),
         url("../images/fondos/ornamento-der.svg");
     background-repeat: repeat-y, repeat-y;
-    background-size: 420px auto, 420px auto;
+    background-size: 360px auto, 360px auto;
     /* El derecho va desfasado para que los dos lados no queden en espejo */
-    background-position: left -60px top 0, right -60px top 520px;
-    opacity: 0.9;
-    animation: fondo-flotar 16s ease-in-out infinite alternate;
-    will-change: transform;
-}
-
-/* Trama de puntos que se desvanece hacia el centro */
-.fondo-elegante::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: radial-gradient(rgba(193, 123, 60, 0.22) 1px, transparent 1.6px);
-    background-size: 26px 26px;
-    -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 24%, transparent 76%, #000 100%);
-            mask-image: linear-gradient(90deg, #000 0%, transparent 24%, transparent 76%, #000 100%);
-    opacity: 0.55;
-}
-
-@keyframes fondo-flotar {
-    from { transform: translateY(-10px); }
-    to   { transform: translateY(10px); }
+    background-position: left top, right top 300px;
 }
 
 /* En Salones el beige estaba en el .container; ahora lo da el fondo. */
@@ -78,35 +55,23 @@
 .fondo-elegante .hablemos-card,
 .fondo-elegante .item-card,
 .fondo-elegante .panel-cotizacion {
-    box-shadow: 0 14px 34px -18px rgba(60, 46, 35, 0.35), 0 2px 8px rgba(60, 46, 35, 0.06) !important;
-    border: 1px solid rgba(214, 178, 122, 0.35) !important;
+    box-shadow: 0 10px 28px -18px rgba(60, 46, 35, 0.3), 0 1px 4px rgba(60, 46, 35, 0.05) !important;
+    border: 1px solid rgba(184, 149, 90, 0.28) !important;
 }
 
 /* Pantallas medianas: los márgenes son más angostos */
 @media (max-width: 1199.98px) {
     .fondo-elegante::before {
-        background-size: 340px auto, 340px auto;
-        background-position: left -110px top 0, right -110px top 420px;
-        opacity: 0.75;
+        background-position: left -90px top, right -90px top 300px;
+        opacity: 0.8;
     }
 }
 
-/* Celular: el contenido ocupa casi todo el ancho, los adornos se asoman
-   solo por los bordes y más tenues. */
+/* Celular: el contenido ocupa casi todo el ancho; solo se asoman los
+   filetes de los bordes. */
 @media (max-width: 767.98px) {
     .fondo-elegante::before {
-        background-size: 260px auto, 260px auto;
-        background-position: left -150px top 0, right -150px top 340px;
-        opacity: 0.55;
-    }
-    .fondo-elegante::after {
-        -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 12%, transparent 88%, #000 100%);
-                mask-image: linear-gradient(90deg, #000 0%, transparent 12%, transparent 88%, #000 100%);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .fondo-elegante::before {
-        animation: none;
+        background-position: left -25px top, right -25px top 300px;
+        opacity: 0.6;
     }
 }
