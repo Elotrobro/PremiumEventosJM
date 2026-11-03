@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="1100" viewBox="0 0 420 1100">
+  <!-- Ornamento del margen derecho (core/static/css/fondos.css). Se repite hacia abajo. -->
+  <defs>
+    <radialGradient id="brillo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e8c77d" stop-opacity=".5"/>
+      <stop offset=".55" stop-color="#e3b866" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#e3b866" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vino" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#9b3b33" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#9b3b33" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="perla" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".45" stop-color="#fbf3e6"/>
+      <stop offset="1" stop-color="#e2c9a0"/>
+    </radialGradient>
+    <linearGradient id="oro" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e3be6e"/>
+      <stop offset="1" stop-color="#b9772f"/>
+    </linearGradient>
+    <filter id="sombra" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#7a5523" flood-opacity=".22"/>
+    </filter>
+  </defs>
+
+  <!-- Resplandores -->
+  <circle cx="380" cy="760" r="210" fill="url(#brillo)"/>
+  <circle cx="300" cy="230" r="150" fill="url(#vino)"/>
+
+  <!-- Arcos finos -->
+  <g fill="none" stroke="url(#oro)" stroke-width="1.2" opacity=".55">
+    <circle cx="430" cy="760" r="160"/>
+    <circle cx="430" cy="760" r="120" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <path d="M420 60 C 300 90, 250 190, 300 290 S 410 420, 330 520"/>
+  </g>
+  <g fill="#c79a40" opacity=".45">
+    <circle cx="300" cy="290" r="3.2"/>
+    <circle cx="330" cy="520" r="2.6"/>
+  </g>
+
+  <!-- Destellos -->
+  <g fill="url(#oro)">
+    <path d="M110 170 l3.5 11 11 3.5 -11 3.5 -3.5 11 -3.5 -11 -11 -3.5 11 -3.5z" opacity=".7"/>
+    <path d="M200 610 l2.5 8 8 2.5 -8 2.5 -2.5 8 -2.5 -8 -8 -2.5 8 -2.5z" opacity=".6"/>
+    <path d="M350 980 l4 13 13 4 -13 4 -4 13 -4 -13 -13 -4 13 -4z" opacity=".7"/>
+  </g>
+
+  <!-- Rombos -->
+  <g transform="translate(150 930) rotate(45)">
+    <rect x="-28" y="-28" width="56" height="56" rx="4" fill="none" stroke="url(#oro)" stroke-width="1.2" opacity=".5"/>
+    <rect x="-40" y="-40" width="80" height="80" rx="6" fill="none" stroke="url(#oro)" stroke-width=".8" opacity=".3"/>
+  </g>
+
+  <!-- Perlas sombreadas -->
+  <g filter="url(#sombra)">
+    <circle cx="330" cy="400" r="36" fill="url(#perla)"/>
+    <circle cx="270" cy="450" r="15" fill="url(#perla)"/>
+    <circle cx="380" cy="470" r="10" fill="url(#perla)"/>
+    <circle cx="150" cy="930" r="14" fill="url(#perla)"/>
+    <circle cx="90" cy="420" r="9" fill="url(#perla)"/>
+  </g>
+  <circle cx="330" cy="400" r="36" fill="none" stroke="#d6b27a" stroke-width="1" opacity=".5"/>
+
+  <!-- Toque vino -->
+  <circle cx="230" cy="80" r="4" fill="#7b2d26" opacity=".25"/>
+  <circle cx="260" cy="1060" r="3" fill="#7b2d26" opacity=".2"/>
+</svg>
