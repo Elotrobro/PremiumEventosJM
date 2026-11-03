@@ -12,31 +12,37 @@ urlpatterns = [
     path('usuarios/nuevo/', views.usuario_create, name='usuario_create'),
     path('usuarios/<int:pk>/editar/', views.usuario_edit, name='usuario_edit'),
     path('usuarios/<int:pk>/eliminar/', views.usuario_delete, name='usuario_delete'),
+    path('usuarios/seleccionados/', views.usuarios_seleccion, name='usuarios_seleccion'),
 
     # Catálogo de decoración
     path('catalogo/', views.catalogo_list, name='catalogo_list'),
     path('catalogo/nuevo/', views.catalogo_create, name='catalogo_create'),
     path('catalogo/<int:pk>/editar/', views.catalogo_edit, name='catalogo_edit'),
     path('catalogo/<int:pk>/eliminar/', views.catalogo_delete, name='catalogo_delete'),
+    path('catalogo/seleccionados/', views.catalogo_seleccion, name='catalogo_seleccion'),
 
     # Galería
     path('galeria/', views.galeria_list, name='galeria_list'),
     path('galeria/subir/', views.galeria_upload, name='galeria_upload'),
     path('galeria/<int:pk>/eliminar/', views.galeria_delete, name='galeria_delete'),
+    path('galeria/seleccionados/', views.galeria_seleccion, name='galeria_seleccion'),
 
     # Mensajes de contacto
     path('mensajes/', views.mensajes_list, name='mensajes_list'),
     path('mensajes/<int:pk>/eliminar/', views.mensaje_delete, name='mensaje_delete'),
+    path('mensajes/seleccionados/', views.mensajes_seleccion, name='mensajes_seleccion'),
 
     # Testimonios
     path('testimonios/', views.testimonios_list, name='testimonios_list'),
     path('testimonios/<int:pk>/aprobar/', views.testimonio_aprobar, name='testimonio_aprobar'),
     path('testimonios/<int:pk>/eliminar/', views.testimonio_delete, name='testimonio_delete'),
+    path('testimonios/seleccionados/', views.testimonios_seleccion, name='testimonios_seleccion'),
 
     # Cotizaciones
     path('cotizaciones/', views.cotizaciones_list, name='cotizaciones_list'),
     path('cotizaciones/<int:pk>/editar/', views.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<int:pk>/eliminar/', views.cotizacion_delete, name='cotizacion_delete'),
+    path('cotizaciones/seleccionados/', views.cotizaciones_seleccion, name='cotizaciones_seleccion'),
 
     # Tabla de precios (estimado por número de invitados)
     path('precios/', views.precios_edit, name='precios_edit'),

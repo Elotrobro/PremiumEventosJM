@@ -41,6 +41,9 @@
     </div>
 </div>
 
+{% url 'panel_admin:cotizaciones_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="cotización" plural="cotizaciones" genero="f" %}
+
 {% if page_obj %}
 
     {% if page_obj.object_list %}
@@ -52,6 +55,7 @@
             <table class="pa-table">
                 <thead>
                     <tr>
+                        {% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}
                         <th>Código</th>
                         <th>Cliente</th>
                         <th>Correo</th>
@@ -66,6 +70,15 @@
                 <tbody>
                     {% for cotizacion in page_obj %}
                     <tr>
+                        {% if acciones_masivas %}
+                        <td class="pa-col-check">
+                            {# Las pagadas no se pueden eliminar (ver cotizacion_delete) #}
+                            {% if cotizacion.estado != 'pagado' %}
+                            <input type="checkbox" class="pa-check" name="ids" value="{{ cotizacion.pk }}" form="paFormSeleccion"
+                                   data-nombre="{{ cotizacion.codigo_seguimiento }} · {{ cotizacion.nombre_cliente }}" aria-label="Seleccionar cotización {{ cotizacion.codigo_seguimiento }}">
+                            {% endif %}
+                        </td>
+                        {% endif %}
                         <td class="pa-codigo">
                             {{ cotizacion.codigo_seguimiento }}
                         </td>
@@ -135,7 +148,13 @@
             <article class="pa-cotizacion-card">
 
                 <div class="pa-cotizacion-card-header">
-                    <div>
+                    {% if acciones_masivas and cotizacion.estado != 'pagado' %}
+                    <label class="pa-card-check" title="Seleccionar">
+                        <input type="checkbox" class="pa-check" name="ids" value="{{ cotizacion.pk }}" form="paFormSeleccion"
+                                   data-nombre="{{ cotizacion.codigo_seguimiento }} · {{ cotizacion.nombre_cliente }}" aria-label="Seleccionar cotización {{ cotizacion.codigo_seguimiento }}">
+                    </label>
+                    {% endif %}
+                    <div class="me-auto">
                         <span class="pa-card-caption">Código de seguimiento</span>
                         <h3 class="pa-codigo">
                             {{ cotizacion.codigo_seguimiento }}

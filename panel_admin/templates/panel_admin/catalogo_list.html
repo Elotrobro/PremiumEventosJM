@@ -10,12 +10,21 @@
 
 {% include "panel_admin/_modo_vista.html" %}
 
+{% url 'panel_admin:catalogo_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="ítem" plural="ítems" %}
+
 {% if items and vista_actual == 'cards' %}
 
 <!-- VISTA CARDS (usa los estilos de las tarjetas de cotizaciones, admin.css) -->
 <div class="pa-cotizaciones-grid">
   {% for item in items %}
   <article class="pa-cotizacion-card">
+    {% if acciones_masivas %}
+      <label class="pa-card-check pa-card-check-flotante" title="Seleccionar">
+        <input type="checkbox" class="pa-check" name="ids" value="{{ item.pk }}" form="paFormSeleccion"
+               data-nombre="{{ item.nombre }}" aria-label="Seleccionar {{ item.nombre }}">
+      </label>
+    {% endif %}
     {% if item.imagen %}
       <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" class="pa-card-imagen">
     {% else %}
@@ -64,11 +73,17 @@
   {% if items %}
   <table class="pa-table">
     <thead>
-      <tr><th></th><th>#</th><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Precio</th><th>Disponible</th><th></th></tr>
+      <tr>{% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}<th></th><th>#</th><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Precio</th><th>Disponible</th><th></th></tr>
     </thead>
     <tbody>
       {% for item in items %}
       <tr>
+        {% if acciones_masivas %}
+        <td class="pa-col-check">
+          <input type="checkbox" class="pa-check" name="ids" value="{{ item.pk }}" form="paFormSeleccion"
+                 data-nombre="{{ item.nombre }}" aria-label="Seleccionar {{ item.nombre }}">
+        </td>
+        {% endif %}
         <td>
           {% if item.imagen %}
             <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" class="pa-thumb">

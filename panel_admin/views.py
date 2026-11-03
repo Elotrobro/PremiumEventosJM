@@ -147,6 +147,7 @@ def usuarios_list(request):
     contexto = {
         'usuarios': paginacion['page_obj'].object_list,
         'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
+        'acciones_masivas': _acciones_masivas(request, 'usuarios'),
     }
 
     contexto.update(paginacion)
@@ -225,6 +226,7 @@ def catalogo_list(request):
     contexto = {
         'items': paginacion['page_obj'].object_list,
         'vista_actual': _vista_actual(request),
+        'acciones_masivas': _acciones_masivas(request, 'catalogo'),
     }
 
     contexto.update(paginacion)
@@ -289,6 +291,7 @@ def galeria_list(request):
     return render(request, 'panel_admin/galeria_list.html', {
         'fotos_por_categoria': fotos_por_categoria,
         'form': form,
+        'acciones_masivas': _acciones_masivas(request, 'galeria'),
     })
 
 
@@ -331,6 +334,7 @@ def mensajes_list(request):
 
     contexto = {
         'mensajes': paginacion['page_obj'].object_list,
+        'acciones_masivas': _acciones_masivas(request, 'mensajes'),
     }
 
     contexto.update(paginacion)
@@ -363,6 +367,7 @@ def testimonios_list(request):
     contexto = {
         'testimonios': paginacion['page_obj'].object_list,
         'vista_actual': _vista_actual(request),
+        'acciones_masivas': _acciones_masivas(request, 'testimonios'),
     }
 
     contexto.update(paginacion)
@@ -443,6 +448,7 @@ def cotizaciones_list(request):
     contexto = {
         'cotizaciones': cotizaciones,
         'vista_actual': _vista_actual(request),
+        'acciones_masivas': _acciones_masivas(request, 'cotizaciones'),
         **contexto_filtro,
     }
 
@@ -533,6 +539,227 @@ def cotizacion_delete(request, pk):
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': cotizacion, 'titulo': 'cotización', 'cancelar_url': 'panel_admin:cotizaciones_list',
     })
+
+
+# ─────────────────── Selección múltiple (acciones en lote) ───────────────────
+#
+# Los listados tienen una casilla por registro y una barra con acciones
+# para los marcados (ver _seleccion_masiva.html y
+# panel_admin/static/panel_admin/js/seleccion.js). Cada módulo envía un
+# POST con:
+#   - ids:    los registros marcados (uno por casilla),
+#   - accion: lo que se quiere hacer ('eliminar', 'publicar', …),
+#   - volver: la querystring del listado (vista, página, filtros), para
+#             regresar exactamente a donde estaba.
+#
+# Cada vista vuelve a aplicar las mismas reglas que la acción individual
+# (permisos del rol empleado, no borrar la propia cuenta, no borrar
+# cotizaciones pagadas, borrar el archivo de /media…), así que la barra
+# no permite nada que no se pudiera hacer registro por registro.
+
+ACCION_ELIMINAR = {
+    'valor': 'eliminar', 'texto': 'Eliminar', 'icono': 'fa-trash',
+    'estilo': 'pa-btn-danger', 'confirmar': True,
+}
+
+
+def _acciones_masivas(request, modulo):
+    """Acciones de la barra de selección que el rol actual puede usar."""
+    admin = es_admin(request)
+    acciones = []
+    if modulo == 'catalogo':
+        acciones += [
+            {'valor': 'disponible', 'texto': 'Marcar disponible', 'icono': 'fa-circle-check', 'estilo': 'pa-btn-secondary'},
+            {'valor': 'no_disponible', 'texto': 'Marcar no disponible', 'icono': 'fa-circle-minus', 'estilo': 'pa-btn-secondary'},
+        ]
+    elif modulo == 'testimonios':
+        acciones += [
+            {'valor': 'publicar', 'texto': 'Publicar', 'icono': 'fa-eye', 'estilo': 'pa-btn-secondary'},
+            {'valor': 'ocultar', 'texto': 'Ocultar', 'icono': 'fa-eye-slash', 'estilo': 'pa-btn-secondary'},
+        ]
+    # Eliminar: solo admin, salvo en usuarios (el empleado puede borrar
+    # clientes sin cotizaciones; las casillas solo salen en esos).
+    if admin or modulo == 'usuarios':
+        acciones.append(ACCION_ELIMINAR)
+    return acciones
+
+
+def _ids_seleccionados(request):
+    ids = []
+    for valor in request.POST.getlist('ids'):
+        try:
+            ids.append(int(valor))
+        except (TypeError, ValueError):
+            continue
+    return ids
+
+
+def _volver_al_listado(request, nombre_url):
+    """Igual que en testimonio_aprobar: URL fija del listado + querystring."""
+    url = reverse(nombre_url)
+    volver = request.POST.get('volver', '')
+    return redirect(f'{url}?{volver}' if volver else url)
+
+
+def _plural(cantidad, singular, plural):
+    return f'{cantidad} {singular if cantidad == 1 else plural}'
+
+
+def _leer_seleccion(request, modelo, nombre_url, ninguno):
+    """
+    Valida el POST común a todas las acciones en lote. Devuelve
+    (accion, queryset) o (None, respuesta) si hay que cortar.
+    """
+    if request.method != 'POST':
+        return None, redirect(nombre_url)
+    seleccion = modelo.objects.filter(pk__in=_ids_seleccionados(request))
+    if not seleccion.exists():
+        messages.error(request, f'No seleccionaste {ninguno}.')
+        return None, _volver_al_listado(request, nombre_url)
+    return request.POST.get('accion', ''), seleccion
+
+
+def _accion_no_permitida(request, nombre_url):
+    messages.error(request, 'Esa acción no está disponible para tu rol.')
+    return _volver_al_listado(request, nombre_url)
+
+
+@staff_required
+def usuarios_seleccion(request):
+    url = 'panel_admin:usuarios_list'
+    accion, usuarios = _leer_seleccion(request, Usuario, url, 'ningún usuario')
+    if accion is None:
+        return usuarios
+    if accion != 'eliminar':
+        return _accion_no_permitida(request, url)
+
+    usuarios = usuarios.annotate(
+        tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
+    )
+    propio = request.session.get('usuario_id')
+    eliminados = 0
+    omitidos = []
+    for usuario in usuarios:
+        if usuario.pk == propio:
+            omitidos.append('tu propia cuenta')
+            continue
+        # Misma regla que usuario_delete para el rol empleado.
+        if not es_admin(request) and (usuario.rol != Usuario.ROL_CLIENTE or usuario.tiene_cotizacion):
+            omitidos.append(usuario.nombre_completo)
+            continue
+        usuario.delete()
+        eliminados += 1
+
+    if eliminados:
+        messages.success(request, f'{_plural(eliminados, "usuario eliminado", "usuarios eliminados")} correctamente.')
+    if omitidos:
+        motivo = ('no puedes eliminar tu propia cuenta mientras tienes la sesión activa'
+                  if omitidos == ['tu propia cuenta'] else
+                  'como empleado solo puedes eliminar clientes sin cotizaciones, y nunca tu propia cuenta')
+        verbo = 'No se eliminó' if len(omitidos) == 1 else f'No se eliminaron {len(omitidos)}'
+        messages.error(request, f'{verbo}: {", ".join(omitidos)} ({motivo}).')
+    return _volver_al_listado(request, url)
+
+
+@staff_required
+def catalogo_seleccion(request):
+    url = 'panel_admin:catalogo_list'
+    accion, items = _leer_seleccion(request, ItemDecoracion, url, 'ningún ítem')
+    if accion is None:
+        return items
+
+    if accion in ('disponible', 'no_disponible'):
+        total = items.update(estado=(accion == 'disponible'))
+        estado = 'disponible' if accion == 'disponible' else 'no disponible'
+        messages.success(request, f'{_plural(total, "ítem marcado", "ítems marcados")} como {estado}.')
+    elif accion == 'eliminar' and es_admin(request):
+        total = 0
+        for item in items:
+            if item.imagen:
+                item.imagen.delete(save=False)  # igual que catalogo_delete: borra el archivo en /media
+            item.delete()
+            total += 1
+        messages.success(request, f'{_plural(total, "ítem de decoración eliminado", "ítems de decoración eliminados")} correctamente.')
+    else:
+        return _accion_no_permitida(request, url)
+    return _volver_al_listado(request, url)
+
+
+@admin_required  # 'empleado' no puede eliminar fotos (ver galeria_delete)
+def galeria_seleccion(request):
+    url = 'panel_admin:galeria_list'
+    accion, fotos = _leer_seleccion(request, FotoGaleria, url, 'ninguna foto')
+    if accion is None:
+        return fotos
+    if accion != 'eliminar':
+        return _accion_no_permitida(request, url)
+    total = 0
+    for foto in fotos:
+        foto.imagen.delete(save=False)  # borra también el archivo en /media
+        foto.delete()
+        total += 1
+    messages.success(request, f'{_plural(total, "foto eliminada", "fotos eliminadas")} correctamente.')
+    return _volver_al_listado(request, url)
+
+
+@admin_required  # 'empleado' no puede eliminar mensajes (ver mensaje_delete)
+def mensajes_seleccion(request):
+    url = 'panel_admin:mensajes_list'
+    accion, mensajes_sel = _leer_seleccion(request, ContactoSimple, url, 'ningún mensaje')
+    if accion is None:
+        return mensajes_sel
+    if accion != 'eliminar':
+        return _accion_no_permitida(request, url)
+    total = mensajes_sel.count()
+    mensajes_sel.delete()
+    messages.success(request, f'{_plural(total, "mensaje eliminado", "mensajes eliminados")} correctamente.')
+    return _volver_al_listado(request, url)
+
+
+@staff_required
+def testimonios_seleccion(request):
+    url = 'panel_admin:testimonios_list'
+    accion, testimonios = _leer_seleccion(request, Testimonio, url, 'ningún testimonio')
+    if accion is None:
+        return testimonios
+
+    if accion in ('publicar', 'ocultar'):
+        total = testimonios.update(aprobado=(accion == 'publicar'))
+        estado = 'aprobados y publicados' if accion == 'publicar' else 'ocultos (ya no se publican)'
+        if total == 1:
+            estado = 'aprobado y publicado' if accion == 'publicar' else 'oculto (ya no se publica)'
+        messages.success(request, f'{_plural(total, "testimonio", "testimonios")} {estado}.')
+    elif accion == 'eliminar' and es_admin(request):
+        total = testimonios.count()
+        testimonios.delete()
+        messages.success(request, f'{_plural(total, "testimonio eliminado", "testimonios eliminados")} correctamente.')
+    else:
+        return _accion_no_permitida(request, url)
+    return _volver_al_listado(request, url)
+
+
+@admin_required  # 'empleado' no puede eliminar cotizaciones (ver cotizacion_delete)
+def cotizaciones_seleccion(request):
+    url = 'panel_admin:cotizaciones_list'
+    accion, cotizaciones = _leer_seleccion(request, Cotizacion, url, 'ninguna cotización')
+    if accion is None:
+        return cotizaciones
+    if accion != 'eliminar':
+        return _accion_no_permitida(request, url)
+
+    # Misma regla que cotizacion_delete: las pagadas no se eliminan.
+    pagadas = cotizaciones.filter(estado=Cotizacion.ESTADO_PAGADO).count()
+    borrables = cotizaciones.exclude(estado=Cotizacion.ESTADO_PAGADO)
+    total = 0
+    for cotizacion in borrables:
+        cotizacion.delete()
+        total += 1
+    if total:
+        messages.success(request, f'{_plural(total, "cotización eliminada", "cotizaciones eliminadas")} correctamente.')
+    if pagadas:
+        messages.error(request, f'{_plural(pagadas, "cotización no se eliminó porque está", "cotizaciones no se eliminaron porque están")} '
+                                'en estado "Pagado".')
+    return _volver_al_listado(request, url)
 
 
 # ───────────────────────────── Historial + PDF ─────────────────────────────

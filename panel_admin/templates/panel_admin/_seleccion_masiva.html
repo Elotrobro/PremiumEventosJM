@@ -1,0 +1,40 @@
+{% comment %}
+Barra de selección múltiple de los listados del panel.
+
+Se incluye con:
+  {% url 'panel_admin:catalogo_seleccion' as seleccion_url %}
+  {% include "panel_admin/_seleccion_masiva.html" with singular="ítem" plural="ítems" %}
+(genero="f" para "seleccionada(s)", ej. fotos o cotizaciones).
+
+Las casillas de cada registro viven en la tabla o en las tarjetas y se
+unen a este formulario con form="paFormSeleccion" (así no hay formularios
+anidados). Las acciones vienen de _acciones_masivas() en views.py según
+el rol; el comportamiento está en panel_admin/static/panel_admin/js/seleccion.js.
+{% endcomment %}
+{% if acciones_masivas %}
+<form method="post" action="{{ seleccion_url }}" id="paFormSeleccion" class="pa-seleccion"
+      data-singular="{{ singular }}" data-plural="{{ plural }}" data-genero="{{ genero|default:'m' }}">
+  {% csrf_token %}
+  <input type="hidden" name="volver" value="{{ request.GET.urlencode }}">
+  <input type="hidden" name="accion" value="">
+
+  <label class="pa-seleccion-todos">
+    <input type="checkbox" class="pa-check" data-seleccionar-todos>
+    <span>Seleccionar todo</span>
+  </label>
+
+  <span class="pa-seleccion-contador" aria-live="polite">Marca las casillas para elegir varios {{ plural }}</span>
+
+  <div class="pa-seleccion-acciones">
+    {% for accion in acciones_masivas %}
+      <button type="button" class="pa-btn pa-btn-sm {{ accion.estilo }}" data-accion="{{ accion.valor }}"
+              {% if accion.confirmar %}data-confirmar{% endif %} disabled>
+        <i class="fas {{ accion.icono }}"></i> {{ accion.texto }}
+      </button>
+    {% endfor %}
+    <button type="button" class="pa-seleccion-limpiar" data-limpiar-seleccion disabled>
+      <i class="fas fa-xmark"></i> Quitar selección
+    </button>
+  </div>
+</form>
+{% endif %}

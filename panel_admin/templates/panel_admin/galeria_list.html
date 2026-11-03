@@ -22,6 +22,9 @@
   </form>
 </div>
 
+{% url 'panel_admin:galeria_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="foto" plural="fotos" genero="f" %}
+
 {% for categoria in fotos_por_categoria %}
 <div class="pa-card">
   <h2 class="pa-card-titulo">
@@ -34,6 +37,12 @@
       {% for foto in categoria.fotos %}
         <div class="pa-galeria-item">
           <img src="{{ foto.imagen.url }}" alt="{{ categoria.nombre }}">
+          {% if acciones_masivas %}
+            <label class="pa-card-check pa-card-check-flotante" title="Seleccionar">
+              <input type="checkbox" class="pa-check" name="ids" value="{{ foto.pk }}" form="paFormSeleccion"
+                     data-nombre="{{ categoria.nombre }} · foto #{{ foto.pk }}" aria-label="Seleccionar foto #{{ foto.pk }} de {{ categoria.nombre }}">
+            </label>
+          {% endif %}
           <a href="{% url 'panel_admin:galeria_delete' foto.pk %}" data-pa-modal class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar">
             <i class="fas fa-trash"></i>
           </a>

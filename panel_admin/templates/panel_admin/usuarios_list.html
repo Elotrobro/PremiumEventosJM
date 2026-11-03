@@ -20,17 +20,30 @@
   Las cuentas de cliente que no hagan ninguna cotización en {{ dias_sin_cotizar }} días desde que se crearon se eliminan automáticamente.
 </p>
 
+{% url 'panel_admin:usuarios_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="usuario" plural="usuarios" %}
+
 <div class="pa-card" style="padding:0; overflow-x:auto;">
   {% if usuarios %}
   <table class="pa-table">
     <thead>
       <tr>
+        {% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}
         <th>Nombre</th><th>Correo</th><th>Rol</th><th>Último acceso</th><th>Creado</th><th></th>
       </tr>
     </thead>
     <tbody>
       {% for usuario in usuarios %}
       <tr>
+        {% if acciones_masivas %}
+        <td class="pa-col-check">
+          {# Misma regla que el botón de eliminar: admin cualquiera menos su propia cuenta; empleado solo clientes sin cotizar #}
+          {% if usuario.pk != request.session.usuario_id %}{% if request.session.usuario_rol == 'admin' or usuario.rol == 'cliente' and not usuario.tiene_cotizacion %}
+            <input type="checkbox" class="pa-check" name="ids" value="{{ usuario.pk }}" form="paFormSeleccion"
+                   data-nombre="{{ usuario.nombre_completo }} ({{ usuario.correo_electronico }})" aria-label="Seleccionar {{ usuario.nombre_completo }}">
+          {% endif %}{% endif %}
+        </td>
+        {% endif %}
         <td>{{ usuario.nombre_completo }}</td>
         <td>{{ usuario.correo_electronico }}</td>
         <td>

@@ -15,6 +15,9 @@
 
 {% include "panel_admin/_modo_vista.html" %}
 
+{% url 'panel_admin:testimonios_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="testimonio" plural="testimonios" %}
+
 
 {% if testimonios and vista_actual == 'cards' %}
 
@@ -26,7 +29,13 @@
     <article class="pa-cotizacion-card">
 
         <div class="pa-cotizacion-card-header">
-            <div>
+            {% if acciones_masivas %}
+            <label class="pa-card-check" title="Seleccionar">
+                <input type="checkbox" class="pa-check" name="ids" value="{{ testimonio.pk }}" form="paFormSeleccion"
+                       data-nombre="{{ testimonio.usuario.nombre_completo }} · {{ testimonio.fecha_creacion|date:'d/m/Y' }}" aria-label="Seleccionar testimonio de {{ testimonio.usuario.nombre_completo }}">
+            </label>
+            {% endif %}
+            <div class="me-auto">
                 <span class="pa-card-caption">{{ testimonio.fecha_creacion|date:"d/m/Y H:i" }}</span>
                 <h3>{{ testimonio.usuario.nombre_completo }}</h3>
                 <small class="text-muted">{{ testimonio.usuario.correo_electronico }}</small>
@@ -82,6 +91,7 @@
 
         <thead>
             <tr>
+                {% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}
                 <th>Cliente</th>
                 <th>Calificación</th>
                 <th>Comentario</th>
@@ -96,6 +106,13 @@
             {% for testimonio in testimonios %}
 
             <tr>
+
+                {% if acciones_masivas %}
+                <td class="pa-col-check">
+                    <input type="checkbox" class="pa-check" name="ids" value="{{ testimonio.pk }}" form="paFormSeleccion"
+                           data-nombre="{{ testimonio.usuario.nombre_completo }} · {{ testimonio.fecha_creacion|date:'d/m/Y' }}" aria-label="Seleccionar testimonio de {{ testimonio.usuario.nombre_completo }}">
+                </td>
+                {% endif %}
 
                 <td>
                     <strong>{{ testimonio.usuario.nombre_completo }}</strong>

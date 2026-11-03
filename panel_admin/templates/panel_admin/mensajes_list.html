@@ -6,15 +6,24 @@
   <h1><i class="fas fa-envelope"></i> Mensajes de contacto</h1>
 </div>
 
+{% url 'panel_admin:mensajes_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="mensaje" plural="mensajes" %}
+
 <div class="pa-card" style="padding:0; overflow-x:auto;">
   {% if mensajes %}
   <table class="pa-table">
     <thead>
-      <tr><th>Fecha</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Mensaje</th><th></th></tr>
+      <tr>{% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}<th>Fecha</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Mensaje</th><th></th></tr>
     </thead>
     <tbody>
       {% for mensaje in mensajes %}
       <tr>
+        {% if acciones_masivas %}
+        <td class="pa-col-check">
+          <input type="checkbox" class="pa-check" name="ids" value="{{ mensaje.pk }}" form="paFormSeleccion"
+                 data-nombre="{{ mensaje.nombre }} {{ mensaje.apellidos }} · {{ mensaje.fecha_contacto|date:'Y-m-d' }}" aria-label="Seleccionar mensaje de {{ mensaje.nombre }}">
+        </td>
+        {% endif %}
         <td>{{ mensaje.fecha_contacto|date:'Y-m-d H:i' }}</td>
         <td>{{ mensaje.nombre }} {{ mensaje.apellidos }}</td>
         <td>{{ mensaje.email }}</td>
