@@ -1,0 +1,13 @@
+{% comment %}
+Mensajes de Django (messages.success / error / …) como notificaciones
+flotantes. No se ven aquí: core/static/js/notificaciones.js lee cada
+elemento con data-notificacion y lo muestra como tarjeta arriba a la
+derecha. Se incluye en base.html y en panel_admin/base_admin.html.
+{% endcomment %}
+{% if messages %}
+  <div hidden>
+    {% for message in messages %}
+      <div data-notificacion="{{ message.level_tag|default:'info' }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}

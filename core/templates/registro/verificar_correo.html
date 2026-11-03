@@ -12,11 +12,7 @@ Ver Bd_PremiumEventos/verificacion.py.
       <p>Te enviamos un código de 6 dígitos a <strong>{{ correo_oculto }}</strong>. Escríbelo para terminar de crear tu cuenta.</p>
     </div>
 
-    {% for message in messages %}
-      {% if 'verificacion' in message.tags %}
-        <div class="login-alert {% if 'success' in message.tags %}login-alert-success{% else %}login-alert-error{% endif %}">{{ message }}</div>
-      {% endif %}
-    {% endfor %}
+    {# Los avisos (código incorrecto, reenviado, etc.) salen como notificación flotante desde base.html. #}
 
     <form method="post" action="{% url 'verificar_correo' %}">
       {% csrf_token %}

@@ -112,13 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!email || !password) {
                 event.preventDefault();
-                alert('Por favor completa todos los campos');
+                notificar('Por favor completa todos los campos.', 'error', { titulo: 'Revisa el formulario' });
                 return;
             }
 
             if (!email.includes('@')) {
                 event.preventDefault();
-                alert('Ingresa un correo electrónico válido');
+                notificar('Ingresa un correo electrónico válido.', 'error', { titulo: 'Revisa el formulario' });
                 return;
             }
 

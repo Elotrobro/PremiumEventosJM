@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Validación: no se puede enviar una cotización sin haber iniciado sesión
             // (mismo patrón de bloqueo que usa modal.js para el formulario de inicio.html).
             if (!usuarioLogueado) {
-                alert("Debes iniciar sesión para poder solicitar una cotización.");
+                notificar("Debes iniciar sesión para poder solicitar una cotización.", "warning", { titulo: "Inicia sesión" });
                 // La modal de login vive en base.html (visible en toda página);
                 // se abre directamente en vez de navegar a otra URL.
                 if (window.abrirLoginModal) {

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{% static 'css/widget.css' %}">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="stylesheet" href="{% static 'css/animaciones.css' %}">
+  <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
   <script>
     // Activa las animaciones (core/static/js/animaciones.js) antes de pintar
     // la página, salvo que el sistema pida reducir el movimiento.
@@ -137,19 +138,8 @@
 
 
 <main>
-      {% if messages %}
-        <div class="mensajes-wrapper">
-            <div class="container mensajes-container">
-                {% for message in messages %}
-                    {% if 'login-error' not in message.tags and 'registro-error' not in message.tags and 'verificacion' not in message.tags %}
-                        <div class="global-alert {% if message.tags %}global-alert-{{ message.tags }}{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
+    {# Mensajes de Django: se muestran como notificaciones flotantes (notificaciones.js) #}
+    {% include 'partials/_notificaciones.html' %}
     {% block content %}{% endblock %}
 </main>
 
@@ -321,11 +311,6 @@
 
     <!-- Pestaña: iniciar sesión  -->
     <div class="auth-panel is-active" id="authPanelLogin" role="tabpanel">
-      {% for message in messages %}
-        {% if 'login-error' in message.tags %}
-          <div class="login-alert login-alert-error">{{ message }}</div>
-        {% endif %}
-      {% endfor %}
 
       <form id="loginForm" method="post" action="{% url 'login' %}" novalidate>
         {% csrf_token %}
@@ -367,11 +352,6 @@
 
     <!-- Pestaña: crear cuenta  -->
     <div class="auth-panel" id="authPanelRegistro" role="tabpanel">
-      {% for message in messages %}
-        {% if 'registro-error' in message.tags %}
-          <div class="login-alert login-alert-error">{{ message }}</div>
-        {% endif %}
-      {% endfor %}
       
       <form id="registroForm" method="post" action="{% url 'registro' %}">
         {% csrf_token %}
@@ -508,6 +488,7 @@ Puedo contarte sobre nuestros servicios, estimar el precio de tu evento o consul
   </button>
 </div>
 
+<script src="{% static 'js/notificaciones.js' %}"></script>
 <script src="{% static 'js/animaciones.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/widget.js' %}"></script>

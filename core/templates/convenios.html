@@ -105,7 +105,7 @@
 
         function abrirLogin(e) {
             if (e) e.preventDefault();
-            alert("Debes iniciar sesión para poder solicitar una cotización.");
+            notificar("Debes iniciar sesión para poder solicitar una cotización.", "warning", { titulo: "Inicia sesión" });
             // La modal de login vive en base.html (visible en toda página);
             // se abre directamente en vez de navegar a otra URL.
             if (window.abrirLoginModal) {

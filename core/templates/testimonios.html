@@ -132,11 +132,15 @@
                                 {{ form.comentario }}
                             </div>
 
-                            {% if form.errors %}
-                                <div class="errores-testimonio">
-                                    {{ form.errors }}
-                                </div>
-                            {% endif %}
+                            {# Errores del formulario como notificación flotante (core/static/js/notificaciones.js). #}
+                            {% for error in form.non_field_errors %}
+                                <div hidden data-notificacion="error">{{ error }}</div>
+                            {% endfor %}
+                            {% for campo in form %}
+                                {% for error in campo.errors %}
+                                    <div hidden data-notificacion="error">{{ campo.label }}: {{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
 
                             <div class="btn-enviar-container">
                                 <button type="submit" class="btn-enviar-testimonio">

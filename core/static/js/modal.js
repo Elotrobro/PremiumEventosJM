@@ -248,7 +248,7 @@ if (inputFechaEvento) {
         if (!usuarioAutenticado) {
           event.preventDefault();
           modalCotizacion.close();
-          alert("Debes iniciar sesión para realizar una cotización.");
+          notificar("Debes iniciar sesión para realizar una cotización.", "warning", { titulo: "Inicia sesión" });
           // La modal de login vive en base.html (visible en toda página);
           // se abre directamente en vez de navegar a otra URL.
           if (window.abrirLoginModal) {
@@ -267,7 +267,7 @@ if (inputFechaEvento) {
           const fechaSeleccionada = inputFechaEvento.value; // formato YYYY-MM-DD
           if (fechaSeleccionada < obtenerFechaHoyISO()) {
             event.preventDefault();
-            alert("La fecha del evento no puede ser una fecha que ya pasó. Por favor selecciona una fecha válida.");
+            notificar("La fecha del evento no puede ser una fecha que ya pasó. Por favor selecciona una fecha válida.", "error", { titulo: "Revisa el formulario" });
             inputFechaEvento.focus();
             return;
           }
@@ -279,10 +279,14 @@ if (inputFechaEvento) {
         const invitadosInput = document.getElementById("invitados");
         const precio = invitadosInput ? calcularPrecioEstimado(invitadosInput.value) : null;
 
+        // El formulario se envía y la página se recarga, así que el aviso
+        // se guarda para mostrarlo como notificación al cargar la siguiente.
         if (precio !== null) {
-          alert(
-            "Costo estimado para tu evento: " + formatearCOP(precio) + "\n\n" +
-            "Atención, esta es una cotización aproximada de lo que puede costar el evento."
+          notificar.siguientePagina(
+            "Costo estimado para tu evento: " + formatearCOP(precio) + ". " +
+            "Atención, esta es una cotización aproximada de lo que puede costar el evento.",
+            "info",
+            { titulo: "Costo estimado" }
           );
         }
       });

@@ -199,9 +199,10 @@
                     error
                 );
 
-                alert(
+                notificar(
                     "No se pudieron cargar las reseñas. " +
-                    "Inténtalo de nuevo."
+                    "Inténtalo de nuevo.",
+                    "error"
                 );
             } finally {
                 cargando = false;
