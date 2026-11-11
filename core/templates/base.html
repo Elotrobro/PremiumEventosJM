@@ -340,6 +340,14 @@
         <button type="submit" class="btn-login">Ingresar</button>
       </form>
 
+      {% if google_client_id %}
+        {# Botón oficial de Google (core/static/js/google-login.js) #}
+        <div class="auth-separador"><span>o</span></div>
+        <div class="google-login" data-google-boton data-texto="signin_with">
+          <span class="google-login-cargando">Cargando acceso con Google…</span>
+        </div>
+      {% endif %}
+
       <div class="forgot-link">
         <a href="{% url 'recuperar_password' %}">¿Olvidaste tu contraseña?</a>
       </div>
@@ -410,6 +418,13 @@
         <button type="submit" class="btn-login">Crear mi cuenta</button>
       </form>
 
+      {% if google_client_id %}
+        <div class="auth-separador"><span>o</span></div>
+        <div class="google-login" data-google-boton data-texto="signup_with">
+          <span class="google-login-cargando">Cargando acceso con Google…</span>
+        </div>
+      {% endif %}
+
       <p class="auth-cambio">
         ¿Ya tienes cuenta?
         <button type="button" class="auth-enlace" data-ir-a="login">Inicia sesión</button>
@@ -417,6 +432,15 @@
     </div>
   </div>
 </div>
+
+{% if google_client_id and not request.session.usuario_id %}
+{# Lleva a Django el token que entrega Google (Bd_PremiumEventos/google_login.py). #}
+<form id="googleLoginForm" method="post" action="{% url 'login_google' %}" data-client-id="{{ google_client_id }}" hidden>
+  {% csrf_token %}
+  <input type="hidden" name="credential">
+  <input type="hidden" name="origen">
+</form>
+{% endif %}
 
 <!-- ─────────────────────────────────────────────────────────────────
      Burbuja flotante de contacto (JM)
@@ -494,5 +518,6 @@ Puedo contarte sobre nuestros servicios, estimar el precio de tu evento o consul
 <script src="{% static 'js/widget.js' %}"></script>
 <script src="{% static 'js/login-modal.js' %}"></script>
 <script src="{% static 'js/contrasena.js' %}"></script>
+<script src="{% static 'js/google-login.js' %}"></script>
 </body>
 </html>

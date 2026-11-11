@@ -8,6 +8,7 @@ from Bd_PremiumEventos import recuperacion
 from Bd_PremiumEventos import recordatorios
 from Bd_PremiumEventos import chatbot
 from Bd_PremiumEventos import verificacion
+from Bd_PremiumEventos import google_login
 
 # ═══════════════════════════════════════════════════════════════════════
 # Tabla de rutas del proyecto (URLconf principal).
@@ -32,6 +33,7 @@ urlpatterns = [
     path('cotizacion/', auth_views.cotizacion_view, name='cotizacion'),  # procesa el formulario modal de inicio.html (requiere sesión)
     path('contacto/enviar/', auth_views.guardar_contacto, name='guardar_contacto'),  # procesa el formulario de contacto.html
     path('login/', auth_views.login_view, name='login'),
+    path('login/google/', google_login.google_login_view, name='login_google'),  # botón "Continuar con Google" (login y registro)
     path('registro/', auth_views.registro_view, name='registro'),  # crea cuentas de cliente desde la modal
     # Verificación del correo con un código (Bd_PremiumEventos/verificacion.py)
     path('registro/verificar/', verificacion.verificar_correo, name='verificar_correo'),
