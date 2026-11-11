@@ -935,3 +935,25 @@ dialog::backdrop {
         transition: none;
     }
 }
+
+/* ---------- AVISO "INICIA SESIÓN" (solo visitantes sin sesión) ----------
+   Mismos colores que el aviso de convenios.css (.aviso-login-salones). */
+
+.aviso-login-cotizacion {
+    background: #fdf3e7;
+    color: #a5632a;
+    border: 1px solid #eadcc7;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.aviso-login-cotizacion a {
+    color: #a5632a;
+    font-weight: 700;
+    text-decoration: underline;
+}
