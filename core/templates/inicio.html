@@ -89,7 +89,7 @@
     <div class="row g-3">
         <div class="col-md-6">
             <label for="nombre" class="form-label">Nombre completo</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" maxlength="150" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)" required>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ usuario_cotizacion.nombre_completo|default:'' }}" autocomplete="name" maxlength="150" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' .\-]+" title="Solo letras y espacios (sin números, @ ni otros símbolos)" required>
         </div>
 
         <div class="col-md-6">
@@ -100,7 +100,7 @@
 
         <div class="col-md-6">
             <label for="correo" class="form-label">Correo electrónico</label>
-            <input type="email" class="form-control" id="correo" name="correo" maxlength="100" required>
+            <input type="email" class="form-control" id="correo" name="correo" value="{{ usuario_cotizacion.correo_electronico|default:'' }}" autocomplete="email" maxlength="100" required>
         </div>
     </div>
 </fieldset>

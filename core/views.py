@@ -5,6 +5,7 @@ from .galeria_data import (
     CATEGORIAS, categorias_por_grupo, fotos_de_categoria, mosaico_general,
     obtener_categoria,
 )
+from Bd_PremiumEventos.models import Usuario
 from Bd_PremiumEventos.precios import tabla_para_js
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -24,7 +25,18 @@ def inicio(request):
     # Bd_PremiumEventos.views.cotizacion_view, no aquí).
     # La tabla de precios va a la página para que modal.js calcule el
     # estimado en vivo con los mismos valores del panel (ver precios.py).
-    return render(request, 'inicio.html', {'tabla_precios': tabla_para_js()})
+    # Con sesión iniciada, el nombre y el correo de la cuenta llegan ya
+    # escritos en el formulario (se pueden cambiar si la cotización es
+    # para otra persona).
+    usuario = None
+    usuario_id = request.session.get('usuario_id')
+    if usuario_id:
+        usuario = Usuario.objects.filter(pk=usuario_id).first()
+
+    return render(request, 'inicio.html', {
+        'tabla_precios': tabla_para_js(),
+        'usuario_cotizacion': usuario,
+    })
 
 
 def informacion(request):
