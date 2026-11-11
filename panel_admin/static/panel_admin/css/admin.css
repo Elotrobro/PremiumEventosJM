@@ -77,6 +77,14 @@ body.panel-admin-body {
     border-right: 1px solid var(--pa-borde);
     padding: 1.25rem 0;
     flex-shrink: 0;
+    /* Se queda fijo debajo de la barra superior al hacer scroll. Ocupa el
+       alto de la ventana y, si el menú no cabe, se desplaza por dentro. */
+    position: sticky;
+    top: var(--pa-topbar-alto);
+    align-self: flex-start;
+    height: calc(100vh - var(--pa-topbar-alto));
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .pa-sidebar a {
@@ -496,6 +504,9 @@ body.panel-admin-body {
 @media (max-width: 768px) {
     .pa-layout { flex-direction: column; }
     .pa-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }
+    /* En celular el menú es una fila de pestañas arriba del contenido: no se
+       deja fijo para no quitar más alto de pantalla (la barra ya ocupa dos líneas). */
+    .pa-sidebar { position: static; height: auto; overflow-y: hidden; }
     .pa-sidebar a { padding: 0.5rem 0.9rem; white-space: nowrap; }
     .pa-sidebar a.active, .pa-sidebar a:hover { border-right: none; border-bottom: 3px solid var(--pa-oro); }
 }
