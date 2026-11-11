@@ -65,11 +65,19 @@
 <dialog id="modalCotizacion" class="modal-cotizacion">
         <div class="modal-header-custom">
         <h3>Solicita tu cotización</h3>
-        <button type="button" class="btn-cerrar-modal" onclick="cerrarModalCotizacion()">×</button>
+        <button type="button" class="btn-cerrar-modal" onclick="cerrarModalCotizacion()" aria-label="Cerrar">×</button>
     </div>
 
     <div class="modal-cotizacion-layout">
         <div class="modal-form-col">
+
+    {# Aviso antes de llenar el formulario: sin sesión no se puede enviar (mismo aviso que convenios.html). #}
+    {% if not request.session.usuario_id %}
+    <div class="aviso-login-cotizacion">
+        <i class="fas fa-lock" aria-hidden="true"></i>
+        <span>Para enviar la cotización debes <a href="#" id="avisoLoginCotizacion">iniciar sesión</a>. Hazlo antes de llenar el formulario para no perder lo que escribas.</span>
+    </div>
+    {% endif %}
 
     <form method="post" action="/cotizacion/" class="modal-formulario" id="formCotizacion">
         {% csrf_token %}
@@ -92,7 +100,7 @@
 
         <div class="col-md-6">
             <label for="correo" class="form-label">Correo electrónico</label>
-            <input type="email" class="form-control" id="correo" name="correo" required>
+            <input type="email" class="form-control" id="correo" name="correo" maxlength="100" required>
         </div>
     </div>
 </fieldset>
@@ -112,7 +120,7 @@
                 <option value="grado">Grado</option>
                 <option value="cumpleaños">Cumpleaños</option>
                 <option value="empresarial">Empresarial</option>
-                <option value="primera_comunion">Primera Comunion</option>
+                <option value="primera_comunion">Primera Comunión</option>
                 <option value="bautizo">Bautizo</option>
                 <option value="fiesta_infantil">Fiesta Infantil</option>
                 <option value="baby_shower">Baby Shower</option>
@@ -127,21 +135,21 @@
 
         <div class="col-md-6">
             <label for="hora_evento" class="form-label">Hora estimada del evento</label>
-                <select class="form-control" id="hora_evento" name="hora_evento" required>
-                    <option value="" selected disabled>Seleccione una hora</option>
+                <select class="form-select" id="hora_evento" name="hora_evento" required>
+                    <option value="" selected disabled>Selecciona una hora</option>
                 </select>
         </div>
 
         <div class="col-md-6">
             <label for="invitados" class="form-label">Cantidad de invitados o asistentes</label>
-            <input type="number" class="form-control" id="invitados" name="invitados" min="1" required>
+            <input type="number" class="form-control" id="invitados" name="invitados" min="1" max="100000" required>
         </div>
 
        
 
         <div class="col-md-6">
             <label for="lugar_evento" class="form-label">Lugar del evento / ciudad</label>
-            <input type="text" class="form-control" id="lugar_evento" name="lugar_evento" placeholder="Ej: Medellín, Antioquia">
+            <input type="text" class="form-control" id="lugar_evento" name="lugar_evento" maxlength="100" placeholder="Ej: Medellín, Antioquia">
         </div>
 
         <div class="col-md-6">
@@ -218,22 +226,22 @@
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="fotografia" name="servicios" id="servicio_fotografia">
-                <label class="form-check-label" for="servicio_fotografia">Fotografia</label>
+                <label class="form-check-label" for="servicio_fotografia">Fotografía</label>
             </div>
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="camara_360" name="servicios" id="servicio_camara_360">
-                <label class="form-check-label" for="servicio_camara_360">Camara 360</label>
+                <label class="form-check-label" for="servicio_camara_360">Cámara 360</label>
             </div>
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="ceremonias_privadas" name="servicios" id="servicio_ceremonias_privadas">
-                <label class="form-check-label" for="servicio_ceremonias_privadas">Ceremonia Privadas</label>
+                <label class="form-check-label" for="servicio_ceremonias_privadas">Ceremonias privadas</label>
             </div>
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="inflables_magos_titeres" name="servicios" id="servicio_inflables_magos_titeres">
-                <label class="form-check-label" for="servicio_inflables_magos_titeres">Inflables. Magos y títeres</label>
+                <label class="form-check-label" for="servicio_inflables_magos_titeres">Inflables, magos y títeres</label>
             </div>
 
             <div class="form-check">
@@ -258,7 +266,7 @@
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="musica_en_vivo" name="servicios" id="servicio_musica_en_vivo">
-                <label class="form-check-label" for="servicio_musica_en_vivo">Musica en vivo</label>
+                <label class="form-check-label" for="servicio_musica_en_vivo">Música en vivo</label>
             </div>
 
             <div class="form-check">
@@ -269,12 +277,12 @@
 
         <div class="col-md-6">
             <label for="presupuesto" class="form-label">Presupuesto aproximado</label>
-            <input type="number" class="form-control" id="presupuesto" name="presupuesto" min="0" placeholder="Ej: 3000000">
+            <input type="number" class="form-control" id="presupuesto" name="presupuesto" min="0" max="9999999999" step="1" placeholder="Ej: 3000000">
         </div>
 
         <div class="col-md-6">
             <label for="tema_evento" class="form-label">Tema o estilo del evento</label>
-            <input type="text" class="form-control" id="tema_evento" name="tema_evento" placeholder="Ej: elegante, vintage, moderno">
+            <input type="text" class="form-control" id="tema_evento" name="tema_evento" maxlength="100" placeholder="Ej: elegante, vintage, moderno">
         </div>
 
         <div class="col-12">

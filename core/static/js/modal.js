@@ -67,7 +67,7 @@ function generarHorasDisponibles() {
   const opcionInicial = document.createElement("option");
 
   opcionInicial.value = "";
-  opcionInicial.textContent = "Seleccione una hora";
+  opcionInicial.textContent = "Selecciona una hora";
   opcionInicial.disabled = true;
   opcionInicial.selected = true;
 
@@ -260,34 +260,45 @@ if (inputFechaEvento) {
         }
 
         // Segunda barrera de validación para la fecha del evento: aunque el
-        // atributo "min" ya deshabilita (en gris) los días pasados en el
-        // calendario nativo, se vuelve a comprobar aquí por si el valor
+        // atributo "min" ya deshabilita (en gris) hoy y los días pasados en
+        // el calendario nativo, se vuelve a comprobar aquí por si el valor
         // llegó manipulado (autocompletado, DevTools, etc.).
         if (inputFechaEvento && inputFechaEvento.value) {
           const fechaSeleccionada = inputFechaEvento.value; // formato YYYY-MM-DD
-          if (fechaSeleccionada < obtenerFechaHoyISO()) {
+          if (fechaSeleccionada < obtenerFechaMañanaISO()) {
             event.preventDefault();
-            notificar("La fecha del evento no puede ser una fecha que ya pasó. Por favor selecciona una fecha válida.", "error", { titulo: "Revisa el formulario" });
+            notificar("La fecha del evento debe ser a partir de mañana. Por favor selecciona una fecha válida.", "error", { titulo: "Revisa el formulario" });
             inputFechaEvento.focus();
             return;
           }
         }
 
-        // Muestra el cálculo del posible costo del evento justo en el
-        // momento de realizar la cotización, según la cantidad de
-        // invitados ingresada.
-        const invitadosInput = document.getElementById("invitados");
-        const precio = invitadosInput ? calcularPrecioEstimado(invitadosInput.value) : null;
+        // El navegador no revisa un <select> deshabilitado aunque tenga
+        // "required" (pasa cuando ya no quedan horas para mañana), así que
+        // se revisa aquí para no enviar la cotización sin hora.
+        if (inputHoraEvento && !inputHoraEvento.value) {
+          event.preventDefault();
+          notificar("Selecciona la hora del evento. Si ya no quedan horas para mañana, elige otra fecha.", "error", { titulo: "Revisa el formulario" });
+          (inputHoraEvento.disabled ? inputFechaEvento : inputHoraEvento).focus();
+          return;
+        }
 
-        // El formulario se envía y la página se recarga, así que el aviso
-        // se guarda para mostrarlo como notificación al cargar la siguiente.
-        if (precio !== null) {
-          notificar.siguientePagina(
-            "Costo estimado para tu evento: " + formatearCOP(precio) + ". " +
-            "Atención, esta es una cotización aproximada de lo que puede costar el evento.",
-            "info",
-            { titulo: "Costo estimado" }
-          );
+        // El costo estimado (con los servicios) lo confirma el servidor en
+        // el mensaje de "¡Gracias!" que aparece al recargar la página.
+      });
+    }
+
+    // Enlace "iniciar sesión" del aviso de arriba del formulario (solo se
+    // muestra a visitantes sin sesión, ver inicio.html).
+    const avisoLoginCotizacion = document.getElementById("avisoLoginCotizacion");
+    if (avisoLoginCotizacion) {
+      avisoLoginCotizacion.addEventListener("click", function (event) {
+        event.preventDefault();
+        modalCotizacion.close();
+        if (window.abrirLoginModal) {
+          window.abrirLoginModal();
+        } else {
+          window.location.href = "/?login=1";
         }
       });
     }
@@ -339,6 +350,13 @@ if (inputFechaEvento) {
       }
 
       return null;
+    }
+
+    // Lo que escribe el usuario se muestra como texto, nunca como HTML.
+    function escaparHTML(texto) {
+      const div = document.createElement("div");
+      div.textContent = texto;
+      return div.innerHTML;
     }
 
     function formatearCOP(valor) {
@@ -562,7 +580,7 @@ function actualizarResumenModal() {
                     <i class="fas fa-check-circle"></i>
 
                     <span>
-                        ${nombre}
+                        ${escaparHTML(nombre)}
                         <strong>
                             ${formatearCOP(precioServicio)}
                         </strong>
@@ -650,30 +668,19 @@ function actualizarResumenModal() {
         div.className =
             "resumen-item-modal";
 
-        if (item.html) {
+        // item.html solo lo usan los servicios, cuyo HTML arma este mismo
+        // archivo; el resto (lugar, tema, etc.) es texto del usuario y se escapa.
+        const valor = item.html ? item.valor : escaparHTML(item.valor);
 
-            div.innerHTML = `
-                <div class="resumen-label">
-                    ${item.label}
-                </div>
+        div.innerHTML = `
+            <div class="resumen-label">
+                ${item.label}
+            </div>
 
-                <div class="resumen-valor">
-                    ${item.valor}
-                </div>
-            `;
-
-        } else {
-
-            div.innerHTML = `
-                <div class="resumen-label">
-                    ${item.label}
-                </div>
-
-                <div class="resumen-valor">
-                    ${item.valor}
-                </div>
-            `;
-        }
+            <div class="resumen-valor">
+                ${valor}
+            </div>
+        `;
 
         resumen.appendChild(div);
     });

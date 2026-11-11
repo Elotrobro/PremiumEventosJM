@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
 from django.conf import settings
+from django.db import transaction
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 import json
@@ -37,6 +38,11 @@ from .validaciones import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Límites del formulario de cotización (inicio.html lleva los mismos en max="…").
+# El presupuesto cabe en DetalleCotizacion.presupuesto (12 dígitos, 2 decimales).
+MAX_INVITADOS_COTIZACION = 100000
+MAX_PRESUPUESTO_COTIZACION = Decimal('9999999999')
 
 
 def login_view(request):
@@ -403,61 +409,98 @@ def cotizacion_view(request):
     except InvalidOperation:
         presupuesto_dec = Decimal('0')
 
+    # "NaN" o "Infinity" también son Decimal válidos, pero no caben en la
+    # base de datos: se tratan como presupuesto no indicado.
+    if not presupuesto_dec.is_finite():
+        presupuesto_dec = Decimal('0')
+
+    # Mismos límites que los campos del formulario (inicio.html) y que las
+    # columnas de la base de datos: así una cotización nunca se queda a
+    # medio guardar por un valor fuera de rango.
+    errores = []
+
+    if fecha_evento_dt < timezone.localdate():
+        errores.append('La fecha del evento no puede ser una fecha que ya pasó.')
+
+    if not 1 <= cantidad_invitados <= MAX_INVITADOS_COTIZACION:
+        errores.append(
+            'La cantidad de invitados debe estar entre 1 y '
+            f'{formatear_miles(MAX_INVITADOS_COTIZACION)}.'
+        )
+
+    if not 0 <= presupuesto_dec <= MAX_PRESUPUESTO_COTIZACION:
+        errores.append('El presupuesto aproximado no es un valor válido.')
+
+    if len(lugar_evento) > 100 or len(tema_evento) > 100:
+        errores.append('El lugar y el tema del evento pueden tener máximo 100 caracteres.')
+
+    if len(correo) > 100:
+        errores.append('El correo electrónico puede tener máximo 100 caracteres.')
+
+    if errores:
+        for error in errores:
+            messages.error(request, error)
+
+        return redirect('inicio')
+
     usuario = Usuario.objects.get(pk=usuario_id)
 
-    cliente, _creado = Cliente.objects.get_or_create(
-        usuario=usuario,
-        defaults={
-            'nombre_completo': nombre,
-            'correo_electronico': correo,
-            'telefono_whatsapp': telefono,
-        },
-    )
+    # Todo o nada: si algo falla al guardar, no queda una cotización sin
+    # su detalle (ni un cliente modificado a medias).
+    with transaction.atomic():
+        cliente, _creado = Cliente.objects.get_or_create(
+            usuario=usuario,
+            defaults={
+                'nombre_completo': nombre,
+                'correo_electronico': correo,
+                'telefono_whatsapp': telefono,
+            },
+        )
 
-    cliente.nombre_completo = nombre
-    cliente.correo_electronico = correo
-    cliente.telefono_whatsapp = telefono
-    cliente.save()
+        cliente.nombre_completo = nombre
+        cliente.correo_electronico = correo
+        cliente.telefono_whatsapp = telefono
+        cliente.save()
 
-    cotizacion = Cotizacion.objects.create(
-        cliente=cliente,
-        nombre_cliente=nombre,
-        correo_cliente=correo,
-        telefono_cliente=telefono,
-        fecha_evento=fecha_evento_dt,
-        cantidad_invitados=cantidad_invitados,
-        tema_estilo=tema_evento or 'Sin especificar',
-        hora_inicio=hora_inicio_dt,
-        hora_fin=hora_fin_dt,
-        ubicacion=lugar_evento or 'Por definir',
-    )
+        cotizacion = Cotizacion.objects.create(
+            cliente=cliente,
+            nombre_cliente=nombre,
+            correo_cliente=correo,
+            telefono_cliente=telefono,
+            fecha_evento=fecha_evento_dt,
+            cantidad_invitados=cantidad_invitados,
+            tema_estilo=tema_evento or 'Sin especificar',
+            hora_inicio=hora_inicio_dt,
+            hora_fin=hora_fin_dt,
+            ubicacion=lugar_evento or 'Por definir',
+        )
 
-    precio_estimado = calcular_total_cotizacion(
-        cantidad_invitados,
-        servicios,
-    )
+        precio_estimado = calcular_total_cotizacion(
+            cantidad_invitados,
+            servicios,
+        )
 
-    detalles_extra = {
-        'servicios_solicitados': servicios,
-        'desea_sugerencias_sede': sugerencias_sede,
-        'observaciones': mensaje,
-        'hora_fin_estimada': (
-            'Calculada automáticamente (+4h desde la hora de inicio)'
-        ),
-    }
+        detalles_extra = {
+            'servicios_solicitados': servicios,
+            'desea_sugerencias_sede': sugerencias_sede,
+            'observaciones': mensaje,
+            'hora_fin_estimada': (
+                'Calculada automáticamente (+4h desde la hora de inicio)'
+            ),
+        }
 
-    detalle = DetalleCotizacion.objects.create(
-        cotizacion=cotizacion,
-        cantidad_personas_aplica=cantidad_invitados,
-        salon=(salon == 'si'),
-        detalles=json.dumps(
-            detalles_extra,
-            ensure_ascii=False,
-        ),
-        evento=tipo_evento,
-        presupuesto=presupuesto_dec,
-        precio_cotizado=precio_estimado,
-    )
+        detalle = DetalleCotizacion.objects.create(
+            cotizacion=cotizacion,
+            cantidad_personas_aplica=cantidad_invitados,
+            salon=(salon == 'si'),
+            detalles=json.dumps(
+                detalles_extra,
+                ensure_ascii=False,
+            ),
+            evento=tipo_evento,
+            presupuesto=presupuesto_dec,
+            precio_cotizado=precio_estimado,
+        )
 
     _notificar_cotizacion(
         request,

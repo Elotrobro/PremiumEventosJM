@@ -379,12 +379,9 @@
     }
 }
 
-body {
-    background-image: url('images/carrusel/boda_bienvenida.jpg'); /* Reemplaza con la ruta deseada */
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-}
+/* El fondo de la página lo pone .fondo-elegante (css/fondos.css). Aquí había
+   un fondo de foto con una ruta que no existía (daba error 404 en cada visita)
+   y que, de cargar, quedaría tapado por ese fondo; por eso se quitó. */
 
 /* ── Carga progresiva de reseñas (inspirada en la galería) ───────── */
 .testimonios-lista .testimonio-card[data-reveal] {
