@@ -8,6 +8,15 @@
     --pa-fondo: #fffaf5;
     --pa-fondo-suave: #f5ece0;
     --pa-borde: #e3d3bd;
+    /* Alto de la barra superior. El valor real lo actualiza el script de
+       base_admin.html (en celular la barra ocupa dos líneas). */
+    --pa-topbar-alto: 56px;
+}
+
+/* Al saltar a un elemento (ancla, foco de un campo con error) que no
+   quede escondido debajo de la barra superior fija. */
+html {
+    scroll-padding-top: calc(var(--pa-topbar-alto) + 12px);
 }
 
 body.panel-admin-body {
@@ -23,6 +32,12 @@ body.panel-admin-body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Se queda arriba al hacer scroll. Debajo de las modales de Bootstrap
+       (backdrop 1050) y por encima del contenido del panel. */
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 2px 10px rgba(60, 46, 35, 0.18);
 }
 
 .pa-topbar a {
@@ -875,7 +890,7 @@ body.panel-admin-body {
 /* Barra de acciones */
 .pa-seleccion {
     position: sticky;
-    top: 10px;
+    top: calc(var(--pa-topbar-alto) + 10px);  /* justo debajo de la barra superior */
     z-index: 20;
     display: flex;
     align-items: center;
