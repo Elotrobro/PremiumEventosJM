@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'Bd_PremiumEventos.context_processors.google_login',  # GOOGLE_CLIENT_ID para el botón "Continuar con Google"
             ],
         },
     },
@@ -191,3 +192,14 @@ N8N_WEBHOOK_SECRET = config('N8N_WEBHOOK_SECRET', default='')
 # Dirección pública del sitio, para los enlaces de los correos que no salen
 # de una petición web (los recordatorios se envían desde un comando).
 SITIO_URL = config('SITIO_URL', default='http://127.0.0.1:8000')
+
+# Iniciar sesión / crear cuenta con Google (Bd_PremiumEventos/google_login.py).
+# Es el "ID de cliente" de Google Cloud (Google Auth Platform → Clientes) y va
+# solo en el .env. Si está vacío, el botón "Continuar con Google" no se muestra
+# y el resto del login sigue funcionando igual.
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='')
+
+# La ventana emergente de Google necesita poder avisarle a la página que la
+# abrió. Con el valor por defecto de Django ('same-origin') el navegador corta
+# esa comunicación y el botón de Google no termina el inicio de sesión.
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'

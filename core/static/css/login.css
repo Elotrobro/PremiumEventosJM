@@ -446,3 +446,57 @@
     cursor: not-allowed;
     text-decoration: none;
 }
+
+/* ── "Continuar con Google" (ver core/static/js/google-login.js) ─────── */
+.auth-separador {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 1.1rem 0 0.9rem;
+    color: #a8968a;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.auth-separador::before,
+.auth-separador::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eadfd3;
+}
+
+.google-login {
+    display: flex;
+    justify-content: center;
+    min-height: 44px;            /* reserva el alto del botón mientras carga */
+    transition: opacity 0.2s ease;
+}
+
+.google-login.google-login-enviando {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.google-login-cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px dashed #e3d3bd;
+    border-radius: 40px;
+    color: #a8968a;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.google-login-error {
+    border-style: solid;
+    border-color: #f0c3bd;
+    color: #a33a3a;
+    line-height: 1.35;
+    padding: 0.5rem 1rem;
+}

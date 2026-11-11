@@ -8,6 +8,15 @@
     --pa-fondo: #fffaf5;
     --pa-fondo-suave: #f5ece0;
     --pa-borde: #e3d3bd;
+    /* Alto de la barra superior. El valor real lo actualiza el script de
+       base_admin.html (en celular la barra ocupa dos líneas). */
+    --pa-topbar-alto: 56px;
+}
+
+/* Al saltar a un elemento (ancla, foco de un campo con error) que no
+   quede escondido debajo de la barra superior fija. */
+html {
+    scroll-padding-top: calc(var(--pa-topbar-alto) + 12px);
 }
 
 body.panel-admin-body {
@@ -23,6 +32,12 @@ body.panel-admin-body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Se queda arriba al hacer scroll. Debajo de las modales de Bootstrap
+       (backdrop 1050) y por encima del contenido del panel. */
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 2px 10px rgba(60, 46, 35, 0.18);
 }
 
 .pa-topbar a {
@@ -62,6 +77,14 @@ body.panel-admin-body {
     border-right: 1px solid var(--pa-borde);
     padding: 1.25rem 0;
     flex-shrink: 0;
+    /* Se queda fijo debajo de la barra superior al hacer scroll. Ocupa el
+       alto de la ventana y, si el menú no cabe, se desplaza por dentro. */
+    position: sticky;
+    top: var(--pa-topbar-alto);
+    align-self: flex-start;
+    height: calc(100vh - var(--pa-topbar-alto));
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .pa-sidebar a {
@@ -481,6 +504,9 @@ body.panel-admin-body {
 @media (max-width: 768px) {
     .pa-layout { flex-direction: column; }
     .pa-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }
+    /* En celular el menú es una fila de pestañas arriba del contenido: no se
+       deja fijo para no quitar más alto de pantalla (la barra ya ocupa dos líneas). */
+    .pa-sidebar { position: static; height: auto; overflow-y: hidden; }
     .pa-sidebar a { padding: 0.5rem 0.9rem; white-space: nowrap; }
     .pa-sidebar a.active, .pa-sidebar a:hover { border-right: none; border-bottom: 3px solid var(--pa-oro); }
 }
@@ -875,7 +901,7 @@ body.panel-admin-body {
 /* Barra de acciones */
 .pa-seleccion {
     position: sticky;
-    top: 10px;
+    top: calc(var(--pa-topbar-alto) + 10px);  /* justo debajo de la barra superior */
     z-index: 20;
     display: flex;
     align-items: center;

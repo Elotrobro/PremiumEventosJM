@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password, is_password_usable, make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
@@ -94,6 +94,18 @@ def login_view(request):
             f'¡Bienvenido, {usuario.nombre_completo}!',
         )
         return redirect('inicio')
+
+    # Cuenta creada con "Continuar con Google" (no tiene contraseña): se le
+    # explica cómo entrar en vez del mensaje genérico (ver google_login.py).
+    if usuario is not None and not is_password_usable(usuario.contrasena):
+        messages.error(
+            request,
+            'Esta cuenta se creó con Google. Usa "Continuar con Google" o crea '
+            'una contraseña con "¿Olvidaste tu contraseña?".',
+            extra_tags='login-error',
+        )
+        request.session['login_correo_prefill'] = correo
+        return redirect(url_inicio_con_modal)
 
     messages.error(
         request,
