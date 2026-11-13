@@ -11,6 +11,7 @@ from Bd_PremiumEventos.models import (
     PaquetePrecio,
     ConfiguracionPrecios,
     ServicioPrecio,
+    Salon,
 )
 from Bd_PremiumEventos.validaciones import REGLAS_CONTRASENA, errores_contrasena, errores_nombre, limpiar_nombre
 
@@ -232,6 +233,57 @@ class SubirFotosGaleriaForm(forms.Form):
             }
         ),
     )
+
+
+class SalonForm(forms.ModelForm):
+    """
+    Crear / editar un salón de /convenios/. Además de los datos del salón
+    permite adjuntar varias fotos a la vez (como en la Galería); las fotos
+    se guardan en la vista (salon_create / salon_edit) como FotoSalon.
+    """
+
+    imagenes = _VariasImagenesField(
+        label='Agregar fotos',
+        required=False,
+        help_text='Puedes seleccionar varias a la vez (Ctrl o Shift + clic).',
+        error_messages={
+            'invalid_image': 'Uno de los archivos no es una imagen válida.',
+        },
+        widget=_VariosArchivosInput(
+            attrs={'class': 'form-control', 'accept': 'image/*'}
+        ),
+    )
+
+    class Meta:
+        model = Salon
+        fields = ['nombre', 'ubicacion', 'capacidad', 'icono', 'descripcion', 'caracteristicas', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'icono': forms.Select(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'caracteristicas': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'ubicacion': 'Ubicación',
+            'capacidad': 'Capacidad (personas)',
+            'icono': 'Ícono (se ve mientras no tenga fotos)',
+            'descripcion': 'Descripción',
+            'caracteristicas': 'Características',
+            'activo': 'Visible en la página de Salones',
+        }
+
+    def clean_capacidad(self):
+        capacidad = self.cleaned_data['capacidad']
+        if capacidad < 1:
+            raise forms.ValidationError('La capacidad debe ser de al menos 1 persona.')
+        return capacidad
+
+    def clean_imagenes(self):
+        # Sin archivos, _VariasImagenesField devuelve [None]: se deja vacío.
+        return [imagen for imagen in self.cleaned_data.get('imagenes') or [] if imagen]
 
 
 class CotizacionEstadoForm(forms.ModelForm):

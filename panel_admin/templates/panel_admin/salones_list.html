@@ -1,0 +1,163 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% block title %}Salones{% endblock %}
+{% block content %}
+
+<div class="pa-page-header">
+  <h1><i class="fas fa-hotel"></i> Salones</h1>
+  <a href="{% url 'panel_admin:salon_create' %}" data-pa-modal="lg" class="pa-btn"><i class="fas fa-plus"></i> Nuevo salón</a>
+</div>
+
+<p class="pa-help mb-3">
+  <i class="fas fa-circle-info"></i>
+  Estos son los salones de la página <a href="{% url 'convenios' %}" target="_blank">Salones y Espacios</a>.
+  Solo se muestran los que están marcados como visibles.
+</p>
+
+{# Buscador y filtro (mismo estilo que los filtros de Cotizaciones y el buscador de Usuarios) #}
+<form method="get" class="pa-filtros pa-card pa-buscador" role="search">
+  <input type="hidden" name="por_pagina" value="{{ por_pagina|default:10 }}">
+  <input type="hidden" name="vista" value="{{ vista_actual }}">
+
+  <div class="pa-buscador-campo">
+    <label for="buscarSalon">Buscar salón</label>
+    <input type="search" name="q" id="buscarSalon" class="form-control"
+           value="{{ busqueda }}" maxlength="100" autocomplete="off"
+           placeholder="Nombre o ubicación">
+  </div>
+
+  <div>
+    <label for="estadoSalon">Estado</label>
+    <select name="estado" id="estadoSalon" class="form-control">
+      {% for valor, texto in filtros_estado %}
+        <option value="{{ valor }}" {% if estado == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <button type="submit" class="pa-btn"><i class="fas fa-filter"></i> Aplicar</button>
+    {% if busqueda or estado %}
+      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}&vista={{ vista_actual }}" class="pa-btn pa-btn-secondary">
+        <i class="fas fa-xmark"></i> Limpiar
+      </a>
+    {% endif %}
+  </div>
+
+  {% if busqueda or estado %}
+    <p class="pa-help pa-buscador-resultado" aria-live="polite">
+      {{ page_obj.paginator.count }} salón{{ page_obj.paginator.count|pluralize:"es" }} encontrado{{ page_obj.paginator.count|pluralize }}
+    </p>
+  {% endif %}
+</form>
+
+{% include "panel_admin/_modo_vista.html" %}
+
+{% url 'panel_admin:salones_seleccion' as seleccion_url %}
+{% include "panel_admin/_seleccion_masiva.html" with singular="salón" plural="salones" %}
+
+{% if salones and vista_actual == 'cards' %}
+
+<!-- VISTA TARJETAS (usa los estilos de las tarjetas de cotizaciones, admin.css) -->
+<div class="pa-cotizaciones-grid">
+  {% for salon in salones %}
+  <article class="pa-cotizacion-card">
+    {% if acciones_masivas %}
+      <label class="pa-card-check pa-card-check-flotante" title="Seleccionar">
+        <input type="checkbox" class="pa-check" name="ids" value="{{ salon.pk }}" form="paFormSeleccion"
+               data-nombre="{{ salon.nombre }}" aria-label="Seleccionar {{ salon.nombre }}">
+      </label>
+    {% endif %}
+    {% with portada=salon.fotos.all|first %}
+      {% if portada %}
+        <img src="{{ portada.imagen.url }}" alt="{{ salon.nombre }}" class="pa-card-imagen">
+      {% else %}
+        <span class="pa-card-imagen pa-thumb-vacio"><i class="fas {{ salon.icono }}"></i></span>
+      {% endif %}
+    {% endwith %}
+
+    <div class="pa-cotizacion-card-header">
+      <div>
+        <span class="pa-card-caption">{{ salon.ubicacion }}</span>
+        <h3>{{ salon.nombre }}</h3>
+      </div>
+      {% if salon.activo %}<span class="pa-badge pa-badge-aprobada">Visible</span>{% else %}<span class="pa-badge pa-badge-rechazada">Oculto</span>{% endif %}
+    </div>
+
+    <div class="pa-cotizacion-card-body">
+      <div class="pa-cotizacion-dato">
+        <i class="fas fa-users"></i>
+        <div><span>Capacidad</span><strong>Hasta {{ salon.capacidad }} personas</strong></div>
+      </div>
+      <div class="pa-cotizacion-dato">
+        <i class="fas fa-images"></i>
+        <div><span>Fotos</span><strong>{{ salon.total_fotos }}</strong></div>
+      </div>
+    </div>
+
+    <div class="pa-cotizacion-card-actions">
+      <a href="{% url 'panel_admin:salon_edit' salon.pk %}" data-pa-modal="lg" class="pa-btn"><i class="fas fa-pen"></i> Editar</a>
+      {% if request.session.usuario_rol == 'admin' %}
+        <a href="{% url 'panel_admin:salon_delete' salon.pk %}" data-pa-modal class="pa-btn pa-btn-danger"><i class="fas fa-trash"></i> Eliminar</a>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{% include "panel_admin/_paginacion.html" %}
+
+{% else %}
+
+<!-- VISTA TABLA -->
+<div class="pa-card" style="padding:0; overflow-x:auto;">
+  {% if salones %}
+  <table class="pa-table">
+    <thead>
+      <tr>{% if acciones_masivas %}<th class="pa-col-check"><input type="checkbox" class="pa-check" data-seleccionar-todos aria-label="Seleccionar todos"></th>{% endif %}<th></th><th>Nombre</th><th>Ubicación</th><th>Capacidad</th><th>Fotos</th><th>Visible</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for salon in salones %}
+      <tr>
+        {% if acciones_masivas %}
+        <td class="pa-col-check">
+          <input type="checkbox" class="pa-check" name="ids" value="{{ salon.pk }}" form="paFormSeleccion"
+                 data-nombre="{{ salon.nombre }}" aria-label="Seleccionar {{ salon.nombre }}">
+        </td>
+        {% endif %}
+        <td>
+          {% with portada=salon.fotos.all|first %}
+            {% if portada %}
+              <img src="{{ portada.imagen.url }}" alt="{{ salon.nombre }}" class="pa-thumb">
+            {% else %}
+              <span class="pa-thumb pa-thumb-vacio"><i class="fas {{ salon.icono }}"></i></span>
+            {% endif %}
+          {% endwith %}
+        </td>
+        <td>{{ salon.nombre }}</td>
+        <td>{{ salon.ubicacion }}</td>
+        <td>Hasta {{ salon.capacidad }}</td>
+        <td>{{ salon.total_fotos }}</td>
+        <td>
+          {% if salon.activo %}<span class="pa-badge pa-badge-aprobada">Sí</span>{% else %}<span class="pa-badge pa-badge-rechazada">No</span>{% endif %}
+        </td>
+        <td>
+          <a href="{% url 'panel_admin:salon_edit' salon.pk %}" data-pa-modal="lg" class="pa-btn pa-btn-sm" title="Editar"><i class="fas fa-pen"></i></a>
+          {% if request.session.usuario_rol == 'admin' %}
+            <a href="{% url 'panel_admin:salon_delete' salon.pk %}" data-pa-modal class="pa-btn pa-btn-sm pa-btn-danger" title="Eliminar"><i class="fas fa-trash"></i></a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "panel_admin/_paginacion.html" %}
+  {% elif busqueda or estado %}
+  <p class="pa-empty">Ningún salón coincide con la búsqueda o el filtro.</p>
+  {% else %}
+  <p class="pa-empty">No hay salones todavía. Crea el primero con "Nuevo salón".</p>
+  {% endif %}
+</div>
+
+{% endif %}
+
+{% endblock %}

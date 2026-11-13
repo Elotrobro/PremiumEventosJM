@@ -440,3 +440,67 @@ class ServicioPrecio(models.Model):
     class Meta:
         db_table = 'servicio_precio'
         ordering = ['categoria', 'nombre']
+
+# ─────────────────────────────────────────────────────────────────────────
+# Salones y espacios (/convenios/)
+# ─────────────────────────────────────────────────────────────────────────
+
+class Salon(models.Model):
+    """
+    Salón o espacio que se muestra en /convenios/ ("Salones y Espacios").
+    Se crea, edita y elimina desde el panel (panel_admin → Salones), igual
+    que el catálogo. Sus fotos van en FotoSalon (varias por salón).
+    """
+    # Ícono de Font Awesome que se ve arriba de la tarjeta cuando el salón
+    # todavía no tiene fotos (así se veían los tres salones originales).
+    ICONO_CHOICES = [
+        ('fa-hotel', 'Hotel / salón'),
+        ('fa-tree', 'Campestre / al aire libre'),
+        ('fa-glass-cheers', 'Lounge / coctel'),
+        ('fa-building', 'Edificio / empresarial'),
+        ('fa-church', 'Capilla / ceremonia'),
+        ('fa-umbrella-beach', 'Piscina / playa'),
+    ]
+
+    id_salon = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=150)
+    ubicacion = models.CharField(max_length=150, help_text='Ej. Sede Principal, Zona Sur, Centro de la Ciudad.')
+    descripcion = models.TextField()
+    capacidad = models.PositiveIntegerField(help_text='Número máximo de personas.')
+    # Una característica por línea (ej. "Parqueadero disponible"); en la
+    # página cada línea es un punto de la lista de la tarjeta.
+    caracteristicas = models.TextField(blank=True, help_text='Una por línea. Ej.: Parqueadero disponible')
+    icono = models.CharField(max_length=40, choices=ICONO_CHOICES, default='fa-hotel')
+    activo = models.BooleanField(default=True)  # True = se muestra en /convenios/
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre
+
+    def lista_caracteristicas(self):
+        """Las características como lista, sin líneas vacías."""
+        return [linea.strip() for linea in self.caracteristicas.splitlines() if linea.strip()]
+
+    class Meta:
+        db_table = 'salon'
+        ordering = ['id_salon']
+
+
+def _ruta_imagen_salon(instance, nombre_archivo):
+    """Cada foto queda en media/salones/<id del salón>/<archivo>."""
+    return f'salones/{instance.salon_id}/{nombre_archivo}'
+
+
+class FotoSalon(models.Model):
+    """Foto de un salón; se suben varias a la vez desde el panel."""
+    id_foto = models.AutoField(primary_key=True)
+    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='fotos')
+    imagen = models.ImageField(upload_to=_ruta_imagen_salon)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.salon.nombre} — {self.imagen.name}'
+
+    class Meta:
+        db_table = 'foto_salon'
+        ordering = ['fecha_subida', 'id_foto']

@@ -27,6 +27,13 @@ urlpatterns = [
     path('galeria/<int:pk>/eliminar/', views.galeria_delete, name='galeria_delete'),
     path('galeria/seleccionados/', views.galeria_seleccion, name='galeria_seleccion'),
 
+    # Salones (página /convenios/)
+    path('salones/', views.salones_list, name='salones_list'),
+    path('salones/nuevo/', views.salon_create, name='salon_create'),
+    path('salones/<int:pk>/editar/', views.salon_edit, name='salon_edit'),
+    path('salones/<int:pk>/eliminar/', views.salon_delete, name='salon_delete'),
+    path('salones/seleccionados/', views.salones_seleccion, name='salones_seleccion'),
+
     # Mensajes de contacto
     path('mensajes/', views.mensajes_list, name='mensajes_list'),
     path('mensajes/<int:pk>/eliminar/', views.mensaje_delete, name='mensaje_delete'),
