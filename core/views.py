@@ -5,7 +5,7 @@ from .galeria_data import (
     CATEGORIAS, categorias_por_grupo, fotos_de_categoria, mosaico_general,
     obtener_categoria,
 )
-from Bd_PremiumEventos.models import Usuario
+from Bd_PremiumEventos.models import Salon, Usuario
 from Bd_PremiumEventos.precios import tabla_para_js
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -83,8 +83,11 @@ def catalogo(request):
 
 
 def convenios(request):
-    # Salones y espacios aliados con los que trabaja la empresa.
-    return render(request, 'convenios.html')
+    # Salones y espacios aliados con los que trabaja la empresa. Se
+    # administran desde el panel (panel_admin → Salones); aquí solo se
+    # muestran los visibles, con sus fotos para la ventana de detalle.
+    salones = Salon.objects.filter(activo=True).prefetch_related('fotos')
+    return render(request, 'convenios.html', {'salones': salones})
 
 
 def contacto(request):

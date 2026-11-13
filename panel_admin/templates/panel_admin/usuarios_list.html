@@ -20,8 +20,10 @@
   Las cuentas de cliente que no hagan ninguna cotización en {{ dias_sin_cotizar }} días desde que se crearon se eliminan automáticamente.
 </p>
 
-{# Buscador por nombre o correo (?q=); lo ven tanto el admin como el empleado. #}
-<form method="get" class="pa-filtros pa-card pa-buscador" role="search">
+{# Buscador por nombre o correo (?q=); lo ven tanto el admin como el empleado.   #}
+{# Filtra mientras se escribe (panel_admin/js/busqueda.js): se reemplazan solo  #}
+{# las zonas marcadas con data-busqueda-zona, sin recargar la página.           #}
+<form method="get" class="pa-filtros pa-card pa-buscador" role="search" data-busqueda-progresiva>
   <input type="hidden" name="por_pagina" value="{{ por_pagina|default:10 }}">
 
   <div class="pa-buscador-campo">
@@ -37,25 +39,21 @@
       Buscar
     </button>
 
-    {% if busqueda %}
-      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}" class="pa-btn pa-btn-secondary">
+    <span data-busqueda-zona="limpiar">{% if busqueda %}
+      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}" class="pa-btn pa-btn-secondary" data-busqueda-limpiar>
         <i class="fas fa-xmark"></i>
         Limpiar
       </a>
-    {% endif %}
+    {% endif %}</span>
   </div>
 
-  {% if busqueda %}
-    <p class="pa-help pa-buscador-resultado" aria-live="polite">
-      {{ page_obj.paginator.count }} resultado{{ page_obj.paginator.count|pluralize }} para «{{ busqueda }}»
-    </p>
-  {% endif %}
+  <div class="pa-buscador-resultado" data-busqueda-zona="conteo" aria-live="polite">{% if busqueda %}<p class="pa-help mb-0">{{ page_obj.paginator.count }} resultado{{ page_obj.paginator.count|pluralize }} para «{{ busqueda }}»</p>{% endif %}</div>
 </form>
 
 {% url 'panel_admin:usuarios_seleccion' as seleccion_url %}
 {% include "panel_admin/_seleccion_masiva.html" with singular="usuario" plural="usuarios" %}
 
-<div class="pa-card" style="padding:0; overflow-x:auto;">
+<div class="pa-card" style="padding:0; overflow-x:auto;" data-busqueda-zona="resultados">
   {% if usuarios %}
   <table class="pa-table">
     <thead>

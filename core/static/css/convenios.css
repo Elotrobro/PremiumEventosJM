@@ -216,3 +216,416 @@
     text-decoration: underline;
 }
 
+
+/* ============================================================
+   ENCABEZADO DE SALONES
+   Antes era un fondo negro (bg-dark). Ahora es una foto del proyecto
+   con un velo oscuro encima para que el texto blanco siga leyéndose.
+   ============================================================ */
+
+.salones-header {
+    position: relative;
+    background-color: #2c2a29; /* mientras carga la foto */
+    background-image:
+        linear-gradient(180deg, rgba(20, 14, 10, 0.72) 0%, rgba(20, 14, 10, 0.55) 55%, rgba(20, 14, 10, 0.78) 100%),
+        url('../images/hero/hero_salon.jpg');
+    background-size: cover;
+    background-position: center 60%;
+}
+
+.salones-header h1,
+.salones-header p {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================
+   TARJETAS DE SALÓN: foto de portada y apertura de la ventana
+   ============================================================ */
+
+.salon-card[data-salon] {
+    cursor: pointer;
+}
+
+.salon-card-top {
+    position: relative;
+    overflow: hidden;
+}
+
+.salon-card-foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.salon-card:hover .salon-card-foto {
+    transform: scale(1.05);
+}
+
+.salon-card-contador {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    background: rgba(44, 42, 41, 0.75);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* El nombre del salón es un botón (para abrir con el teclado), con el
+   mismo aspecto del título que tenía. */
+.salon-ver-detalle {
+    all: unset;
+    cursor: pointer;
+}
+
+.salon-ver-detalle:hover {
+    color: #a5632a;
+}
+
+.salon-ver-detalle:focus-visible {
+    outline: 2px solid #c17b3c;
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.salones-vacio {
+    text-align: center;
+    color: #7a6856;
+    padding: 2rem 0;
+}
+
+/* ============================================================
+   VENTANA DE DETALLE DEL SALÓN (<dialog id="modalSalon">)
+   Animación de zoom igual a la del modal de cotización de inicio
+   (ver cotizacion.css): se anima con `scale` porque `transform`
+   centra la ventana.
+   ============================================================ */
+
+.modal-salon {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 24px;
+    width: min(1000px, 94vw);
+    max-height: 90vh;
+    overflow: hidden;
+    background: #fffdf9;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.modal-salon[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-salon::backdrop {
+    background: rgba(30, 22, 16, 0.65);
+    backdrop-filter: blur(4px);
+}
+
+.modal-salon-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.5rem;
+    background: linear-gradient(135deg, #771f1f 0%, #c17b3c 100%);
+    border-bottom: 3px solid #d6a15f;
+    color: #fff;
+}
+
+.modal-salon-header h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.modal-salon-cerrar {
+    background: none;
+    border: none;
+    color: #f8eadb;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.modal-salon-cerrar:hover {
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.modal-salon-cuerpo {
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.modal-salon-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 1.75rem;
+}
+
+/* ---------- Visor de fotos ---------- */
+
+.salon-galeria-principal {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #f5ede4;
+}
+
+.salon-galeria-foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.salon-galeria-foto.activa {
+    opacity: 1;
+}
+
+.salon-galeria-flecha {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 253, 249, 0.9);
+    color: #771f1f;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background 0.2s ease, scale 0.2s ease;
+}
+
+.salon-galeria-flecha:hover { background: #fff; scale: 1.08; }
+.salon-galeria-flecha.anterior { left: 0.75rem; }
+.salon-galeria-flecha.siguiente { right: 0.75rem; }
+
+.salon-galeria-contador {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    background: rgba(44, 42, 41, 0.75);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.salon-galeria-vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #c9b8a4 0%, #d4c5b5 100%);
+    color: #fff;
+    text-align: center;
+}
+
+.salon-galeria-vacia i { font-size: 4rem; }
+.salon-galeria-vacia span { font-size: 0.9rem; font-weight: 600; }
+
+.salon-galeria-miniaturas {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.salon-miniatura {
+    flex: 0 0 72px;
+    height: 54px;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    background: none;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.salon-miniatura img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.salon-miniatura:hover,
+.salon-miniatura.activa {
+    opacity: 1;
+    border-color: #c17b3c;
+}
+
+/* ---------- Información ---------- */
+
+.salon-detalle-descripcion {
+    color: #4a3a2c;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
+
+.salon-detalle-info .salon-ubicacion {
+    font-size: 0.9rem;
+}
+
+.salon-detalle-info .salon-lista li {
+    font-size: 0.92rem;
+}
+
+/* ---------- Animación de zoom ---------- */
+
+.modal-salon[open] {
+    animation: salon-zoom 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.modal-salon[open]::backdrop {
+    animation: salon-fondo 0.45s ease backwards;
+}
+
+.modal-salon[open] .modal-salon-header,
+.modal-salon[open] .salon-galeria,
+.modal-salon[open] .salon-detalle-info {
+    animation: salon-contenido 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.modal-salon[open] .modal-salon-header  { animation-delay: 0.18s; }
+.modal-salon[open] .salon-galeria       { animation-delay: 0.28s; }
+.modal-salon[open] .salon-detalle-info  { animation-delay: 0.38s; }
+
+/* Cierre: se encoge y se desvanece (en navegadores sin allow-discrete se cierra al instante) */
+.modal-salon,
+.modal-salon::backdrop {
+    transition:
+        scale 0.3s ease-in,
+        opacity 0.3s ease-in,
+        overlay 0.3s allow-discrete,
+        display 0.3s allow-discrete;
+}
+
+.modal-salon:not([open]) {
+    scale: 0.85;
+    opacity: 0;
+}
+
+.modal-salon:not([open])::backdrop {
+    opacity: 0;
+}
+
+@keyframes salon-zoom {
+    0%   { opacity: 0; scale: 0.55; }
+    55%  { opacity: 1; scale: 1.025; }
+    100% { opacity: 1; scale: 1; }
+}
+
+@keyframes salon-fondo {
+    from { opacity: 0; backdrop-filter: blur(0); }
+}
+
+@keyframes salon-contenido {
+    from { opacity: 0; translate: 0 22px; }
+}
+
+@media (max-width: 768px) {
+    .modal-salon-layout {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .modal-salon-cuerpo {
+        padding: 1rem;
+    }
+
+    .modal-salon-header h3 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-salon[open],
+    .modal-salon[open]::backdrop,
+    .modal-salon[open] .modal-salon-header,
+    .modal-salon[open] .salon-galeria,
+    .modal-salon[open] .salon-detalle-info {
+        animation: none;
+    }
+
+    .modal-salon,
+    .modal-salon::backdrop,
+    .salon-galeria-foto,
+    .salon-card-foto {
+        transition: none;
+    }
+}
+
+/* El ícono del contador no debe heredar el tamaño grande de .salon-card-top i */
+.salon-card-top .salon-card-contador i {
+    font-size: inherit;
+    text-shadow: none;
+}
+
+/* Al abrir, el foco va al contenido (no a la ×) para poder usar las flechas
+   del teclado de inmediato; ese foco no necesita borde. */
+.modal-salon-cuerpo:focus {
+    outline: none;
+}
+
+/* ---------- Mapa del salón en la ventana de detalle ---------- */
+
+.salon-mapa {
+    height: 170px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eadcc7;
+    background: #f5ede4;
+    margin-bottom: 0.4rem;
+}
+
+.salon-mapa iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.salon-mapa-direccion {
+    font-size: 0.8rem;
+    color: #7a6856;
+    margin-bottom: 1rem;
+}
+
+.salon-mapa-direccion a {
+    color: #a5632a;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.salon-mapa-direccion a:hover {
+    text-decoration: underline;
+}
+
+.salon-mapa-direccion i {
+    font-size: 0.7rem;
+}

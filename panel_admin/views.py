@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Sum, Count, Exists, OuterRef, Q
+from django.db.models import Sum, Count, Exists, OuterRef, Q, Prefetch
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -22,6 +22,8 @@ from Bd_PremiumEventos.models import (
     ConfiguracionPrecios,
     PaquetePrecio,
     ServicioPrecio,
+    Salon,
+    FotoSalon,
 )
 from Bd_PremiumEventos import limpieza
 from Bd_PremiumEventos.recordatorios import enviar_correo_estado
@@ -36,6 +38,7 @@ from .forms import (
     TablaPreciosFormSet,
     ConfiguracionPreciosForm,
     ServiciosPreciosFormSet,
+    SalonForm,
 )
 from .utils import formatear_miles
 
@@ -337,6 +340,130 @@ def galeria_delete(request, pk):
     });
 
 
+# ─────────────────── Salones (Salon + FotoSalon) ───────────────────
+#
+# Salones y espacios que se muestran en /convenios/. Mismo esquema que el
+# catálogo: listado con búsqueda, filtro, modo tabla/tarjetas, paginación
+# y selección múltiple; crear/editar en la modal del panel. Cada salón
+# puede tener varias fotos, que se adjuntan varias a la vez desde el mismo
+# formulario (como en la Galería). El empleado puede crear, editar y
+# publicar/ocultar, pero no eliminar salones ni fotos.
+
+SALONES_FILTROS_ESTADO = (
+    ('', 'Todos'),
+    ('visibles', 'Visibles en la página'),
+    ('ocultos', 'Ocultos'),
+)
+
+
+def _borrar_fotos_salon(fotos):
+    """Borra las fotos y sus archivos en /media (no solo el registro)."""
+    total = 0
+    for foto in fotos:
+        foto.imagen.delete(save=False)
+        foto.delete()
+        total += 1
+    return total
+
+
+def _guardar_salon(request, form):
+    """
+    Guarda el salón del formulario, sus fotos nuevas y, si es admin, quita
+    las fotos que marcó en "Quitar". Devuelve el texto para el mensaje.
+    """
+    salon = form.save()
+
+    nuevas = form.cleaned_data.get('imagenes') or []
+    for imagen in nuevas:
+        FotoSalon.objects.create(salon=salon, imagen=imagen)
+
+    quitadas = 0
+    if es_admin(request):
+        ids = [int(v) for v in request.POST.getlist('fotos_eliminar') if v.isdigit()]
+        if ids:
+            quitadas = _borrar_fotos_salon(salon.fotos.filter(pk__in=ids))
+
+    partes = []
+    if nuevas:
+        partes.append(_plural(len(nuevas), 'foto agregada', 'fotos agregadas'))
+    if quitadas:
+        partes.append(_plural(quitadas, 'foto quitada', 'fotos quitadas'))
+    return f' ({", ".join(partes)})' if partes else ''
+
+
+@staff_required
+def salones_list(request):
+    busqueda = request.GET.get('q', '').strip()[:100]
+    estado = request.GET.get('estado', '')
+    if estado not in dict(SALONES_FILTROS_ESTADO):
+        estado = ''
+
+    salones = Salon.objects.annotate(total_fotos=Count('fotos')).prefetch_related(
+        Prefetch('fotos', queryset=FotoSalon.objects.order_by('fecha_subida', 'id_foto'))
+    )
+    if busqueda:
+        salones = salones.filter(Q(nombre__icontains=busqueda) | Q(ubicacion__icontains=busqueda))
+    if estado == 'visibles':
+        salones = salones.filter(activo=True)
+    elif estado == 'ocultos':
+        salones = salones.filter(activo=False)
+
+    paginacion = _paginar(request, salones.order_by('nombre'))
+
+    contexto = {
+        'salones': paginacion['page_obj'].object_list,
+        'busqueda': busqueda,
+        'estado': estado,
+        'filtros_estado': SALONES_FILTROS_ESTADO,
+        'vista_actual': _vista_actual(request),
+        'acciones_masivas': _acciones_masivas(request, 'salones'),
+    }
+    contexto.update(paginacion)
+    return render(request, 'panel_admin/salones_list.html', contexto)
+
+
+@staff_required
+def salon_create(request):
+    if request.method == 'POST':
+        form = SalonForm(request.POST, request.FILES)
+        if form.is_valid():
+            detalle = _guardar_salon(request, form)
+            messages.success(request, f'Salón creado correctamente{detalle}.')
+            return redirect('panel_admin:salones_list')
+    else:
+        form = SalonForm()
+    return render_panel(request, 'panel_admin/salon_form.html', {'form': form, 'modo': 'crear'})
+
+
+@staff_required
+def salon_edit(request, pk):
+    salon = get_object_or_404(Salon, pk=pk)
+    if request.method == 'POST':
+        form = SalonForm(request.POST, request.FILES, instance=salon)
+        if form.is_valid():
+            detalle = _guardar_salon(request, form)
+            messages.success(request, f'Salón actualizado correctamente{detalle}.')
+            return redirect('panel_admin:salones_list')
+    else:
+        form = SalonForm(instance=salon)
+    return render_panel(request, 'panel_admin/salon_form.html', {
+        'form': form, 'modo': 'editar', 'salon': salon, 'fotos': salon.fotos.all(),
+    })
+
+
+@admin_required  # 'empleado' no puede eliminar nada salvo clientes sin cotizaciones (ver usuario_delete)
+def salon_delete(request, pk):
+    salon = get_object_or_404(Salon, pk=pk)
+    if request.method == 'POST':
+        _borrar_fotos_salon(salon.fotos.all())  # los archivos en /media no se borran solos
+        salon.delete()
+        messages.success(request, 'Salón eliminado correctamente.')
+        return redirect('panel_admin:salones_list')
+    return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
+        'objeto': salon, 'titulo': 'salón (y sus fotos)', 'cancelar_url': 'panel_admin:salones_list',
+    })
+
+
 # ─────────────────── Mensajes de contacto (ContactoSimple) ───────────────────
 
 @staff_required
@@ -585,7 +712,7 @@ def _acciones_masivas(request, modulo):
             {'valor': 'disponible', 'texto': 'Marcar disponible', 'icono': 'fa-circle-check', 'estilo': 'pa-btn-secondary'},
             {'valor': 'no_disponible', 'texto': 'Marcar no disponible', 'icono': 'fa-circle-minus', 'estilo': 'pa-btn-secondary'},
         ]
-    elif modulo == 'testimonios':
+    elif modulo in ('testimonios', 'salones'):
         acciones += [
             {'valor': 'publicar', 'texto': 'Publicar', 'icono': 'fa-eye', 'estilo': 'pa-btn-secondary'},
             {'valor': 'ocultar', 'texto': 'Ocultar', 'icono': 'fa-eye-slash', 'estilo': 'pa-btn-secondary'},
@@ -712,6 +839,29 @@ def galeria_seleccion(request):
         foto.delete()
         total += 1
     messages.success(request, f'{_plural(total, "foto eliminada", "fotos eliminadas")} correctamente.')
+    return _volver_al_listado(request, url)
+
+
+@staff_required
+def salones_seleccion(request):
+    url = 'panel_admin:salones_list'
+    accion, salones = _leer_seleccion(request, Salon, url, 'ningún salón')
+    if accion is None:
+        return salones
+
+    if accion in ('publicar', 'ocultar'):
+        total = salones.update(activo=(accion == 'publicar'))
+        estado = 'visible' if accion == 'publicar' else 'oculto'
+        messages.success(request, f'{_plural(total, "salón marcado", "salones marcados")} como {estado}{"s" if total != 1 else ""} en la página.')
+    elif accion == 'eliminar' and es_admin(request):
+        total = 0
+        for salon in salones:
+            _borrar_fotos_salon(salon.fotos.all())  # igual que salon_delete
+            salon.delete()
+            total += 1
+        messages.success(request, f'{_plural(total, "salón eliminado", "salones eliminados")} correctamente.')
+    else:
+        return _accion_no_permitida(request, url)
     return _volver_al_listado(request, url)
 
 
@@ -912,11 +1062,13 @@ def historial_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_cotizaciones.pdf"'
 
+    # Encabezado corporativo (logo + título) y pie en todas las páginas;
+    # por eso el margen de arriba deja espacio para el logo.
     doc = SimpleDocTemplate(response, pagesize=landscape(letter),
-                             topMargin=1.5 * cm, bottomMargin=1.5 * cm)
+                             topMargin=3.4 * cm, bottomMargin=1.8 * cm,
+                             title='Historial de cotizaciones', author='Premium Eventos JM')
     estilos = getSampleStyleSheet()
     elementos = [
-        Paragraph('Premium Eventos JM — Historial de cotizaciones', estilos['Title']),
         Paragraph(f'Filtro aplicado: {descripcion_filtro}', estilos['Normal']),
         Paragraph(f"Generado: {timezone.localtime().strftime('%Y-%m-%d %H:%M')}", estilos['Normal']),
         Spacer(1, 0.5 * cm),
@@ -958,8 +1110,89 @@ def historial_pdf(request):
     )
     elementos.append(Paragraph(resumen, estilos['Heading4']))
 
-    doc.build(elementos)
+    logo = _logo_corporativo_pdf()
+
+    def encabezado_y_pie(canvas, documento):
+        ancho, alto = documento.pagesize
+        izquierda = documento.leftMargin
+        derecha = ancho - documento.rightMargin
+        canvas.saveState()
+
+        # Logo de la empresa arriba a la izquierda (core/static/images/Logo.png).
+        alto_logo = 2.2 * cm
+        if logo:
+            imagen, proporcion = logo
+            canvas.drawImage(imagen, izquierda, alto - 0.8 * cm - alto_logo,
+                             width=alto_logo * proporcion, height=alto_logo, mask='auto')
+        else:
+            canvas.setFont('Helvetica-Bold', 16)
+            canvas.setFillColor(colors.HexColor('#5a1320'))
+            canvas.drawString(izquierda, alto - 2 * cm, 'Premium Eventos JM')
+
+        # Título del reporte a la derecha, alineado con el logo.
+        canvas.setFillColor(colors.HexColor('#5a1320'))
+        canvas.setFont('Helvetica-Bold', 16)
+        canvas.drawRightString(derecha, alto - 1.75 * cm, 'Historial de cotizaciones')
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor('#7a6856'))
+        canvas.drawRightString(derecha, alto - 2.3 * cm, 'Premium Eventos JM · Su mejor opción')
+
+        # Línea dorada bajo el encabezado.
+        canvas.setStrokeColor(colors.HexColor('#c9a14a'))
+        canvas.setLineWidth(1.2)
+        canvas.line(izquierda, alto - 3.1 * cm, derecha, alto - 3.1 * cm)
+
+        # Pie: empresa y número de página.
+        canvas.setStrokeColor(colors.HexColor('#e4d3bf'))
+        canvas.setLineWidth(0.6)
+        canvas.line(izquierda, 1.3 * cm, derecha, 1.3 * cm)
+        canvas.setFont('Helvetica', 8)
+        canvas.setFillColor(colors.HexColor('#7a6856'))
+        canvas.drawString(izquierda, 0.85 * cm, 'Premium Eventos JM — Documento generado desde el panel administrativo')
+        canvas.drawRightString(derecha, 0.85 * cm, f'Página {documento.page}')
+
+        canvas.restoreState()
+
+    doc.build(elementos, onFirstPage=encabezado_y_pie, onLaterPages=encabezado_y_pie)
     return response
+
+
+def _logo_corporativo_pdf():
+    """
+    Logo de la empresa (core/static/images/Logo.png) listo para ReportLab:
+    devuelve (imagen, ancho/alto) o None si no se encuentra. El archivo
+    trae mucho margen blanco alrededor, así que se recorta al contenido
+    para que el logo se vea del tamaño correcto en el encabezado.
+    """
+    from io import BytesIO
+
+    from django.contrib.staticfiles import finders
+    from PIL import Image, ImageChops
+    from reportlab.lib.utils import ImageReader
+
+    ruta = finders.find('images/Logo.png')
+    if not ruta:
+        return None
+    try:
+        with Image.open(ruta) as original:
+            imagen = original.convert('RGB')
+        fondo = Image.new('RGB', imagen.size, (255, 255, 255))
+        # Se ignoran los píxeles casi blancos (el fondo no es blanco puro).
+        diferencia = ImageChops.difference(imagen, fondo).convert('L').point(lambda v: 255 if v > 18 else 0)
+        caja = diferencia.getbbox()
+        if caja:
+            margen = 12
+            caja = (max(caja[0] - margen, 0), max(caja[1] - margen, 0),
+                    min(caja[2] + margen, imagen.width), min(caja[3] + margen, imagen.height))
+            imagen = imagen.crop(caja)
+        # Suficiente nitidez para ~6 cm de ancho sin hacer pesado el PDF.
+        imagen.thumbnail((900, 900))
+        datos = BytesIO()
+        imagen.save(datos, format='JPEG', quality=92)  # fondo blanco: JPEG pesa mucho menos que PNG
+        datos.seek(0)
+        return ImageReader(datos), imagen.width / imagen.height
+    except OSError:
+        return None
 
 
 # ─────────────────────────────────────────────────────────────────────────
