@@ -20,6 +20,38 @@
   Las cuentas de cliente que no hagan ninguna cotización en {{ dias_sin_cotizar }} días desde que se crearon se eliminan automáticamente.
 </p>
 
+{# Buscador por nombre o correo (?q=); lo ven tanto el admin como el empleado. #}
+<form method="get" class="pa-filtros pa-card pa-buscador" role="search">
+  <input type="hidden" name="por_pagina" value="{{ por_pagina|default:10 }}">
+
+  <div class="pa-buscador-campo">
+    <label for="buscarUsuario">Buscar usuario</label>
+    <input type="search" name="q" id="buscarUsuario" class="form-control"
+           value="{{ busqueda }}" maxlength="100" autocomplete="off"
+           placeholder="Escribe un nombre o un correo">
+  </div>
+
+  <div>
+    <button type="submit" class="pa-btn">
+      <i class="fas fa-magnifying-glass"></i>
+      Buscar
+    </button>
+
+    {% if busqueda %}
+      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}" class="pa-btn pa-btn-secondary">
+        <i class="fas fa-xmark"></i>
+        Limpiar
+      </a>
+    {% endif %}
+  </div>
+
+  {% if busqueda %}
+    <p class="pa-help pa-buscador-resultado" aria-live="polite">
+      {{ page_obj.paginator.count }} resultado{{ page_obj.paginator.count|pluralize }} para «{{ busqueda }}»
+    </p>
+  {% endif %}
+</form>
+
 {% url 'panel_admin:usuarios_seleccion' as seleccion_url %}
 {% include "panel_admin/_seleccion_masiva.html" with singular="usuario" plural="usuarios" %}
 
@@ -70,7 +102,11 @@
   </table>
   {% include "panel_admin/_paginacion.html" %}
   {% else %}
+  {% if busqueda %}
+  <p class="pa-empty">Ningún usuario coincide con «{{ busqueda }}». Prueba con otra parte del nombre o del correo.</p>
+  {% else %}
   <p class="pa-empty">No hay usuarios registrados todavía.</p>
+  {% endif %}
   {% endif %}
 </div>
 
