@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Sum, Count, Exists, OuterRef
+from django.db.models import Sum, Count, Exists, OuterRef, Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -130,13 +130,25 @@ def dashboard(request):
 
 @staff_required
 def usuarios_list(request):
-    usuarios = list(Usuario.objects.annotate(
+    # Buscador (?q=): busca en el nombre o en el correo, sin importar
+    # mayúsculas. Lo usan igual el admin y el empleado.
+    busqueda = request.GET.get('q', '').strip()[:100]
+
+    usuarios = Usuario.objects.annotate(
         tiene_cotizacion=Exists(
             Cotizacion.objects.filter(
                 cliente__usuario=OuterRef('pk')
             )
         )
-    ).order_by('nombre_completo'))
+    )
+
+    if busqueda:
+        usuarios = usuarios.filter(
+            Q(nombre_completo__icontains=busqueda)
+            | Q(correo_electronico__icontains=busqueda)
+        )
+
+    usuarios = list(usuarios.order_by('nombre_completo'))
 
     for usuario in usuarios:
         if usuario.rol == Usuario.ROL_CLIENTE and not usuario.tiene_cotizacion:
@@ -146,6 +158,7 @@ def usuarios_list(request):
 
     contexto = {
         'usuarios': paginacion['page_obj'].object_list,
+        'busqueda': busqueda,
         'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
         'acciones_masivas': _acciones_masivas(request, 'usuarios'),
     }

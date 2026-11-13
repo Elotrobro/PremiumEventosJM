@@ -246,6 +246,17 @@ body.panel-admin-body {
 
 .pa-filtros-rango[hidden] { display: none; }
 
+/* Buscador de usuarios (usuarios_list.html): el campo ocupa el espacio libre. */
+.pa-buscador-campo {
+    flex: 1 1 260px;
+    max-width: 480px;
+}
+
+.pa-buscador-resultado {
+    flex-basis: 100%;
+    margin: 0;
+}
+
 .pa-form-group { margin-bottom: 1rem; }
 
 /* Formulario en dos columnas (ej. catálogo); una sola en pantallas angostas. */
