@@ -465,6 +465,12 @@ class Salon(models.Model):
     id_salon = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     ubicacion = models.CharField(max_length=150, help_text='Ej. Sede Principal, Zona Sur, Centro de la Ciudad.')
+    # Dirección exacta para el mapa de Google Maps de la ventana de detalle
+    # (convenios.html). Si está vacía, la ventana no muestra mapa.
+    direccion = models.CharField(
+        max_length=255, blank=True,
+        help_text='Dirección para el mapa. Ej.: Cl. 36 #70-19, San Antonio de Prado, Medellín, Antioquia.',
+    )
     descripcion = models.TextField()
     capacidad = models.PositiveIntegerField(help_text='Número máximo de personas.')
     # Una característica por línea (ej. "Parqueadero disponible"); en la

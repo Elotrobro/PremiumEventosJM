@@ -13,8 +13,9 @@
   Solo se muestran los que están marcados como visibles.
 </p>
 
-{# Buscador y filtro (mismo estilo que los filtros de Cotizaciones y el buscador de Usuarios) #}
-<form method="get" class="pa-filtros pa-card pa-buscador" role="search">
+{# Buscador y filtro (mismo estilo que los filtros de Cotizaciones y el buscador de Usuarios). #}
+{# Filtra mientras se escribe o al cambiar el estado (panel_admin/js/busqueda.js).            #}
+<form method="get" class="pa-filtros pa-card pa-buscador" role="search" data-busqueda-progresiva>
   <input type="hidden" name="por_pagina" value="{{ por_pagina|default:10 }}">
   <input type="hidden" name="vista" value="{{ vista_actual }}">
 
@@ -36,18 +37,14 @@
 
   <div>
     <button type="submit" class="pa-btn"><i class="fas fa-filter"></i> Aplicar</button>
-    {% if busqueda or estado %}
-      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}&vista={{ vista_actual }}" class="pa-btn pa-btn-secondary">
+    <span data-busqueda-zona="limpiar">{% if busqueda or estado %}
+      <a href="{{ request.path }}?por_pagina={{ por_pagina|default:10 }}&vista={{ vista_actual }}" class="pa-btn pa-btn-secondary" data-busqueda-limpiar>
         <i class="fas fa-xmark"></i> Limpiar
       </a>
-    {% endif %}
+    {% endif %}</span>
   </div>
 
-  {% if busqueda or estado %}
-    <p class="pa-help pa-buscador-resultado" aria-live="polite">
-      {{ page_obj.paginator.count }} salón{{ page_obj.paginator.count|pluralize:"es" }} encontrado{{ page_obj.paginator.count|pluralize }}
-    </p>
-  {% endif %}
+  <div class="pa-buscador-resultado" data-busqueda-zona="conteo" aria-live="polite">{% if busqueda or estado %}<p class="pa-help mb-0">{{ page_obj.paginator.count }} salón{{ page_obj.paginator.count|pluralize:"es" }} encontrado{{ page_obj.paginator.count|pluralize }}</p>{% endif %}</div>
 </form>
 
 {% include "panel_admin/_modo_vista.html" %}
@@ -55,6 +52,7 @@
 {% url 'panel_admin:salones_seleccion' as seleccion_url %}
 {% include "panel_admin/_seleccion_masiva.html" with singular="salón" plural="salones" %}
 
+<div data-busqueda-zona="resultados">
 {% if salones and vista_actual == 'cards' %}
 
 <!-- VISTA TARJETAS (usa los estilos de las tarjetas de cotizaciones, admin.css) -->
@@ -159,5 +157,6 @@
 </div>
 
 {% endif %}
+</div>
 
 {% endblock %}

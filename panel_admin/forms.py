@@ -256,10 +256,13 @@ class SalonForm(forms.ModelForm):
 
     class Meta:
         model = Salon
-        fields = ['nombre', 'ubicacion', 'capacidad', 'icono', 'descripcion', 'caracteristicas', 'activo']
+        fields = ['nombre', 'ubicacion', 'direccion', 'capacidad', 'icono', 'descripcion', 'caracteristicas', 'activo']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
+            # data-mapa-vista-previa: panel_admin/js/mapa.js actualiza el mapa de
+            # muestra del formulario mientras se escribe la dirección.
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'data-mapa-vista-previa': 'mapaSalonPrevia', 'autocomplete': 'off'}),
             'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'icono': forms.Select(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
@@ -268,6 +271,7 @@ class SalonForm(forms.ModelForm):
         }
         labels = {
             'ubicacion': 'Ubicación',
+            'direccion': 'Dirección (para el mapa de Google Maps)',
             'capacidad': 'Capacidad (personas)',
             'icono': 'Ícono (se ve mientras no tenga fotos)',
             'descripcion': 'Descripción',

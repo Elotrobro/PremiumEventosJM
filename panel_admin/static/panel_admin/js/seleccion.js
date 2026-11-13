@@ -27,12 +27,15 @@
     }
 
     // Sin casillas (ej. un empleado sin registros que pueda tocar) no
-    // tiene sentido mostrar la barra ni la casilla del encabezado.
-    if (!casillas().length) {
-        form.hidden = true;
-        document.querySelectorAll('[data-seleccionar-todos]').forEach(function (c) { c.hidden = true; });
-        return;
+    // tiene sentido mostrar la barra ni la casilla del encabezado. Se
+    // revisa al cargar y cada vez que la búsqueda progresiva cambia la
+    // lista (busqueda.js), por eso no corta el script.
+    function revisarVisibilidad() {
+        const hay = casillas().length > 0;
+        form.hidden = !hay;
+        document.querySelectorAll('[data-seleccionar-todos]').forEach(function (c) { c.hidden = !hay; });
     }
+    revisarVisibilidad();
 
     function contenedorDe(casilla) {
         return casilla.closest('tr, .pa-cotizacion-card, .pa-galeria-item');
@@ -187,4 +190,11 @@
     // El navegador puede recordar casillas marcadas al volver atrás.
     actualizar();
     window.addEventListener('pageshow', actualizar);
+
+    // La búsqueda progresiva reemplazó la lista: las casillas son otras.
+    document.addEventListener('pa:listado-actualizado', function () {
+        ultima = null;
+        revisarVisibilidad();
+        actualizar();
+    });
 })();

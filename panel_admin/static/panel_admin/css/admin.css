@@ -257,6 +257,17 @@ body.panel-admin-body {
     margin: 0;
 }
 
+/* Sin búsqueda la zona del conteo queda vacía y no debe ocupar una fila. */
+.pa-buscador-resultado:empty {
+    display: none;
+}
+
+/* Mientras llegan los resultados de la búsqueda progresiva. */
+[data-busqueda-zona="resultados"].pa-buscando {
+    opacity: 0.55;
+    transition: opacity 0.15s ease;
+}
+
 .pa-form-group { margin-bottom: 1rem; }
 
 /* Formulario en dos columnas (ej. catálogo); una sola en pantallas angostas. */
@@ -1090,4 +1101,22 @@ body.panel-admin-body {
 
 .pa-galeria-item:has(.pa-salon-foto-quitar input:checked) img {
     opacity: 0.35;
+}
+
+/* Vista previa del mapa del salón (salon_form.html) */
+.pa-mapa-previa {
+    margin-top: 0.6rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--pa-borde);
+    height: 170px;
+}
+
+.pa-mapa-previa[hidden] { display: none; }
+
+.pa-mapa-previa iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
 }

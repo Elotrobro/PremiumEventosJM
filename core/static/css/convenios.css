@@ -590,3 +590,42 @@
 .modal-salon-cuerpo:focus {
     outline: none;
 }
+
+/* ---------- Mapa del salón en la ventana de detalle ---------- */
+
+.salon-mapa {
+    height: 170px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eadcc7;
+    background: #f5ede4;
+    margin-bottom: 0.4rem;
+}
+
+.salon-mapa iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.salon-mapa-direccion {
+    font-size: 0.8rem;
+    color: #7a6856;
+    margin-bottom: 1rem;
+}
+
+.salon-mapa-direccion a {
+    color: #a5632a;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.salon-mapa-direccion a:hover {
+    text-decoration: underline;
+}
+
+.salon-mapa-direccion i {
+    font-size: 0.7rem;
+}

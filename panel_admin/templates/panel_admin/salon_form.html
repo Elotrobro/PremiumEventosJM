@@ -23,6 +23,19 @@
               {% if field.help_text %}<div class="pa-help">{{ field.help_text }}</div>{% endif %}
               {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
             </div>
+          {% elif field.name == 'direccion' %}
+            {# Dirección del mapa con vista previa: se actualiza al escribir (panel_admin/js/mapa.js). #}
+            <div class="pa-form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              <div class="pa-help">{{ field.help_text }} Si la dejas vacía, la ventana del salón no muestra mapa.</div>
+              {% for error in field.errors %}<div class="pa-alert pa-alert-error">{{ error }}</div>{% endfor %}
+              <div class="pa-mapa-previa" id="mapaSalonPrevia" {% if not field.value %}hidden{% endif %}>
+                <iframe title="Vista previa del mapa"
+                        {% if field.value %}src="https://www.google.com/maps?q={{ field.value|urlencode }}&amp;output=embed"{% endif %}
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+            </div>
           {% endif %}
         {% endfor %}
       </div>

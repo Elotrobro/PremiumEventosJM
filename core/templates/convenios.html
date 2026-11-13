@@ -124,6 +124,20 @@
 
         <div class="salon-detalle-info">
             <p class="salon-ubicacion"><i class="fas fa-map-marker-alt"></i> {{ salon.ubicacion }}</p>
+            {% if salon.direccion %}
+            {# Mapa de Google Maps con la dirección del salón (se edita en el panel → Salones). #}
+            <div class="salon-mapa">
+                <iframe src="https://www.google.com/maps?q={{ salon.direccion|urlencode }}&amp;output=embed"
+                        title="Mapa de {{ salon.nombre }}" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            </div>
+            <p class="salon-mapa-direccion">
+                {{ salon.direccion }} ·
+                <a href="https://www.google.com/maps/search/?api=1&amp;query={{ salon.direccion|urlencode }}" target="_blank" rel="noopener">
+                    Cómo llegar <i class="fas fa-arrow-up-right-from-square"></i>
+                </a>
+            </p>
+            {% endif %}
             <p class="salon-detalle-descripcion">{{ salon.descripcion|linebreaksbr }}</p>
             <ul class="salon-lista">
                 <li><i class="fas fa-users"></i> Capacidad: Hasta {{ salon.capacidad }} personas</li>

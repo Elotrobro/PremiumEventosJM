@@ -1062,11 +1062,13 @@ def historial_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_cotizaciones.pdf"'
 
+    # Encabezado corporativo (logo + título) y pie en todas las páginas;
+    # por eso el margen de arriba deja espacio para el logo.
     doc = SimpleDocTemplate(response, pagesize=landscape(letter),
-                             topMargin=1.5 * cm, bottomMargin=1.5 * cm)
+                             topMargin=3.4 * cm, bottomMargin=1.8 * cm,
+                             title='Historial de cotizaciones', author='Premium Eventos JM')
     estilos = getSampleStyleSheet()
     elementos = [
-        Paragraph('Premium Eventos JM — Historial de cotizaciones', estilos['Title']),
         Paragraph(f'Filtro aplicado: {descripcion_filtro}', estilos['Normal']),
         Paragraph(f"Generado: {timezone.localtime().strftime('%Y-%m-%d %H:%M')}", estilos['Normal']),
         Spacer(1, 0.5 * cm),
@@ -1108,8 +1110,89 @@ def historial_pdf(request):
     )
     elementos.append(Paragraph(resumen, estilos['Heading4']))
 
-    doc.build(elementos)
+    logo = _logo_corporativo_pdf()
+
+    def encabezado_y_pie(canvas, documento):
+        ancho, alto = documento.pagesize
+        izquierda = documento.leftMargin
+        derecha = ancho - documento.rightMargin
+        canvas.saveState()
+
+        # Logo de la empresa arriba a la izquierda (core/static/images/Logo.png).
+        alto_logo = 2.2 * cm
+        if logo:
+            imagen, proporcion = logo
+            canvas.drawImage(imagen, izquierda, alto - 0.8 * cm - alto_logo,
+                             width=alto_logo * proporcion, height=alto_logo, mask='auto')
+        else:
+            canvas.setFont('Helvetica-Bold', 16)
+            canvas.setFillColor(colors.HexColor('#5a1320'))
+            canvas.drawString(izquierda, alto - 2 * cm, 'Premium Eventos JM')
+
+        # Título del reporte a la derecha, alineado con el logo.
+        canvas.setFillColor(colors.HexColor('#5a1320'))
+        canvas.setFont('Helvetica-Bold', 16)
+        canvas.drawRightString(derecha, alto - 1.75 * cm, 'Historial de cotizaciones')
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor('#7a6856'))
+        canvas.drawRightString(derecha, alto - 2.3 * cm, 'Premium Eventos JM · Su mejor opción')
+
+        # Línea dorada bajo el encabezado.
+        canvas.setStrokeColor(colors.HexColor('#c9a14a'))
+        canvas.setLineWidth(1.2)
+        canvas.line(izquierda, alto - 3.1 * cm, derecha, alto - 3.1 * cm)
+
+        # Pie: empresa y número de página.
+        canvas.setStrokeColor(colors.HexColor('#e4d3bf'))
+        canvas.setLineWidth(0.6)
+        canvas.line(izquierda, 1.3 * cm, derecha, 1.3 * cm)
+        canvas.setFont('Helvetica', 8)
+        canvas.setFillColor(colors.HexColor('#7a6856'))
+        canvas.drawString(izquierda, 0.85 * cm, 'Premium Eventos JM — Documento generado desde el panel administrativo')
+        canvas.drawRightString(derecha, 0.85 * cm, f'Página {documento.page}')
+
+        canvas.restoreState()
+
+    doc.build(elementos, onFirstPage=encabezado_y_pie, onLaterPages=encabezado_y_pie)
     return response
+
+
+def _logo_corporativo_pdf():
+    """
+    Logo de la empresa (core/static/images/Logo.png) listo para ReportLab:
+    devuelve (imagen, ancho/alto) o None si no se encuentra. El archivo
+    trae mucho margen blanco alrededor, así que se recorta al contenido
+    para que el logo se vea del tamaño correcto en el encabezado.
+    """
+    from io import BytesIO
+
+    from django.contrib.staticfiles import finders
+    from PIL import Image, ImageChops
+    from reportlab.lib.utils import ImageReader
+
+    ruta = finders.find('images/Logo.png')
+    if not ruta:
+        return None
+    try:
+        with Image.open(ruta) as original:
+            imagen = original.convert('RGB')
+        fondo = Image.new('RGB', imagen.size, (255, 255, 255))
+        # Se ignoran los píxeles casi blancos (el fondo no es blanco puro).
+        diferencia = ImageChops.difference(imagen, fondo).convert('L').point(lambda v: 255 if v > 18 else 0)
+        caja = diferencia.getbbox()
+        if caja:
+            margen = 12
+            caja = (max(caja[0] - margen, 0), max(caja[1] - margen, 0),
+                    min(caja[2] + margen, imagen.width), min(caja[3] + margen, imagen.height))
+            imagen = imagen.crop(caja)
+        # Suficiente nitidez para ~6 cm de ancho sin hacer pesado el PDF.
+        imagen.thumbnail((900, 900))
+        datos = BytesIO()
+        imagen.save(datos, format='JPEG', quality=92)  # fondo blanco: JPEG pesa mucho menos que PNG
+        datos.seek(0)
+        return ImageReader(datos), imagen.width / imagen.height
+    except OSError:
+        return None
 
 
 # ─────────────────────────────────────────────────────────────────────────
