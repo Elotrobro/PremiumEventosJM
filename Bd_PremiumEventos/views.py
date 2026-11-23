@@ -530,7 +530,7 @@ def cotizacion_view(request):
         f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} '
         '— consérvalo para futuras consultas.',
         # Para admin y empleado, la notificación muestra abajo, en pequeño,
-        # cuánto tardó el guardado (_notificaciones.html → notificaciones.js).
+        # "Guardado 38 ms" (_notificaciones.html → notificaciones.js).
         extra_tags=(
             f'latencia-bd={ms_guardado:.1f}'
             if request.session.get('usuario_rol') in ('admin', 'empleado')

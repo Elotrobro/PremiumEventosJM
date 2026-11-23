@@ -4,7 +4,7 @@
 // Uso desde cualquier script del sitio o del panel:
 //     notificar('Texto', 'success' | 'error' | 'warning' | 'info');
 //     notificar('Texto', 'error', { titulo: 'Otro título', duracion: 4000 });
-//     notificar('Texto', 'success', { detalle: 'Guardado en 38 ms' }); // línea
+//     notificar('Texto', 'success', { detalle: 'Guardado 38 ms' }); // línea
 //                                     // pequeña y tenue al final de la tarjeta
 //     notificar.siguientePagina('Texto', 'info');  // se muestra al cargar
 //                                                 // la próxima página
@@ -417,17 +417,17 @@
     // ── Avisos que vienen en el HTML (mensajes de Django) ───────────────
 
     // "latencia-bd=38.2" (extra_tags del mensaje, ver cotizacion_view) →
-    // "Guardado en la base de datos en 38 ms". Solo llega para admin y empleado.
+    // "Guardado 38 ms". Solo llega para admin y empleado.
     function detalleDesdeEtiquetas(etiquetas) {
         const latencia = /(?:^|\s)latencia-bd=(\d+(?:\.\d+)?)/.exec(etiquetas || '');
         if (!latencia) return '';
         const ms = parseFloat(latencia[1]);
         let tiempo;
-        if (ms < 1) tiempo = 'menos de 1 ms';
+        if (ms < 1) tiempo = '< 1 ms';
         else if (ms < 10) tiempo = ms.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' ms';
         else if (ms < 1000) tiempo = Math.round(ms) + ' ms';
         else tiempo = (ms / 1000).toLocaleString('es-CO', { maximumFractionDigits: 2 }) + ' s';
-        return 'Guardado en la base de datos en ' + tiempo;
+        return 'Guardado ' + tiempo;
     }
 
     function mostrarAvisosDeLaPagina() {
