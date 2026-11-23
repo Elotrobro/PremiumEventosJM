@@ -29,8 +29,16 @@
     });
     const actual = cuerpo.querySelector("[data-actual]");
     if (actual) actual.textContent = String(indice + 1);
+    // Lleva la miniatura activa a la vista moviendo solo su fila (con
+    // scrollIntoView también se movía la ventana del salón).
     const activa = miniaturas[indice];
-    if (activa) activa.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (activa) {
+      const fila = activa.parentElement;
+      const f = fila.getBoundingClientRect();
+      const m = activa.getBoundingClientRect();
+      if (m.left < f.left) fila.scrollLeft -= f.left - m.left;
+      else if (m.right > f.right) fila.scrollLeft += m.right - f.right;
+    }
   }
 
   function abrirSalon(id) {

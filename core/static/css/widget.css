@@ -183,13 +183,20 @@
 
 /* ── Ventana del chatbot (conectado a n8n, ver Bd_PremiumEventos/chatbot.py) ── */
 .jm-chat-window {
+    /* Va encima del botón "JM" sin ocupar espacio en la columna: antes,
+       aunque estuviera cerrada, empujaba el panel de opciones 460px hacia
+       arriba y el panel aparecía lejos del botón (o se salía de la
+       pantalla en celulares). Abierta se ve en el mismo lugar de siempre:
+       64px del botón + 14px de separación. */
+    position: absolute;
+    right: 0;
+    bottom: 78px;
     width: 320px;
     max-width: calc(100vw - 48px);
     height: 460px;
     max-height: 72vh;
     background: #fff;
     border-radius: 16px;
-    margin-bottom: 14px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
@@ -382,4 +389,18 @@
     .jm-chat-window {
         width: calc(100vw - 28px);
     }
+}
+
+/* ── Opción "Manual de usuario" (solo admin y empleado, ver base.html) ── */
+.jm-widget-icon-manual {
+    background: #fbf1df;
+    color: #b07a1e;
+}
+
+.jm-widget-option-sub {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 400;
+    color: #8a7a6a;
+    line-height: 1.2;
 }

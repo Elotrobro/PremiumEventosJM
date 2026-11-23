@@ -1,0 +1,83 @@
+{% comment %}
+  Ilustración animada del manual: una miniatura del panel con el menú a la
+  izquierda y, a la derecha, una "escena" según el módulo. Un cursor va
+  hasta el elemento .mu-demo-objetivo y "hace clic" (core/static/js/manual.js
+  calcula a dónde debe ir; la animación está en core/static/css/manual.css).
+
+  Uso: {% include "panel_admin/manual/_demo.html" with escena="tabla" activo="usuarios" boton="Nuevo usuario" %}
+  Escenas: inicio, tabla, lista, tarjetas, formulario, galeria, busqueda, estado, precios, pdf, filtros.
+{% endcomment %}
+<div class="mu-demo" data-escena="{{ escena }}" aria-hidden="true">
+  <div class="mu-demo-barra"><span></span><span></span><span></span><em>Panel Admin · Premium Eventos JM</em></div>
+  <div class="mu-demo-cuerpo">
+    <div class="mu-demo-menu">
+      <i class="fas fa-house{% if activo == 'inicio' %} activo{% endif %}"></i>
+      <i class="fas fa-users{% if activo == 'usuarios' %} activo{% endif %}"></i>
+      <i class="fas fa-gift{% if activo == 'catalogo' %} activo{% endif %}"></i>
+      <i class="fas fa-images{% if activo == 'galeria' %} activo{% endif %}"></i>
+      <i class="fas fa-hotel{% if activo == 'salones' %} activo{% endif %}"></i>
+      <i class="fas fa-envelope{% if activo == 'mensajes' %} activo{% endif %}"></i>
+      <i class="fas fa-star{% if activo == 'testimonios' %} activo{% endif %}"></i>
+      <i class="fas fa-file-invoice-dollar{% if activo == 'cotizaciones' %} activo{% endif %}"></i>
+      <i class="fas fa-tags{% if activo == 'precios' %} activo{% endif %}"></i>
+      <i class="fas fa-clock-rotate-left{% if activo == 'historial' %} activo{% endif %}"></i>
+    </div>
+
+    <div class="mu-demo-pantalla">
+      {% if escena == 'inicio' %}
+        <div class="mu-demo-stats"><b>24</b><b>58</b><b class="mu-demo-objetivo">7</b><b>12</b></div>
+        <div class="mu-demo-fila corta"></div>
+        <div class="mu-demo-lista"><span></span><span></span><span></span></div>
+
+      {% elif escena == 'busqueda' %}
+        <div class="mu-demo-buscador mu-demo-objetivo"><i class="fas fa-magnifying-glass"></i><span class="mu-demo-tecleo">cami</span></div>
+        <div class="mu-demo-tabla mu-demo-filtrando"><span></span><span></span><span></span><span></span><span></span></div>
+
+      {% elif escena == 'filtros' %}
+        <div class="mu-demo-filtros"><span>Estado ▾</span><span>Fecha ▾</span><span class="mu-demo-boton mu-demo-objetivo">Aplicar</span></div>
+        <div class="mu-demo-tabla"><span></span><span></span><span></span><span></span></div>
+
+      {% elif escena == 'tarjetas' %}
+        <div class="mu-demo-encabezado"><span class="mu-demo-titulo"></span><span class="mu-demo-modos"><em>Tabla</em><em class="mu-demo-objetivo">Tarjetas</em></span></div>
+        <div class="mu-demo-tarjetas"><span></span><span></span><span></span></div>
+
+      {% elif escena == 'formulario' %}
+        <div class="mu-demo-ventana">
+          <div class="mu-demo-campo"></div>
+          <div class="mu-demo-campo"></div>
+          <div class="mu-demo-campo alto"></div>
+          <span class="mu-demo-boton mu-demo-objetivo"><i class="fas fa-floppy-disk"></i> Guardar</span>
+        </div>
+
+      {% elif escena == 'galeria' %}
+        <div class="mu-demo-encabezado"><span class="mu-demo-titulo"></span><span class="mu-demo-boton mu-demo-objetivo"><i class="fas fa-upload"></i> {{ boton|default:"Subir fotos" }}</span></div>
+        <div class="mu-demo-fotos"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+      {% elif escena == 'estado' %}
+        <div class="mu-demo-ventana">
+          <div class="mu-demo-campo"></div>
+          <div class="mu-demo-estados"><em>Pendiente</em><em class="mu-demo-objetivo">Aprobada</em><em>Rechazada</em></div>
+          <div class="mu-demo-campo alto"></div>
+          <span class="mu-demo-boton"><i class="fas fa-check"></i> Validar</span>
+        </div>
+
+      {% elif escena == 'precios' %}
+        <div class="mu-demo-precios"><span>20</span><em>$2.000.000</em><span>40</span><em class="mu-demo-objetivo">$3.200.000</em><span>60</span><em>$4.500.000</em></div>
+        <span class="mu-demo-boton"><i class="fas fa-floppy-disk"></i> Guardar precios</span>
+
+      {% elif escena == 'pdf' %}
+        <div class="mu-demo-encabezado"><span class="mu-demo-titulo"></span><span class="mu-demo-boton mu-demo-objetivo"><i class="fas fa-file-pdf"></i> Descargar PDF</span></div>
+        <div class="mu-demo-hoja"><strong>Premium Eventos JM</strong><span></span><span></span><span></span></div>
+
+      {% elif escena == 'lista' %}
+        <div class="mu-demo-encabezado"><span class="mu-demo-titulo"></span></div>
+        <div class="mu-demo-tabla mu-demo-con-acciones"><span></span><span><i class="fas fa-trash mu-demo-objetivo"></i></span><span></span><span></span></div>
+
+      {% else %}{# tabla #}
+        <div class="mu-demo-encabezado"><span class="mu-demo-titulo"></span><span class="mu-demo-boton mu-demo-objetivo"><i class="fas fa-plus"></i> {{ boton|default:"Nuevo" }}</span></div>
+        <div class="mu-demo-tabla"><span></span><span></span><span></span><span></span></div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="mu-demo-cursor"><i class="fas fa-arrow-pointer"></i><span class="mu-demo-clic"></span></div>
+</div>
