@@ -54,6 +54,9 @@ urlpatterns = [
     # Tabla de precios (estimado por número de invitados)
     path('precios/', views.precios_edit, name='precios_edit'),
 
+    # Manual de usuario (se abre desde la burbuja "JM" del sitio, solo staff)
+    path('manual/', views.manual_usuario, name='manual_usuario'),
+
     # Historial y reportes
     path('historial/', views.historial_list, name='historial_list'),
     path('historial/pdf/', views.historial_pdf, name='historial_pdf'),

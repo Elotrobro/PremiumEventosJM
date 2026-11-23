@@ -1328,6 +1328,22 @@ def precios_edit(request):
     })
 
 
+# ───────────────────── Manual de usuario ─────────────────────
+
+@staff_required
+def manual_usuario(request):
+    """
+    Contenido del manual de usuario del panel. No es una página completa:
+    lo pide core/static/js/manual.js al abrir "Manual de usuario" en la
+    burbuja "JM" del sitio (solo la ven admin y empleado) y lo muestra en
+    una ventana. Se adapta al rol: marca lo que es solo del administrador.
+    """
+    return render(request, 'panel_admin/manual/manual.html', {
+        'es_admin': es_admin(request),
+        'dias_sin_cotizar': limpieza.DIAS_SIN_COTIZAR,
+    })
+
+
 # ───────────────────── Paginación dinámica ─────────────────────
 
 POR_PAGINA_OPCIONES = (5, 10, 15, 25, 50)

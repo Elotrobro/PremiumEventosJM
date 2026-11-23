@@ -183,13 +183,20 @@
 
 /* ── Ventana del chatbot (conectado a n8n, ver Bd_PremiumEventos/chatbot.py) ── */
 .jm-chat-window {
+    /* Va encima del botón "JM" sin ocupar espacio en la columna: antes,
+       aunque estuviera cerrada, empujaba el panel de opciones 460px hacia
+       arriba y el panel aparecía lejos del botón (o se salía de la
+       pantalla en celulares). Abierta se ve en el mismo lugar de siempre:
+       64px del botón + 14px de separación. */
+    position: absolute;
+    right: 0;
+    bottom: 78px;
     width: 320px;
     max-width: calc(100vw - 48px);
     height: 460px;
     max-height: 72vh;
     background: #fff;
     border-radius: 16px;
-    margin-bottom: 14px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
@@ -381,5 +388,60 @@
     .jm-widget-panel,
     .jm-chat-window {
         width: calc(100vw - 28px);
+    }
+}
+
+/* ── Opción "Manual de usuario" (solo admin y empleado, ver base.html) ── */
+.jm-widget-icon-manual {
+    background: #fbf1df;
+    color: #b07a1e;
+}
+
+.jm-widget-option-sub {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 400;
+    color: #8a7a6a;
+    line-height: 1.2;
+}
+
+/* ── Que la burbuja nunca se salga por arriba de la pantalla ─────────────
+   El panel y el chat se abren hacia arriba desde el botón "JM" (64px +
+   24px de margen + 14px de separación ≈ 110px). Si la ventana es baja
+   (portátil con zoom, celular acostado), se limitan a la altura que queda
+   libre: el panel se desplaza por dentro y su título "¿En qué te podemos
+   ayudar?" queda fijo arriba, siempre visible. */
+.jm-widget-panel {
+    max-height: calc(100vh - 116px);
+    max-height: calc(100dvh - 116px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.jm-widget-panel-header {
+    position: sticky;
+    top: -14px;              /* compensa el padding del panel */
+    z-index: 1;
+    margin-top: -14px;
+    padding-top: 18px;
+    background: #fff;
+}
+
+.jm-chat-window {
+    max-height: min(72vh, calc(100vh - 116px));
+    max-height: min(72dvh, calc(100dvh - 116px));
+}
+
+@media (max-height: 520px) {
+    .jm-widget-panel { gap: 2px; padding-top: 10px; padding-bottom: 10px; }
+    .jm-widget-panel-header { top: -10px; margin-top: -10px; padding-top: 12px; }
+    .jm-widget-option { padding: 6px 8px; }
+    .jm-widget-option-icon { width: 32px; height: 32px; font-size: 0.95rem; }
+}
+
+@media (max-width: 420px) {
+    .jm-widget-panel,
+    .jm-chat-window {
+        max-height: calc(100dvh - 96px);   /* aquí el botón está a 14px del borde */
     }
 }

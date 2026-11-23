@@ -7,6 +7,9 @@
   <title>Premium Eventos JM</title>
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/widget.css' %}">
+  {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
+  <link rel="stylesheet" href="{% static 'css/manual.css' %}">
+  {% endif %}
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="stylesheet" href="{% static 'css/animaciones.css' %}">
   <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
@@ -471,6 +474,16 @@
       </span>
       <span>Chatbot</span>
     </button>
+
+    {# Manual de usuario del panel: solo para administrador y empleado (ver core/static/js/manual.js) #}
+    {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
+    <button type="button" class="jm-widget-option" id="jmManualBtn" data-abrir-manual data-url="{% url 'panel_admin:manual_usuario' %}" aria-haspopup="dialog">
+      <span class="jm-widget-option-icon jm-widget-icon-manual">
+        <i class="fas fa-book-open"></i>
+      </span>
+      <span>Manual de usuario <small class="jm-widget-option-sub">Guía del panel de administrador</small></span>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Ventana del chatbot (core/static/js/widget.js → /chatbot/mensaje/ → n8n) -->
@@ -516,6 +529,13 @@ Puedo contarte sobre nuestros servicios, estimar el precio de tu evento o consul
 <script src="{% static 'js/animaciones.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/widget.js' %}"></script>
+{% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
+{# Ventana del manual de usuario; el contenido lo trae manual.js desde el panel al abrirla. #}
+<dialog id="jmManual" class="jm-manual" aria-labelledby="jmManualTitulo">
+  <div class="jm-manual-cargando"><i class="fas fa-book-open"></i><span>Abriendo el manual…</span></div>
+</dialog>
+<script src="{% static 'js/manual.js' %}"></script>
+{% endif %}
 <script src="{% static 'js/login-modal.js' %}"></script>
 <script src="{% static 'js/contrasena.js' %}"></script>
 <script src="{% static 'js/google-login.js' %}"></script>

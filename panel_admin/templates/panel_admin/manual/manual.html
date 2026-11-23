@@ -1,0 +1,732 @@
+{% comment %}
+  Manual de usuario del panel — "Centro de ayuda".
+
+  No es una página completa: core/static/js/manual.js lo pide a
+  panel_admin.views.manual_usuario y lo pone en la ventana #jmManual. Se
+  abre desde la burbuja "JM" del sitio y desde el botón "Manual" de la barra
+  superior del panel (solo administrador y empleado). Estilos en
+  core/static/css/manual.css.
+
+  Estructura:
+    - Portada (.mu-portada): saludo, buscador y una tarjeta por sección.
+    - Secciones (.mu-seccion): cada una se lee de corrido, con todos sus
+      módulos (<article class="mu-modulo">) uno debajo del otro, un índice
+      lateral que marca dónde vas y animaciones que aparecen al bajar.
+    - Botón "Muéstrame en vivo" (data-recorrido): abre esa pantalla del panel
+      y la recorre iluminando los botones reales (core/static/js/recorrido.js).
+
+  Para agregar un módulo: copia un <article class="mu-modulo">, cámbiale el
+  data-modulo y agrégalo a su sección y al índice de esa sección.
+{% endcomment %}
+<div class="mu" data-vista="portada">
+
+  <header class="mu-cabecera">
+    <button type="button" class="mu-marca" data-mu-portada title="Volver a la portada del centro de ayuda">
+      <span class="mu-logo">JM</span>
+      <span class="mu-marca-texto">
+        <strong id="jmManualTitulo">Centro de ayuda</strong>
+        <small>Panel de administrador</small>
+      </span>
+    </button>
+
+    <nav class="mu-migas" aria-label="Ubicación">
+      <button type="button" data-mu-portada><i class="fas fa-house"></i> Portada</button>
+      <span class="mu-migas-seccion" hidden><i class="fas fa-chevron-right"></i> <b></b></span>
+    </nav>
+
+    <label class="mu-buscar">
+      <i class="fas fa-magnifying-glass"></i>
+      <input type="search" placeholder="Buscar en el manual…" aria-label="Buscar en el manual" data-mu-buscar autocomplete="off">
+    </label>
+
+    <span class="mu-rol {% if es_admin %}mu-rol-admin{% endif %}" title="Tu rol en el panel">
+      <i class="fas {% if es_admin %}fa-user-shield{% else %}fa-user-tie{% endif %}"></i>
+      {% if es_admin %}Administrador{% else %}Empleado{% endif %}
+    </span>
+
+    <button type="button" class="mu-cerrar" data-mu-cerrar aria-label="Cerrar el manual"><i class="fas fa-xmark"></i></button>
+  </header>
+
+  {# ═══════════════════════════════ Portada ═══════════════════════════════ #}
+  <div class="mu-portada" data-mu-vista="portada">
+    <div class="mu-portada-hola">
+      <p class="mu-etiqueta">Centro de ayuda</p>
+      <h2>¿Qué quieres aprender hoy?</h2>
+      <p>Elige una sección para leerla de corrido, busca un tema arriba o pide que te lo <strong>mostremos en vivo</strong> sobre el panel.</p>
+      <button type="button" class="mu-continuar" data-mu-continuar hidden>
+        <i class="fas fa-bookmark"></i> Continuar donde quedaste: <b></b>
+      </button>
+    </div>
+
+    <div class="mu-tarjetas">
+      <button type="button" class="mu-tarjeta" data-ir-seccion="primeros-pasos" style="--i:0">
+        <span class="mu-tarjeta-icono"><i class="fas fa-rocket"></i></span>
+        <span class="mu-tarjeta-titulo">Primeros pasos</span>
+        <span class="mu-tarjeta-texto">Cómo entrar al panel, qué puede hacer cada rol y las herramientas que se repiten en todos los módulos.</span>
+        <ul class="mu-tarjeta-lista"><li><i class="fas fa-hand-sparkles"></i> Bienvenida y roles</li><li><i class="fas fa-house"></i> Inicio del panel</li><li><i class="fas fa-toolbox"></i> Herramientas comunes</li></ul>
+        <span class="mu-tarjeta-pie">3 temas <i class="fas fa-arrow-right"></i></span>
+      </button>
+      <button type="button" class="mu-tarjeta" data-ir-seccion="personas" style="--i:1">
+        <span class="mu-tarjeta-icono"><i class="fas fa-address-book"></i></span>
+        <span class="mu-tarjeta-titulo">Personas</span>
+        <span class="mu-tarjeta-texto">Las cuentas de usuario, los mensajes que llegan desde Contacto y las opiniones de los clientes.</span>
+        <ul class="mu-tarjeta-lista"><li><i class="fas fa-users"></i> Usuarios</li><li><i class="fas fa-envelope"></i> Mensajes de contacto</li><li><i class="fas fa-star"></i> Testimonios</li></ul>
+        <span class="mu-tarjeta-pie">3 temas <i class="fas fa-arrow-right"></i></span>
+      </button>
+      <button type="button" class="mu-tarjeta" data-ir-seccion="contenido" style="--i:2">
+        <span class="mu-tarjeta-icono"><i class="fas fa-images"></i></span>
+        <span class="mu-tarjeta-titulo">Contenido de la página</span>
+        <span class="mu-tarjeta-texto">Lo que ven los visitantes en el sitio: el catálogo, las fotos de la galería y los salones.</span>
+        <ul class="mu-tarjeta-lista"><li><i class="fas fa-gift"></i> Catálogo decoración</li><li><i class="fas fa-images"></i> Galería</li><li><i class="fas fa-hotel"></i> Salones</li></ul>
+        <span class="mu-tarjeta-pie">3 temas <i class="fas fa-arrow-right"></i></span>
+      </button>
+      <button type="button" class="mu-tarjeta" data-ir-seccion="ventas" style="--i:3">
+        <span class="mu-tarjeta-icono"><i class="fas fa-file-invoice-dollar"></i></span>
+        <span class="mu-tarjeta-titulo">Ventas y reportes</span>
+        <span class="mu-tarjeta-texto">Las cotizaciones de los clientes, la tabla de precios y los reportes en PDF.</span>
+        <ul class="mu-tarjeta-lista"><li><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</li><li><i class="fas fa-tags"></i> Precios</li><li><i class="fas fa-clock-rotate-left"></i> Historial y reportes</li></ul>
+        <span class="mu-tarjeta-pie">3 temas <i class="fas fa-arrow-right"></i></span>
+      </button>
+      <button type="button" class="mu-tarjeta" data-ir-seccion="ayuda" style="--i:4">
+        <span class="mu-tarjeta-icono"><i class="fas fa-life-ring"></i></span>
+        <span class="mu-tarjeta-titulo">Ayuda</span>
+        <span class="mu-tarjeta-texto">Respuestas rápidas a las dudas más comunes y qué hacer si algo no sale como esperabas.</span>
+        <ul class="mu-tarjeta-lista"><li><i class="fas fa-circle-question"></i> Preguntas frecuentes</li></ul>
+        <span class="mu-tarjeta-pie">1 tema <i class="fas fa-arrow-right"></i></span>
+      </button>
+    </div>
+
+    <div class="mu-vivo-lista">
+      <h3><span class="mu-en-vivo-punto"></span> Recorridos en vivo</h3>
+      <p>Abren la pantalla del panel y te señalan cada botón, paso a paso.</p>
+      <div class="mu-vivo-botones">
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="inicio" data-url="{% url 'panel_admin:dashboard' %}"><i class="fas fa-house"></i> Inicio del panel</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="usuarios" data-url="{% url 'panel_admin:usuarios_list' %}"><i class="fas fa-users"></i> Usuarios</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="mensajes" data-url="{% url 'panel_admin:mensajes_list' %}"><i class="fas fa-envelope"></i> Mensajes de contacto</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="testimonios" data-url="{% url 'panel_admin:testimonios_list' %}"><i class="fas fa-star"></i> Testimonios</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="catalogo" data-url="{% url 'panel_admin:catalogo_list' %}"><i class="fas fa-gift"></i> Catálogo decoración</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="galeria" data-url="{% url 'panel_admin:galeria_list' %}"><i class="fas fa-images"></i> Galería</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="salones" data-url="{% url 'panel_admin:salones_list' %}"><i class="fas fa-hotel"></i> Salones</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="cotizaciones" data-url="{% url 'panel_admin:cotizaciones_list' %}"><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="precios" data-url="{% url 'panel_admin:precios_edit' %}"><i class="fas fa-tags"></i> Precios</button>
+        <button type="button" class="mu-en-vivo mu-en-vivo-chip" data-recorrido="historial" data-url="{% url 'panel_admin:historial_list' %}"><i class="fas fa-clock-rotate-left"></i> Historial y reportes</button>
+      </div>
+    </div>
+  </div>
+
+  {# Resultados del buscador (los arma manual.js con los títulos y textos de los módulos) #}
+  <div class="mu-resultados" data-mu-vista="resultados" hidden>
+    <h3>Resultados para «<span data-mu-termino></span>»</h3>
+    <ul class="mu-resultados-lista"></ul>
+    <p class="mu-sin-resultados" hidden><i class="fas fa-face-meh"></i> No encontramos nada con ese texto. Prueba con otra palabra (por ejemplo "fotos", "PDF" o "eliminar").</p>
+  </div>
+
+  {# ═══════════════════════════════ Sección: Primeros pasos ═══════════════════════════════ #}
+  <div class="mu-seccion" data-mu-vista="seccion" data-seccion="primeros-pasos" data-titulo="Primeros pasos" hidden>
+    <aside class="mu-subindice">
+      <p class="mu-subindice-titulo"><i class="fas fa-rocket"></i> Primeros pasos</p>
+      <nav class="mu-subindice-lista" aria-label="Temas de Primeros pasos">
+        <button type="button" data-ir-modulo="bienvenida"><i class="fas fa-hand-sparkles"></i> Bienvenida y roles</button>
+        <button type="button" data-ir-modulo="inicio"><i class="fas fa-house"></i> Inicio del panel</button>
+        <button type="button" data-ir-modulo="herramientas"><i class="fas fa-toolbox"></i> Herramientas comunes</button>
+      </nav>
+      <p class="mu-subindice-otras">Otras secciones</p>
+      <nav class="mu-secciones-mini" aria-label="Otras secciones">
+        <button type="button" data-ir-seccion="primeros-pasos" title="Primeros pasos" class="activa"><i class="fas fa-rocket"></i><span>Primeros pasos</span></button>
+        <button type="button" data-ir-seccion="personas" title="Personas"><i class="fas fa-address-book"></i><span>Personas</span></button>
+        <button type="button" data-ir-seccion="contenido" title="Contenido de la página"><i class="fas fa-images"></i><span>Contenido de la página</span></button>
+        <button type="button" data-ir-seccion="ventas" title="Ventas y reportes"><i class="fas fa-file-invoice-dollar"></i><span>Ventas y reportes</span></button>
+        <button type="button" data-ir-seccion="ayuda" title="Ayuda"><i class="fas fa-life-ring"></i><span>Ayuda</span></button>
+      </nav>
+    </aside>
+
+    <div class="mu-lectura" tabindex="-1">
+      <div class="mu-avance" aria-hidden="true"><span></span></div>
+      <header class="mu-seccion-cabecera">
+        <span class="mu-seccion-icono"><i class="fas fa-rocket"></i></span>
+        <div>
+          <p class="mu-etiqueta">Sección 1 de 5</p>
+          <h2>Primeros pasos</h2>
+          <p class="mu-intro">Cómo entrar al panel, qué puede hacer cada rol y las herramientas que se repiten en todos los módulos.</p>
+        </div>
+      </header>
+
+      <article class="mu-modulo" data-modulo="bienvenida" data-titulo="Bienvenida y roles">
+
+          <h2><i class="fas fa-hand-sparkles"></i> Bienvenido al panel de Premium Eventos JM</h2>
+          <p class="mu-intro">
+            El panel de administrador es donde se gestiona todo lo que ven los clientes en la página:
+            usuarios, catálogo, galería, salones, testimonios, cotizaciones y precios.
+            Este manual te guía módulo por módulo con pasos cortos.
+          </p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="inicio" activo="inicio" %}
+
+          <h3>Cómo entrar al panel</h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div><strong>Inicia sesión</strong> en la página con tu cuenta de administrador o empleado.</div></li>
+            <li><span class="mu-num">2</span><div>En la barra de arriba aparece el botón <span class="mu-kbd"><i class="fas fa-gauge"></i> Admin</span>. Haz clic en él.</div></li>
+            <li><span class="mu-num">3</span><div>Usa el <strong>menú de la izquierda</strong> para moverte entre los módulos. El módulo en el que estás queda resaltado.</div></li>
+            <li><span class="mu-num">4</span><div>Para volver a la página pública usa <span class="mu-kbd"><i class="fas fa-globe"></i> Ver sitio</span> y para salir, <span class="mu-kbd"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</span>.</div></li>
+          </ol>
+
+          <h3>Qué puede hacer cada rol</h3>
+          <div class="mu-roles">
+            <div class="mu-rol-tarjeta">
+              <h4><i class="fas fa-user-shield"></i> Administrador</h4>
+              <ul>
+                <li>Todo lo del empleado, y además:</li>
+                <li>Editar usuarios y crear cuentas de administrador o empleado.</li>
+                <li>Eliminar registros (ítems, fotos, salones, mensajes, testimonios, cotizaciones).</li>
+                <li>Validar cotizaciones (cambiar su estado).</li>
+                <li>Cambiar la tabla de precios.</li>
+              </ul>
+            </div>
+            <div class="mu-rol-tarjeta">
+              <h4><i class="fas fa-user-tie"></i> Empleado</h4>
+              <ul>
+                <li>Ver todos los módulos.</li>
+                <li>Crear clientes, ítems del catálogo, fotos y salones, y editarlos.</li>
+                <li>Publicar u ocultar testimonios y salones.</li>
+                <li>Ver el detalle de las cotizaciones y descargar reportes.</li>
+                <li>Eliminar solo clientes que aún no han cotizado.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mu-nota mu-nota-consejo">
+            <i class="fas fa-lightbulb"></i>
+            <div><strong>Cómo usar este manual:</strong> cada sección se lee de corrido; el índice de la izquierda marca dónde vas.
+              Con <span class="mu-kbd"><span class="mu-en-vivo-punto"></span> Muéstrame en vivo</span> te llevamos a la pantalla real y te señalamos cada botón. Las marcas
+              <span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> indican lo que el empleado no puede hacer.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="inicio" data-url="{% url 'panel_admin:dashboard' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Recorrido general del panel
+            </button>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="inicio" data-titulo="Inicio del panel">
+
+          <h2><i class="fas fa-house"></i> Inicio del panel</h2>
+          <p class="mu-intro">Es la primera pantalla al entrar. Te muestra en un vistazo cómo va el negocio y qué viene en los próximos días.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="inicio" activo="inicio" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div><strong>Tarjetas de totales:</strong> usuarios registrados, cotizaciones totales, cotizaciones <em>pendientes</em>, mensajes de contacto e ítems del catálogo.</div></li>
+            <li><span class="mu-num">2</span><div><strong>Accesos rápidos:</strong> botones para ir directo a Cotizaciones, Historial y Mensajes.</div></li>
+            <li><span class="mu-num">3</span><div><strong>Novedades:</strong> las cotizaciones recibidas y los eventos que se vienen. Cambia el período con los botones <span class="mu-kbd">7 días</span> <span class="mu-kbd">14 días</span> <span class="mu-kbd">30 días</span>.</div></li>
+            <li><span class="mu-num">4</span><div>Haz clic en cualquier cotización de Novedades para <strong>ver su detalle completo</strong> en una ventana, sin salir del inicio.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-consejo">
+            <i class="fas fa-lightbulb"></i>
+            <div>Revisa <strong>Cotizaciones pendientes</strong> cada día: son las solicitudes de clientes que todavía esperan respuesta.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="inicio" data-url="{% url 'panel_admin:dashboard' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:dashboard' %}"><i class="fas fa-arrow-right"></i> Ir al Inicio del panel</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="herramientas" data-titulo="Herramientas comunes">
+
+          <h2><i class="fas fa-toolbox"></i> Herramientas comunes</h2>
+          <p class="mu-intro">Casi todos los módulos funcionan igual. Si aprendes estas herramientas una vez, las usarás en todo el panel.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="busqueda" activo="usuarios" %}
+
+          <div class="mu-herramientas">
+            <div class="mu-herramienta">
+              <i class="fas fa-magnifying-glass"></i>
+              <h4>Buscador progresivo</h4>
+              <p>En <strong>Usuarios</strong> y <strong>Salones</strong>. La lista se filtra mientras escribes, letra por letra, sin recargar la página. <span class="mu-kbd"><i class="fas fa-xmark"></i> Limpiar</span> quita la búsqueda.</p>
+            </div>
+            <div class="mu-herramienta">
+              <i class="fas fa-filter"></i>
+              <h4>Filtros</h4>
+              <p>En Cotizaciones e Historial filtras por estado y por fecha (siempre, último año, último mes o un rango) y pulsas <span class="mu-kbd">Aplicar</span>.</p>
+            </div>
+            <div class="mu-herramienta">
+              <i class="fas fa-grip"></i>
+              <h4>Tabla o Tarjetas</h4>
+              <p>En Catálogo, Salones, Testimonios y Cotizaciones eliges cómo ver la información: en filas (<em>Tabla</em>) o en tarjetas con imagen (<em>Tarjetas</em>).</p>
+            </div>
+            <div class="mu-herramienta">
+              <i class="fas fa-list-ol"></i>
+              <h4>Páginas</h4>
+              <p>Abajo de cada lista eliges cuántos <strong>registros por página</strong> ver (5 a 50) y te mueves con los números de página.</p>
+            </div>
+            <div class="mu-herramienta">
+              <i class="fas fa-square-check"></i>
+              <h4>Selección múltiple</h4>
+              <p>Marca varias casillas y usa la barra de acciones (publicar, ocultar, eliminar…). <span class="mu-kbd">Shift</span> + clic marca un rango completo.</p>
+            </div>
+            <div class="mu-herramienta">
+              <i class="fas fa-window-restore"></i>
+              <h4>Ventanas y avisos</h4>
+              <p>Crear, editar y eliminar se hace en una ventana sobre la lista. Al terminar aparece un aviso flotante arriba a la derecha que confirma lo que pasó.</p>
+            </div>
+          </div>
+
+          <div class="mu-nota mu-nota-importante">
+            <i class="fas fa-triangle-exclamation"></i>
+            <div><strong>Antes de eliminar</strong> el panel siempre te pide confirmar. Eliminar no se puede deshacer, y las fotos se borran también del servidor.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="salones" data-url="{% url 'panel_admin:salones_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Ver las herramientas en Salones
+            </button>
+          </div>
+      </article>
+
+      <button type="button" class="mu-siguiente-seccion" data-ir-seccion="personas">
+        <span>Siguiente sección</span>
+        <strong><i class="fas fa-address-book"></i> Personas</strong>
+        <i class="fas fa-arrow-right mu-siguiente-flecha"></i>
+      </button>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════ Sección: Personas ═══════════════════════════════ #}
+  <div class="mu-seccion" data-mu-vista="seccion" data-seccion="personas" data-titulo="Personas" hidden>
+    <aside class="mu-subindice">
+      <p class="mu-subindice-titulo"><i class="fas fa-address-book"></i> Personas</p>
+      <nav class="mu-subindice-lista" aria-label="Temas de Personas">
+        <button type="button" data-ir-modulo="usuarios"><i class="fas fa-users"></i> Usuarios</button>
+        <button type="button" data-ir-modulo="mensajes"><i class="fas fa-envelope"></i> Mensajes de contacto</button>
+        <button type="button" data-ir-modulo="testimonios"><i class="fas fa-star"></i> Testimonios</button>
+      </nav>
+      <p class="mu-subindice-otras">Otras secciones</p>
+      <nav class="mu-secciones-mini" aria-label="Otras secciones">
+        <button type="button" data-ir-seccion="primeros-pasos" title="Primeros pasos"><i class="fas fa-rocket"></i><span>Primeros pasos</span></button>
+        <button type="button" data-ir-seccion="personas" title="Personas" class="activa"><i class="fas fa-address-book"></i><span>Personas</span></button>
+        <button type="button" data-ir-seccion="contenido" title="Contenido de la página"><i class="fas fa-images"></i><span>Contenido de la página</span></button>
+        <button type="button" data-ir-seccion="ventas" title="Ventas y reportes"><i class="fas fa-file-invoice-dollar"></i><span>Ventas y reportes</span></button>
+        <button type="button" data-ir-seccion="ayuda" title="Ayuda"><i class="fas fa-life-ring"></i><span>Ayuda</span></button>
+      </nav>
+    </aside>
+
+    <div class="mu-lectura" tabindex="-1">
+      <div class="mu-avance" aria-hidden="true"><span></span></div>
+      <header class="mu-seccion-cabecera">
+        <span class="mu-seccion-icono"><i class="fas fa-address-book"></i></span>
+        <div>
+          <p class="mu-etiqueta">Sección 2 de 5</p>
+          <h2>Personas</h2>
+          <p class="mu-intro">Las cuentas de usuario, los mensajes que llegan desde Contacto y las opiniones de los clientes.</p>
+        </div>
+      </header>
+
+      <article class="mu-modulo" data-modulo="usuarios" data-titulo="Usuarios">
+
+          <h2><i class="fas fa-users"></i> Usuarios</h2>
+          <p class="mu-intro">Las cuentas que pueden entrar a la página: clientes, empleados y administradores.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="tabla" activo="usuarios" boton="Nuevo usuario" %}
+
+          <h3>Crear un usuario</h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-plus"></i> Nuevo usuario</span>.</div></li>
+            <li><span class="mu-num">2</span><div>Escribe nombre, correo y contraseña. La contraseña debe tener al menos 8 caracteres, un número y una mayúscula.</div></li>
+            <li><span class="mu-num">3</span><div>Elige el rol. {% if not es_admin %}<em>Como empleado solo puedes crear clientes.</em>{% else %}Como administrador puedes crear clientes, empleados u otros administradores.{% endif %}</div></li>
+            <li><span class="mu-num">4</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-floppy-disk"></i> Guardar</span>.</div></li>
+          </ol>
+
+          <h3>Buscar, editar y eliminar</h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Escribe parte del <strong>nombre o del correo</strong> en <em>Buscar usuario</em>: la lista se filtra al instante.</div></li>
+            <li><span class="mu-num">2</span><div><span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> El lápiz <i class="fas fa-pen"></i> abre la edición del usuario.</div></li>
+            <li><span class="mu-num">3</span><div>La papelera <i class="fas fa-trash"></i> lo elimina. El empleado solo puede eliminar <strong>clientes que no han hecho ninguna cotización</strong>. Nadie puede eliminar su propia cuenta.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-info">
+            <i class="fas fa-hourglass-half"></i>
+            <div><strong>Limpieza automática:</strong> las cuentas de cliente que no hacen ninguna cotización en {{ dias_sin_cotizar }} días se eliminan solas.
+              En la lista verás cuántos días les quedan.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="usuarios" data-url="{% url 'panel_admin:usuarios_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:usuarios_list' %}"><i class="fas fa-arrow-right"></i> Ir a Usuarios</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="mensajes" data-titulo="Mensajes de contacto">
+
+          <h2><i class="fas fa-envelope"></i> Mensajes de contacto</h2>
+          <p class="mu-intro">Lo que escriben los visitantes en el formulario de la página <strong>Contacto</strong>.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="lista" activo="mensajes" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Cada fila muestra la <strong>fecha</strong>, el <strong>nombre</strong>, el <strong>correo</strong>, el <strong>teléfono</strong> y el mensaje. Los más recientes salen primero.</div></li>
+            <li><span class="mu-num">2</span><div>Responde al cliente por correo o WhatsApp con esos datos.</div></li>
+            <li><span class="mu-num">3</span><div><span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> Elimina los mensajes ya atendidos con la papelera o en grupo.</div></li>
+          </ol>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="mensajes" data-url="{% url 'panel_admin:mensajes_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:mensajes_list' %}"><i class="fas fa-arrow-right"></i> Ir a Mensajes</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="testimonios" data-titulo="Testimonios">
+
+          <h2><i class="fas fa-star"></i> Testimonios</h2>
+          <p class="mu-intro">Las opiniones que dejan los clientes. Tú decides cuáles se publican en la página <strong>Testimonios</strong>.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="tarjetas" activo="testimonios" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Lee la calificación (estrellas) y el comentario de cada cliente.</div></li>
+            <li><span class="mu-num">2</span><div>Marca la casilla <strong>Aprobado</strong> para publicarlo. Se guarda al instante y te quedas en la misma página.</div></li>
+            <li><span class="mu-num">3</span><div>Desmárcala para ocultarlo de la página. Con la selección múltiple publicas u ocultas varios a la vez.</div></li>
+            <li><span class="mu-num">4</span><div><span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> Elimina los que no correspondan (spam, ofensivos…).</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-info">
+            <i class="fas fa-circle-info"></i>
+            <div>Los testimonios no se pueden editar: son la opinión del cliente. Solo se aprueban, se ocultan o se eliminan.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="testimonios" data-url="{% url 'panel_admin:testimonios_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:testimonios_list' %}"><i class="fas fa-arrow-right"></i> Ir a Testimonios</a>
+          </div>
+      </article>
+
+      <button type="button" class="mu-siguiente-seccion" data-ir-seccion="contenido">
+        <span>Siguiente sección</span>
+        <strong><i class="fas fa-images"></i> Contenido de la página</strong>
+        <i class="fas fa-arrow-right mu-siguiente-flecha"></i>
+      </button>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════ Sección: Contenido de la página ═══════════════════════════════ #}
+  <div class="mu-seccion" data-mu-vista="seccion" data-seccion="contenido" data-titulo="Contenido de la página" hidden>
+    <aside class="mu-subindice">
+      <p class="mu-subindice-titulo"><i class="fas fa-images"></i> Contenido de la página</p>
+      <nav class="mu-subindice-lista" aria-label="Temas de Contenido de la página">
+        <button type="button" data-ir-modulo="catalogo"><i class="fas fa-gift"></i> Catálogo decoración</button>
+        <button type="button" data-ir-modulo="galeria"><i class="fas fa-images"></i> Galería</button>
+        <button type="button" data-ir-modulo="salones"><i class="fas fa-hotel"></i> Salones</button>
+      </nav>
+      <p class="mu-subindice-otras">Otras secciones</p>
+      <nav class="mu-secciones-mini" aria-label="Otras secciones">
+        <button type="button" data-ir-seccion="primeros-pasos" title="Primeros pasos"><i class="fas fa-rocket"></i><span>Primeros pasos</span></button>
+        <button type="button" data-ir-seccion="personas" title="Personas"><i class="fas fa-address-book"></i><span>Personas</span></button>
+        <button type="button" data-ir-seccion="contenido" title="Contenido de la página" class="activa"><i class="fas fa-images"></i><span>Contenido de la página</span></button>
+        <button type="button" data-ir-seccion="ventas" title="Ventas y reportes"><i class="fas fa-file-invoice-dollar"></i><span>Ventas y reportes</span></button>
+        <button type="button" data-ir-seccion="ayuda" title="Ayuda"><i class="fas fa-life-ring"></i><span>Ayuda</span></button>
+      </nav>
+    </aside>
+
+    <div class="mu-lectura" tabindex="-1">
+      <div class="mu-avance" aria-hidden="true"><span></span></div>
+      <header class="mu-seccion-cabecera">
+        <span class="mu-seccion-icono"><i class="fas fa-images"></i></span>
+        <div>
+          <p class="mu-etiqueta">Sección 3 de 5</p>
+          <h2>Contenido de la página</h2>
+          <p class="mu-intro">Lo que ven los visitantes en el sitio: el catálogo, las fotos de la galería y los salones.</p>
+        </div>
+      </header>
+
+      <article class="mu-modulo" data-modulo="catalogo" data-titulo="Catálogo decoración">
+
+          <h2><i class="fas fa-gift"></i> Catálogo de decoración</h2>
+          <p class="mu-intro">Los artículos de alquiler y decoración (sillas, manteles, centros de mesa…) con su precio, categoría y foto.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="formulario" activo="catalogo" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-plus"></i> Nuevo ítem</span>.</div></li>
+            <li><span class="mu-num">2</span><div>Completa <strong>nombre, descripción y precio</strong> a la izquierda, y <strong>categoría, unidad</strong> (ej. "Metro lineal") <strong>e imagen</strong> a la derecha.</div></li>
+            <li><span class="mu-num">3</span><div>Deja marcado <em>Disponible para alquilar</em> si se puede ofrecer.</div></li>
+            <li><span class="mu-num">4</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-floppy-disk"></i> Guardar</span>. Para cambiarlo después usa el lápiz <i class="fas fa-pen"></i>.</div></li>
+            <li><span class="mu-num">5</span><div>Con la selección múltiple marcas varios ítems como <em>disponibles</em> o <em>no disponibles</em> de una vez. <span class="mu-solo-admin"><i class="fas fa-lock"></i> Eliminar: solo administrador</span></div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-importante">
+            <i class="fas fa-circle-info"></i>
+            <div>Por ahora la página pública <strong>Catálogo</strong> muestra sus productos fijos; lo que guardes aquí sirve para tener el inventario organizado en el panel.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="catalogo" data-url="{% url 'panel_admin:catalogo_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:catalogo_list' %}"><i class="fas fa-arrow-right"></i> Ir al Catálogo</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="galeria" data-titulo="Galería">
+
+          <h2><i class="fas fa-images"></i> Galería</h2>
+          <p class="mu-intro">Las fotos de eventos que ven los clientes en la página <strong>Galería</strong>, organizadas por tipo de evento.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="galeria" activo="galeria" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>En <em>Subir fotos nuevas</em> elige la <strong>categoría</strong> (Matrimonio, 15 años, Grados…).</div></li>
+            <li><span class="mu-num">2</span><div>En <em>Imágenes</em> selecciona <strong>varias fotos a la vez</strong> con <span class="mu-kbd">Ctrl</span> o <span class="mu-kbd">Shift</span> + clic.</div></li>
+            <li><span class="mu-num">3</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-upload"></i> Subir fotos</span>. Aparecen de inmediato en su categoría.</div></li>
+            <li><span class="mu-num">4</span><div><span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> Para quitar fotos usa la papelera de cada una, o márcalas y usa <em>Eliminar</em>.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-consejo">
+            <i class="fas fa-lightbulb"></i>
+            <div>Mientras una categoría no tenga fotos propias, la página muestra <strong>fotos de muestra</strong>. Al subir la primera, se reemplazan por las tuyas.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="galeria" data-url="{% url 'panel_admin:galeria_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:galeria_list' %}"><i class="fas fa-arrow-right"></i> Ir a la Galería</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="salones" data-titulo="Salones">
+
+          <h2><i class="fas fa-hotel"></i> Salones</h2>
+          <p class="mu-intro">Los salones y espacios de la página <strong>Salones y Espacios</strong>. Al hacer clic en uno, el cliente ve sus fotos, su información completa y el mapa.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="tabla" activo="salones" boton="Nuevo salón" %}
+
+          <h3>Crear o editar un salón</h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-plus"></i> Nuevo salón</span> o el lápiz <i class="fas fa-pen"></i> de uno existente.</div></li>
+            <li><span class="mu-num">2</span><div>Llena nombre, ubicación (ej. "Zona Sur"), capacidad, descripción y <strong>características, una por línea</strong>.</div></li>
+            <li><span class="mu-num">3</span><div>Escribe la <strong>dirección para el mapa</strong>: debajo verás una vista previa de Google Maps que se actualiza mientras escribes. Si la dejas vacía, el salón no muestra mapa.</div></li>
+            <li><span class="mu-num">4</span><div>En <em>Agregar fotos</em> selecciona varias a la vez. La <strong>primera foto es la portada</strong> de la tarjeta. <span class="mu-solo-admin"><i class="fas fa-lock"></i> Quitar fotos: solo administrador</span></div></li>
+            <li><span class="mu-num">5</span><div>Deja marcado <em>Visible en la página de Salones</em> para publicarlo y pulsa <span class="mu-kbd"><i class="fas fa-floppy-disk"></i> Guardar</span>.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-consejo">
+            <i class="fas fa-lightbulb"></i>
+            <div>Para retirar un salón temporalmente no lo elimines: <strong>ocúltalo</strong> con la selección múltiple. Así conservas sus fotos y datos. El filtro <em>Estado</em> te muestra los visibles o los ocultos.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="salones" data-url="{% url 'panel_admin:salones_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:salones_list' %}"><i class="fas fa-arrow-right"></i> Ir a Salones</a>
+          </div>
+      </article>
+
+      <button type="button" class="mu-siguiente-seccion" data-ir-seccion="ventas">
+        <span>Siguiente sección</span>
+        <strong><i class="fas fa-file-invoice-dollar"></i> Ventas y reportes</strong>
+        <i class="fas fa-arrow-right mu-siguiente-flecha"></i>
+      </button>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════ Sección: Ventas y reportes ═══════════════════════════════ #}
+  <div class="mu-seccion" data-mu-vista="seccion" data-seccion="ventas" data-titulo="Ventas y reportes" hidden>
+    <aside class="mu-subindice">
+      <p class="mu-subindice-titulo"><i class="fas fa-file-invoice-dollar"></i> Ventas y reportes</p>
+      <nav class="mu-subindice-lista" aria-label="Temas de Ventas y reportes">
+        <button type="button" data-ir-modulo="cotizaciones"><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</button>
+        <button type="button" data-ir-modulo="precios"><i class="fas fa-tags"></i> Precios</button>
+        <button type="button" data-ir-modulo="historial"><i class="fas fa-clock-rotate-left"></i> Historial y reportes</button>
+      </nav>
+      <p class="mu-subindice-otras">Otras secciones</p>
+      <nav class="mu-secciones-mini" aria-label="Otras secciones">
+        <button type="button" data-ir-seccion="primeros-pasos" title="Primeros pasos"><i class="fas fa-rocket"></i><span>Primeros pasos</span></button>
+        <button type="button" data-ir-seccion="personas" title="Personas"><i class="fas fa-address-book"></i><span>Personas</span></button>
+        <button type="button" data-ir-seccion="contenido" title="Contenido de la página"><i class="fas fa-images"></i><span>Contenido de la página</span></button>
+        <button type="button" data-ir-seccion="ventas" title="Ventas y reportes" class="activa"><i class="fas fa-file-invoice-dollar"></i><span>Ventas y reportes</span></button>
+        <button type="button" data-ir-seccion="ayuda" title="Ayuda"><i class="fas fa-life-ring"></i><span>Ayuda</span></button>
+      </nav>
+    </aside>
+
+    <div class="mu-lectura" tabindex="-1">
+      <div class="mu-avance" aria-hidden="true"><span></span></div>
+      <header class="mu-seccion-cabecera">
+        <span class="mu-seccion-icono"><i class="fas fa-file-invoice-dollar"></i></span>
+        <div>
+          <p class="mu-etiqueta">Sección 4 de 5</p>
+          <h2>Ventas y reportes</h2>
+          <p class="mu-intro">Las cotizaciones de los clientes, la tabla de precios y los reportes en PDF.</p>
+        </div>
+      </header>
+
+      <article class="mu-modulo" data-modulo="cotizaciones" data-titulo="Cotizaciones">
+
+          <h2><i class="fas fa-file-invoice-dollar"></i> Cotizaciones</h2>
+          <p class="mu-intro">Las solicitudes que los clientes hacen desde el botón <em>Cotizar mi evento</em> de la página. Cada una tiene un <strong>código de seguimiento</strong> (ej. PJM-20261113-AB12CD).</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="estado" activo="cotizaciones" %}
+
+          <h3>Revisar una cotización</h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Usa los filtros de <strong>estado</strong> y <strong>fecha</strong> para encontrarla, en vista Tabla o Tarjetas.</div></li>
+            <li><span class="mu-num">2</span><div>Ábrela para ver todo: datos del cliente, evento, invitados, servicios pedidos, presupuesto, precio estimado y observaciones.</div></li>
+          </ol>
+
+          <h3>Validar (cambiar el estado) <span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span></h3>
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>En <em>Gestión del administrador</em> elige el estado: <span class="mu-estado e-pendiente">Pendiente</span> <span class="mu-estado e-aprobada">Aprobada</span> <span class="mu-estado e-rechazada">Rechazada</span> <span class="mu-estado e-completada">Completada</span> <span class="mu-estado e-pagado">Pagado</span>.</div></li>
+            <li><span class="mu-num">2</span><div>Escribe <strong>notas internas</strong> si quieres (el cliente no las ve). Si la rechazas, puedes escribir el <strong>motivo</strong>: ese sí se le envía.</div></li>
+            <li><span class="mu-num">3</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-check"></i> Validar</span>.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-info">
+            <i class="fas fa-paper-plane"></i>
+            <div>Cuando una cotización pasa a <strong>Aprobada</strong> o <strong>Rechazada</strong>, el cliente recibe un <strong>correo automático</strong> avisándole. El aviso flotante te confirma si se envió.</div>
+          </div>
+          <div class="mu-nota mu-nota-importante">
+            <i class="fas fa-shield-halved"></i>
+            <div>Una cotización en estado <strong>Pagado</strong> no se puede eliminar. Si fue un error, cámbiale primero el estado.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="cotizaciones" data-url="{% url 'panel_admin:cotizaciones_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:cotizaciones_list' %}"><i class="fas fa-arrow-right"></i> Ir a Cotizaciones</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="precios" data-titulo="Precios">
+
+          <h2><i class="fas fa-tags"></i> Precios</h2>
+          <p class="mu-intro">Los valores con los que la página calcula el <strong>precio estimado</strong> de cada evento. Los usan el formulario de cotización, el chatbot y el precio que se guarda en cada cotización nueva.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="precios" activo="precios" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div><strong>Tabla por invitados:</strong> cada fila es un tramo (ej. 40 invitados = $3.200.000). Entre dos tramos el precio se calcula en proporción.</div></li>
+            <li><span class="mu-num">2</span><div><strong>Invitado adicional:</strong> lo que se suma por cada invitado por encima del último tramo.</div></li>
+            <li><span class="mu-num">3</span><div><strong>Precios de servicios:</strong> decoración, bar, banquete, fotografía… se suman al precio base cuando el cliente los marca.</div></li>
+            <li><span class="mu-num">4</span><div>Abajo verás <strong>ejemplos</strong> de cómo quedan algunos eventos con los precios guardados.</div></li>
+            <li><span class="mu-num">5</span><div><span class="mu-solo-admin"><i class="fas fa-lock"></i> Solo administrador</span> Pulsa <span class="mu-kbd"><i class="fas fa-floppy-disk"></i> Guardar</span> para aplicar los cambios. El empleado puede verlos, pero no cambiarlos.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-info">
+            <i class="fas fa-circle-info"></i>
+            <div>Las cotizaciones que ya existen <strong>conservan su precio</strong>; los cambios solo aplican a las nuevas.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="precios" data-url="{% url 'panel_admin:precios_edit' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:precios_edit' %}"><i class="fas fa-arrow-right"></i> Ir a Precios</a>
+          </div>
+      </article>
+
+      <article class="mu-modulo" data-modulo="historial" data-titulo="Historial y reportes">
+
+          <h2><i class="fas fa-clock-rotate-left"></i> Historial y reportes</h2>
+          <p class="mu-intro">Todas las cotizaciones con sus totales, para hacer seguimiento y sacar reportes.</p>
+
+          {% include "panel_admin/manual/_demo.html" with escena="pdf" activo="historial" %}
+
+          <ol class="mu-pasos">
+            <li><span class="mu-num">1</span><div>Filtra por <strong>estado</strong> y por <strong>fecha</strong> (siempre, último año, último mes o un rango de fechas) y pulsa <span class="mu-kbd">Aplicar</span>.</div></li>
+            <li><span class="mu-num">2</span><div>Arriba verás los <strong>totales</strong>: cantidad de cotizaciones, suma de presupuestos y suma cotizada.</div></li>
+            <li><span class="mu-num">3</span><div>Pulsa <span class="mu-kbd"><i class="fas fa-file-pdf"></i> Descargar PDF</span>: el reporte sale con el <strong>logo de la empresa</strong> y con los mismos filtros que tienes aplicados.</div></li>
+          </ol>
+
+          <div class="mu-nota mu-nota-consejo">
+            <i class="fas fa-lightbulb"></i>
+            <div>Para un reporte mensual: elige <em>Rango de fechas</em>, pon del día 1 al último día del mes y descarga el PDF.</div>
+          </div>
+
+          <div class="mu-acciones">
+            <button type="button" class="mu-en-vivo" data-recorrido="historial" data-url="{% url 'panel_admin:historial_list' %}">
+              <span class="mu-en-vivo-punto"></span><i class="fas fa-hand-pointer"></i> Muéstrame en vivo
+            </button>
+            <a class="mu-ir-modulo" href="{% url 'panel_admin:historial_list' %}"><i class="fas fa-arrow-right"></i> Ir al Historial</a>
+          </div>
+      </article>
+
+      <button type="button" class="mu-siguiente-seccion" data-ir-seccion="ayuda">
+        <span>Siguiente sección</span>
+        <strong><i class="fas fa-life-ring"></i> Ayuda</strong>
+        <i class="fas fa-arrow-right mu-siguiente-flecha"></i>
+      </button>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════ Sección: Ayuda ═══════════════════════════════ #}
+  <div class="mu-seccion" data-mu-vista="seccion" data-seccion="ayuda" data-titulo="Ayuda" hidden>
+    <aside class="mu-subindice">
+      <p class="mu-subindice-titulo"><i class="fas fa-life-ring"></i> Ayuda</p>
+      <nav class="mu-subindice-lista" aria-label="Temas de Ayuda">
+        <button type="button" data-ir-modulo="preguntas"><i class="fas fa-circle-question"></i> Preguntas frecuentes</button>
+      </nav>
+      <p class="mu-subindice-otras">Otras secciones</p>
+      <nav class="mu-secciones-mini" aria-label="Otras secciones">
+        <button type="button" data-ir-seccion="primeros-pasos" title="Primeros pasos"><i class="fas fa-rocket"></i><span>Primeros pasos</span></button>
+        <button type="button" data-ir-seccion="personas" title="Personas"><i class="fas fa-address-book"></i><span>Personas</span></button>
+        <button type="button" data-ir-seccion="contenido" title="Contenido de la página"><i class="fas fa-images"></i><span>Contenido de la página</span></button>
+        <button type="button" data-ir-seccion="ventas" title="Ventas y reportes"><i class="fas fa-file-invoice-dollar"></i><span>Ventas y reportes</span></button>
+        <button type="button" data-ir-seccion="ayuda" title="Ayuda" class="activa"><i class="fas fa-life-ring"></i><span>Ayuda</span></button>
+      </nav>
+    </aside>
+
+    <div class="mu-lectura" tabindex="-1">
+      <div class="mu-avance" aria-hidden="true"><span></span></div>
+      <header class="mu-seccion-cabecera">
+        <span class="mu-seccion-icono"><i class="fas fa-life-ring"></i></span>
+        <div>
+          <p class="mu-etiqueta">Sección 5 de 5</p>
+          <h2>Ayuda</h2>
+          <p class="mu-intro">Respuestas rápidas a las dudas más comunes y qué hacer si algo no sale como esperabas.</p>
+        </div>
+      </header>
+
+      <article class="mu-modulo" data-modulo="preguntas" data-titulo="Preguntas frecuentes">
+
+          <h2><i class="fas fa-circle-question"></i> Preguntas frecuentes</h2>
+          <p class="mu-intro">Respuestas rápidas a las dudas más comunes.</p>
+
+          <div class="mu-faq">
+            <details><summary>No veo el botón de eliminar o de editar</summary>
+              <p>Esas acciones son <strong>solo del administrador</strong>. Si eres empleado y necesitas hacerlo, pídeselo a un administrador.</p></details>
+            <details><summary>Subí fotos y no aparecen en la página</summary>
+              <p>En Salones, revisa que el salón esté marcado como <em>Visible</em>. En la Galería, verifica que elegiste la categoría correcta. Recarga la página pública.</p></details>
+            <details><summary>El mapa de un salón no aparece</summary>
+              <p>El salón no tiene <em>dirección para el mapa</em>. Edítalo y escríbela completa (calle, barrio, ciudad); la vista previa te muestra si Google la encuentra.</p></details>
+            <details><summary>El cliente no recibió el correo de su cotización</summary>
+              <p>El correo se envía solo al pasar a <em>Aprobada</em> o <em>Rechazada</em>. Si el aviso dice que no se pudo enviar, el estado sí quedó guardado: avísale al encargado técnico para revisar el servicio de correos (n8n).</p></details>
+            <details><summary>Un cliente desapareció de la lista de usuarios</summary>
+              <p>Seguramente no hizo ninguna cotización en {{ dias_sin_cotizar }} días y su cuenta se eliminó automáticamente. Puede registrarse de nuevo.</p></details>
+            <details><summary>¿Cómo encuentro rápido a un cliente?</summary>
+              <p>En Usuarios escribe parte de su nombre o correo y la lista se filtra al instante. En Cotizaciones e Historial usa los filtros de estado y fecha; cada fila muestra el código de seguimiento que el cliente recibió.</p></details>
+          </div>
+
+          <div class="mu-final">
+            <i class="fas fa-champagne-glasses"></i>
+            <p><strong>¡Listo!</strong> Ya conoces todo el panel. Puedes volver a este manual cuando quieras desde la burbuja <span class="mu-logo mu-logo-mini">JM</span> del sitio o desde el botón <span class="mu-kbd"><i class="fas fa-book-open"></i> Manual</span> del panel.</p>
+          </div>
+      </article>
+
+      <button type="button" class="mu-siguiente-seccion" data-mu-portada>
+        <span>Terminaste el recorrido por el manual</span>
+        <strong><i class="fas fa-house"></i> Volver a la portada</strong>
+        <i class="fas fa-arrow-right mu-siguiente-flecha"></i>
+      </button>
+    </div>
+  </div>
+</div>

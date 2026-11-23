@@ -1120,3 +1120,26 @@ body.panel-admin-body {
     border: 0;
     display: block;
 }
+
+/* Botón "Manual" de la barra superior (abre el centro de ayuda, core/static/js/manual.js) */
+.pa-manual-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(232, 178, 61, 0.55);
+    border-radius: 20px;
+    background: rgba(232, 178, 61, 0.14);
+    color: #ffe2a3;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pa-manual-btn:hover {
+    background: rgba(232, 178, 61, 0.28);
+    transform: translateY(-1px);
+}
+
+.pa-manual-btn i { color: var(--pa-oro, #e8b23d); }
