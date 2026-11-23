@@ -4,6 +4,8 @@
 // Uso desde cualquier script del sitio o del panel:
 //     notificar('Texto', 'success' | 'error' | 'warning' | 'info');
 //     notificar('Texto', 'error', { titulo: 'Otro título', duracion: 4000 });
+//     notificar('Texto', 'success', { detalle: 'Guardado 38 ms' }); // línea
+//                                     // pequeña y tenue al final de la tarjeta
 //     notificar.siguientePagina('Texto', 'info');  // se muestra al cargar
 //                                                 // la próxima página
 //
@@ -104,7 +106,7 @@
     }
 
     // ── Tarjeta ──────────────────────────────────────────────────────────
-    function crearTarjeta(texto, tipo, titulo) {
+    function crearTarjeta(texto, tipo, titulo, detalle) {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'notif notif-' + tipo;
         tarjeta.setAttribute('role', tipo === 'error' || tipo === 'warning' ? 'alert' : 'status');
@@ -122,6 +124,16 @@
         p.className = 'notif-texto';
         p.textContent = texto;
         cuerpo.append(h, p);
+
+        // Dato técnico opcional (ej. tiempo de guardado de una cotización):
+        // abajo, en letra pequeña y con baja opacidad.
+        if (detalle) {
+            const d = document.createElement('p');
+            d.className = 'notif-detalle';
+            d.innerHTML = '<i class="fas fa-stopwatch" aria-hidden="true"></i> ';
+            d.append(detalle);
+            cuerpo.append(d);
+        }
 
         const cerrar = document.createElement('button');
         cerrar.type = 'button';
@@ -160,8 +172,8 @@
             { transform: 'scale(1) rotate(0)', opacity: 1 },
         ], { duration: 560, delay: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'backwards' });
 
-        // Título y texto aparecen en cascada.
-        tarjeta.querySelectorAll('.notif-titulo, .notif-texto').forEach(function (el, i) {
+        // Título, texto y detalle aparecen en cascada.
+        tarjeta.querySelectorAll('.notif-titulo, .notif-texto, .notif-detalle').forEach(function (el, i) {
             el.animate([
                 { opacity: 0, transform: 'translateY(6px)' },
                 { opacity: 1, transform: 'translateY(0)' },
@@ -250,7 +262,7 @@
             return repetida;
         }
 
-        const tarjeta = crearTarjeta(texto, tipo, titulo);
+        const tarjeta = crearTarjeta(texto, tipo, titulo, opciones.detalle);
         tarjeta.dataset.clave = tipo + '|' + titulo + '|' + texto;
         contenedor.appendChild(tarjeta);
 
@@ -403,6 +415,21 @@
     document.addEventListener('change', revisarMarca, true);
 
     // ── Avisos que vienen en el HTML (mensajes de Django) ───────────────
+
+    // "latencia-bd=38.2" (extra_tags del mensaje, ver cotizacion_view) →
+    // "Guardado 38 ms". Solo llega para admin y empleado.
+    function detalleDesdeEtiquetas(etiquetas) {
+        const latencia = /(?:^|\s)latencia-bd=(\d+(?:\.\d+)?)/.exec(etiquetas || '');
+        if (!latencia) return '';
+        const ms = parseFloat(latencia[1]);
+        let tiempo;
+        if (ms < 1) tiempo = '< 1 ms';
+        else if (ms < 10) tiempo = ms.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' ms';
+        else if (ms < 1000) tiempo = Math.round(ms) + ' ms';
+        else tiempo = (ms / 1000).toLocaleString('es-CO', { maximumFractionDigits: 2 }) + ' s';
+        return 'Guardado ' + tiempo;
+    }
+
     function mostrarAvisosDeLaPagina() {
         const avisos = [];
 
@@ -413,7 +440,8 @@
         } catch (e) { /* nada */ }
 
         document.querySelectorAll('[data-notificacion]').forEach(function (el) {
-            avisos.push({ texto: el.textContent, tipo: el.dataset.notificacion, opciones: {} });
+            const detalle = detalleDesdeEtiquetas(el.dataset.extra);
+            avisos.push({ texto: el.textContent, tipo: el.dataset.notificacion, opciones: detalle ? { detalle: detalle } : {} });
             el.remove();
         });
 

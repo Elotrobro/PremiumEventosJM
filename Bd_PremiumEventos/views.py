@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 import json
 import logging
+import time
 
 from panel_admin.utils import formatear_miles
 
@@ -445,6 +446,13 @@ def cotizacion_view(request):
 
     usuario = Usuario.objects.get(pk=usuario_id)
 
+    # Cronómetro del guardado en la base de datos: desde que empieza la
+    # transacción hasta que la base confirma (el commit ocurre al salir del
+    # bloque "with"). No incluye el aviso a n8n ni la red. Solo se le
+    # muestra al administrador y al empleado (ver el messages.success de
+    # abajo y core/static/js/notificaciones.js).
+    inicio_guardado = time.perf_counter()
+
     # Todo o nada: si algo falla al guardar, no queda una cotización sin
     # su detalle (ni un cliente modificado a medias).
     with transaction.atomic():
@@ -502,6 +510,8 @@ def cotizacion_view(request):
             precio_cotizado=precio_estimado,
         )
 
+    ms_guardado = (time.perf_counter() - inicio_guardado) * 1000
+
     _notificar_cotizacion(
         request,
         cotizacion,
@@ -519,6 +529,13 @@ def cotizacion_view(request):
         'para confirmar los detalles. '
         f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} '
         '— consérvalo para futuras consultas.',
+        # Para admin y empleado, la notificación muestra abajo, en pequeño,
+        # "Guardado 38 ms" (_notificaciones.html → notificaciones.js).
+        extra_tags=(
+            f'latencia-bd={ms_guardado:.1f}'
+            if request.session.get('usuario_rol') in ('admin', 'empleado')
+            else ''
+        ),
     )
 
     return redirect('inicio')

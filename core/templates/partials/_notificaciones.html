@@ -2,12 +2,14 @@
 Mensajes de Django (messages.success / error / …) como notificaciones
 flotantes. No se ven aquí: core/static/js/notificaciones.js lee cada
 elemento con data-notificacion y lo muestra como tarjeta arriba a la
-derecha. Se incluye en base.html y en panel_admin/base_admin.html.
+derecha. data-extra lleva los extra_tags del mensaje (ej.
+"latencia-bd=38.2": tiempo de guardado de una cotización, que la tarjeta
+muestra abajo en pequeño). Se incluye en base.html y en panel_admin/base_admin.html.
 {% endcomment %}
 {% if messages %}
   <div hidden>
     {% for message in messages %}
-      <div data-notificacion="{{ message.level_tag|default:'info' }}">{{ message }}</div>
+      <div data-notificacion="{{ message.level_tag|default:'info' }}"{% if message.extra_tags %} data-extra="{{ message.extra_tags }}"{% endif %}>{{ message }}</div>
     {% endfor %}
   </div>
 {% endif %}
