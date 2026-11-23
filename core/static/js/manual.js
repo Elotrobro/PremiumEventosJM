@@ -1,250 +1,382 @@
 // ═══════════════════════════════════════════════════════════════════════
-// Manual de usuario del panel — Premium Eventos JM
+// Manual de usuario del panel — "Centro de ayuda" de Premium Eventos JM
 //
-// Solo se carga para administrador y empleado (ver base.html). El botón
-// "Manual de usuario" de la burbuja "JM" abre la ventana #jmManual; la
-// primera vez trae el contenido de /panel-admin/manual/
+// Se carga solo para administrador y empleado: en el sitio (base.html,
+// opción "Manual de usuario" de la burbuja "JM") y en el panel
+// (base_admin.html, botón "Manual" de la barra superior). Cualquier botón
+// con data-abrir-manual y data-url abre la ventana #jmManual; la primera
+// vez trae el contenido de /panel-admin/manual/
 // (panel_admin/templates/panel_admin/manual/manual.html).
 //
 // Dentro del manual:
-//   - índice de capítulos, botones Anterior / Siguiente y flechas ← →
-//   - buscador que filtra los capítulos del índice
-//   - barra de avance y "Capítulo N de M"
-//   - recuerda el último capítulo visto (solo en este navegador)
-//   - cada capítulo tiene una ilustración donde un cursor hace clic en el
-//     botón importante; aquí se calcula a dónde debe moverse.
+//   - Portada con una tarjeta por sección y los recorridos en vivo.
+//   - Cada sección se lee de corrido: sus módulos van uno debajo del otro,
+//     el índice lateral marca dónde vas y el contenido aparece animado al
+//     bajar (no hay que pasar página por página).
+//   - Buscador en todo el manual, sin importar tildes ni mayúsculas.
+//   - "Muéstrame en vivo": abre esa pantalla del panel y la recorre
+//     señalando los botones reales (core/static/js/recorrido.js).
+//   - Recuerda la última sección y tema vistos (solo en este navegador).
 // Las animaciones están en core/static/css/manual.css.
 // ═══════════════════════════════════════════════════════════════════════
 (function () {
   "use strict";
 
-  const boton = document.getElementById("jmManualBtn");
   const ventana = document.getElementById("jmManual");
-  if (!boton || !ventana) return;
+  const botones = document.querySelectorAll("[data-abrir-manual]");
+  if (!ventana || !botones.length) return;
 
-  const CLAVE_CAPITULO = "jmManualCapitulo";
+  const CLAVE = "jmManualLugar";
+  let raiz = null;          // .mu
   let cargado = false;
-  let cargando = false;
-  let capitulos = [];
-  let actual = 0;
+  let cargando = null;
+  let observadorEspia = null;
+  let observadorRevelar = null;
+  let seccionActual = null;
 
-  function leerGuardado() {
-    try { return window.localStorage.getItem(CLAVE_CAPITULO); } catch (e) { return null; }
+  // ── Utilidades ────────────────────────────────────────────────────
+  function leerLugar() {
+    try { return JSON.parse(window.localStorage.getItem(CLAVE) || "null"); } catch (e) { return null; }
   }
 
-  function guardar(id) {
-    try { window.localStorage.setItem(CLAVE_CAPITULO, id); } catch (e) { /* modo privado: no pasa nada */ }
+  function guardarLugar(seccion, modulo) {
+    try { window.localStorage.setItem(CLAVE, JSON.stringify({ seccion, modulo })); } catch (e) { /* modo privado */ }
   }
 
-  // ── Cursor de las ilustraciones: va hasta el elemento .mu-demo-objetivo ──
+  function normalizar(texto) {
+    return (texto || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+
+  function cerrarBurbuja() {
+    const widget = document.getElementById("jmWidget");
+    const toggle = document.getElementById("jmWidgetToggle");
+    if (widget) widget.classList.remove("is-open");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  }
+
+  // ── Cursor de las ilustraciones: va hasta su .mu-demo-objetivo ─────
   function apuntarCursor(demo) {
     const objetivo = demo.querySelector(".mu-demo-objetivo");
     const cursor = demo.querySelector(".mu-demo-cursor");
     if (!objetivo || !cursor) return;
     const caja = demo.getBoundingClientRect();
     const meta = objetivo.getBoundingClientRect();
-    if (!caja.width) return; // todavía oculto
+    if (!caja.width) return;
     cursor.style.setProperty("--cx", (meta.left - caja.left + meta.width * 0.6) + "px");
     cursor.style.setProperty("--cy", (meta.top - caja.top + meta.height * 0.55) + "px");
   }
 
-  function apuntarCursores() {
-    const visible = capitulos[actual];
-    if (visible) visible.querySelectorAll(".mu-demo").forEach(apuntarCursor);
-  }
-
-  // Lleva el capítulo activo a la vista dentro del índice (vertical en
-  // computador, fila deslizable en celular). No se usa scrollIntoView
-  // porque también movería la ventana del manual y la descuadraría.
-  function mostrarEnIndice(boton) {
-    const lista = boton.parentElement;
-    const caja = lista.getBoundingClientRect();
-    const b = boton.getBoundingClientRect();
-    if (lista.scrollWidth > lista.clientWidth) {
-      if (b.left < caja.left) lista.scrollLeft -= caja.left - b.left + 12;
-      else if (b.right > caja.right) lista.scrollLeft += b.right - caja.right + 12;
-    }
-    const indice = ventana.querySelector(".mu-indice");
-    if (indice && indice.scrollHeight > indice.clientHeight) {
-      const ci = indice.getBoundingClientRect();
-      if (b.top < ci.top) indice.scrollTop -= ci.top - b.top + 12;
-      else if (b.bottom > ci.bottom) indice.scrollTop += b.bottom - ci.bottom + 12;
-    }
-  }
-
-  // ── Mostrar un capítulo ───────────────────────────────────────────
-  function mostrar(indice, { enfocar = false } = {}) {
-    if (!capitulos.length) return;
-    actual = Math.max(0, Math.min(indice, capitulos.length - 1));
-
-    capitulos.forEach((cap, i) => {
-      const activo = i === actual;
-      cap.hidden = !activo;
-      cap.classList.remove("mu-entrando");
-      if (activo) {
-        void cap.offsetWidth;          // reinicia la animación de entrada
-        cap.classList.add("mu-entrando");
-      }
+  // ── Vistas: portada, resultados de búsqueda o una sección ──────────
+  function mostrarVista(nombre, seccion) {
+    raiz.dataset.vista = nombre;
+    raiz.querySelectorAll("[data-mu-vista]").forEach((v) => {
+      v.hidden = !(v.dataset.muVista === nombre && (nombre !== "seccion" || v === seccion));
     });
+    const migas = raiz.querySelector(".mu-migas-seccion");
+    if (migas) {
+      migas.hidden = nombre !== "seccion";
+      if (seccion) migas.querySelector("b").textContent = seccion.dataset.titulo;
+    }
+  }
 
-    const id = capitulos[actual].dataset.capitulo;
-    ventana.querySelectorAll("[data-ir]").forEach((b) => {
-      const es = b.dataset.ir === id;
-      b.classList.toggle("activo", es);
-      if (es) {
-        b.setAttribute("aria-current", "step");
-        mostrarEnIndice(b);
+  function irAPortada() {
+    seccionActual = null;
+    const buscador = raiz.querySelector("[data-mu-buscar]");
+    if (buscador) buscador.value = "";
+    mostrarVista("portada");
+    prepararContinuar();
+    const portada = raiz.querySelector(".mu-portada");
+    portada.scrollTop = 0;
+    portada.classList.remove("mu-entrando");
+    void portada.offsetWidth;
+    portada.classList.add("mu-entrando");
+  }
+
+  function irASeccion(id, moduloId, { suave = false } = {}) {
+    const seccion = raiz.querySelector('.mu-seccion[data-seccion="' + id + '"]');
+    if (!seccion) return;
+    seccionActual = seccion;
+    mostrarVista("seccion", seccion);
+    seccion.classList.remove("mu-entrando");
+    void seccion.offsetWidth;
+    seccion.classList.add("mu-entrando");
+
+    const lectura = seccion.querySelector(".mu-lectura");
+    vigilar(seccion);
+
+    const modulo = moduloId && seccion.querySelector('.mu-modulo[data-modulo="' + moduloId + '"]');
+    requestAnimationFrame(() => {
+      if (modulo) {
+        lectura.scrollTo({ top: modulo.offsetTop - 12, behavior: suave ? "smooth" : "auto" });
+        modulo.classList.add("mu-destacado");
+        setTimeout(() => modulo.classList.remove("mu-destacado"), 1600);
       } else {
-        b.removeAttribute("aria-current");
+        lectura.scrollTop = 0;
       }
+      lectura.focus({ preventScroll: true });
+      marcarModulo(seccion, (modulo || seccion.querySelector(".mu-modulo")).dataset.modulo);
     });
-
-    const total = capitulos.length;
-    const progreso = ventana.querySelector(".mu-progreso");
-    if (progreso) {
-      progreso.querySelector("span").style.width = ((actual + 1) / total * 100) + "%";
-      progreso.setAttribute("aria-valuenow", String(actual + 1));
-      progreso.setAttribute("aria-valuemax", String(total));
-    }
-    const contador = ventana.querySelector(".mu-contador");
-    if (contador) contador.textContent = "Capítulo " + (actual + 1) + " de " + total;
-
-    const anterior = ventana.querySelector("[data-mu-anterior]");
-    const siguiente = ventana.querySelector("[data-mu-siguiente]");
-    if (anterior) anterior.disabled = actual === 0;
-    if (siguiente) {
-      const ultimo = actual === total - 1;
-      siguiente.innerHTML = ultimo
-        ? 'Terminar <i class="fas fa-check"></i>'
-        : 'Siguiente <i class="fas fa-arrow-right"></i>';
-    }
-
-    const contenido = ventana.querySelector(".mu-contenido");
-    if (contenido) {
-      contenido.scrollTop = 0;
-      if (enfocar) contenido.focus({ preventScroll: true });
-    }
-
-    guardar(id);
-    requestAnimationFrame(apuntarCursores);
   }
 
-  function irA(id) {
-    const i = capitulos.findIndex((c) => c.dataset.capitulo === id);
-    if (i > -1) mostrar(i, { enfocar: true });
-  }
-
-  // ── Buscador del índice ───────────────────────────────────────────
-  function quitarTildes(texto) {
-    return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-  }
-
-  function filtrar(texto) {
-    const busca = quitarTildes(texto.trim());
-    let visibles = 0;
-    ventana.querySelectorAll("[data-ir]").forEach((b) => {
-      const cap = capitulos.find((c) => c.dataset.capitulo === b.dataset.ir);
-      const coincide = !busca || quitarTildes((cap ? cap.textContent : "") + " " + b.textContent).includes(busca);
-      b.hidden = !coincide;
-      if (coincide) visibles++;
+  // ── Índice que sigue la lectura y animaciones al bajar ─────────────
+  function marcarModulo(seccion, moduloId) {
+    seccion.querySelectorAll("[data-ir-modulo]").forEach((b) => {
+      const es = b.dataset.irModulo === moduloId;
+      b.classList.toggle("activo", es);
+      if (es) b.setAttribute("aria-current", "location"); else b.removeAttribute("aria-current");
     });
-    const aviso = ventana.querySelector(".mu-sin-resultados");
-    if (aviso) aviso.hidden = visibles > 0;
+    guardarLugar(seccion.dataset.seccion, moduloId);
   }
 
-  // ── Preparar el contenido una vez cargado ─────────────────────────
+  function vigilar(seccion) {
+    if (observadorEspia) observadorEspia.disconnect();
+    if (observadorRevelar) observadorRevelar.disconnect();
+    const lectura = seccion.querySelector(".mu-lectura");
+
+    if (!("IntersectionObserver" in window)) {
+      seccion.querySelectorAll(".mu-revelar").forEach((el) => el.classList.add("visible"));
+      return;
+    }
+
+    // Marca en el índice el módulo que está en la parte de arriba de la lectura.
+    observadorEspia = new IntersectionObserver((entradas) => {
+      const visibles = entradas.filter((e) => e.isIntersecting);
+      if (visibles.length) marcarModulo(seccion, visibles[0].target.dataset.modulo);
+    }, { root: lectura, rootMargin: "0px 0px -65% 0px" });
+    seccion.querySelectorAll(".mu-modulo").forEach((m) => observadorEspia.observe(m));
+
+    // Cada bloque aparece animado al entrar a la vista; las ilustraciones
+    // solo se animan mientras se ven (así no gastan batería fuera de vista).
+    observadorRevelar = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (e.isIntersecting) e.target.classList.add("visible");          // aparece una sola vez
+        if (e.target.classList.contains("mu-demo")) {
+          e.target.classList.toggle("mu-en-vista", e.isIntersecting);       // animación solo mientras se ve
+          if (e.isIntersecting) apuntarCursor(e.target);
+        }
+      });
+    }, { root: lectura, threshold: 0.12 });
+    seccion.querySelectorAll(".mu-revelar").forEach((el) => observadorRevelar.observe(el));
+
+    // Barra de avance de la sección.
+    const avance = seccion.querySelector(".mu-avance span");
+    if (avance && !lectura.dataset.avance) {
+      lectura.dataset.avance = "1";
+      lectura.addEventListener("scroll", () => {
+        const total = lectura.scrollHeight - lectura.clientHeight;
+        avance.style.width = (total > 0 ? (lectura.scrollTop / total) * 100 : 100) + "%";
+      }, { passive: true });
+    }
+  }
+
+  // ── Buscador global ────────────────────────────────────────────────
+  let indiceBusqueda = [];
+
+  function armarIndice() {
+    indiceBusqueda = Array.from(raiz.querySelectorAll(".mu-modulo")).map((m) => {
+      const seccion = m.closest(".mu-seccion");
+      return {
+        modulo: m.dataset.modulo,
+        titulo: m.dataset.titulo,
+        seccion: seccion.dataset.seccion,
+        seccionTitulo: seccion.dataset.titulo,
+        texto: m.textContent.replace(/\s+/g, " ").trim(),
+      };
+    });
+  }
+
+  function fragmento(texto, termino) {
+    const posicion = normalizar(texto).indexOf(termino);
+    if (posicion < 0) return null;
+    const inicio = Math.max(0, posicion - 50);
+    const fin = Math.min(texto.length, posicion + termino.length + 70);
+    return {
+      antes: (inicio > 0 ? "…" : "") + texto.slice(inicio, posicion),
+      encontrado: texto.slice(posicion, posicion + termino.length),
+      despues: texto.slice(posicion + termino.length, fin) + (fin < texto.length ? "…" : ""),
+    };
+  }
+
+  function buscar(texto) {
+    const termino = normalizar(texto.trim());
+    if (!termino) {
+      if (seccionActual) irASeccion(seccionActual.dataset.seccion); else irAPortada();
+      return;
+    }
+    mostrarVista("resultados");
+    const caja = raiz.querySelector(".mu-resultados");
+    caja.querySelector("[data-mu-termino]").textContent = texto.trim();
+    const lista = caja.querySelector(".mu-resultados-lista");
+    lista.replaceChildren();
+
+    indiceBusqueda
+      .filter((item) => normalizar(item.titulo + " " + item.texto).includes(termino))
+      .forEach((item, i) => {
+        const li = document.createElement("li");
+        li.style.setProperty("--i", i);
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.dataset.irSeccion = item.seccion;
+        boton.dataset.irModulo = item.modulo;
+
+        const cabeza = document.createElement("span");
+        cabeza.className = "mu-resultado-titulo";
+        cabeza.textContent = item.titulo;
+        const ruta = document.createElement("small");
+        ruta.textContent = item.seccionTitulo;
+        cabeza.appendChild(ruta);
+        boton.appendChild(cabeza);
+
+        // El fragmento se arma con nodos de texto (nunca con HTML).
+        const trozo = fragmento(item.texto, termino);
+        if (trozo) {
+          const p = document.createElement("span");
+          p.className = "mu-resultado-texto";
+          const marca = document.createElement("mark");
+          marca.textContent = trozo.encontrado;
+          p.append(trozo.antes, marca, trozo.despues);
+          boton.appendChild(p);
+        }
+        li.appendChild(boton);
+        lista.appendChild(li);
+      });
+
+    caja.querySelector(".mu-sin-resultados").hidden = lista.children.length > 0;
+  }
+
+  // ── "Continuar donde quedaste" ─────────────────────────────────────
+  function prepararContinuar() {
+    const boton = raiz.querySelector("[data-mu-continuar]");
+    const lugar = leerLugar();
+    const modulo = lugar && raiz.querySelector('.mu-seccion[data-seccion="' + lugar.seccion + '"] .mu-modulo[data-modulo="' + lugar.modulo + '"]');
+    boton.hidden = !modulo;
+    if (modulo) {
+      boton.dataset.seccion = lugar.seccion;
+      boton.dataset.modulo = lugar.modulo;
+      boton.querySelector("b").textContent = modulo.dataset.titulo;
+    }
+  }
+
+  // ── "Muéstrame en vivo" ────────────────────────────────────────────
+  function enVivo(boton) {
+    const destino = new URL(boton.dataset.url, window.location.href);
+    const id = boton.dataset.recorrido;
+    // Si ya estamos en esa pantalla del panel, el recorrido empieza aquí mismo.
+    if (window.PremiumRecorrido && destino.pathname === window.location.pathname) {
+      ventana.close();
+      window.PremiumRecorrido.iniciar(id);
+      return;
+    }
+    destino.searchParams.set("recorrido", id);
+    window.location.href = destino.pathname + destino.search;
+  }
+
+  // ── Preparar el contenido una vez cargado ──────────────────────────
   function preparar() {
-    capitulos = Array.from(ventana.querySelectorAll(".mu-capitulo"));
+    raiz = ventana.querySelector(".mu");
+
+    // Bloques que aparecen animados al bajar.
+    raiz.querySelectorAll(".mu-modulo > *, .mu-seccion-cabecera, .mu-siguiente-seccion").forEach((el) => {
+      el.classList.add("mu-revelar");
+    });
+    armarIndice();
 
     ventana.addEventListener("click", (e) => {
-      const ir = e.target.closest("[data-ir]");
-      if (ir) { irA(ir.dataset.ir); return; }
-      if (e.target.closest("[data-mu-anterior]")) { mostrar(actual - 1, { enfocar: true }); return; }
-      if (e.target.closest("[data-mu-siguiente]")) {
-        if (actual === capitulos.length - 1) ventana.close();
-        else mostrar(actual + 1, { enfocar: true });
+      const t = e.target;
+      const vivo = t.closest("[data-recorrido]");
+      if (vivo) { enVivo(vivo); return; }
+      const continuar = t.closest("[data-mu-continuar]");
+      if (continuar) { irASeccion(continuar.dataset.seccion, continuar.dataset.modulo); return; }
+      const aSeccion = t.closest("[data-ir-seccion]");
+      if (aSeccion) {
+        const buscador = raiz.querySelector("[data-mu-buscar]");
+        if (buscador) buscador.value = "";
+        irASeccion(aSeccion.dataset.irSeccion, aSeccion.dataset.irModulo);
         return;
       }
-      if (e.target.closest("[data-mu-cerrar]")) { ventana.close(); return; }
+      const aModulo = t.closest("[data-ir-modulo]");
+      if (aModulo && seccionActual) { irASeccion(seccionActual.dataset.seccion, aModulo.dataset.irModulo, { suave: true }); return; }
+      if (t.closest("[data-mu-portada]")) { irAPortada(); return; }
+      if (t.closest("[data-mu-cerrar]")) { ventana.close(); return; }
       // Clic en el fondo oscuro (fuera del recuadro): cerrar.
-      if (e.target === ventana) {
+      if (t === ventana) {
         const r = ventana.getBoundingClientRect();
         if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) ventana.close();
       }
     });
 
-    ventana.addEventListener("keydown", (e) => {
-      const escribiendo = e.target.matches("input, textarea, select") || e.target.isContentEditable;
-      if (escribiendo) return;
-      if (e.key === "ArrowRight") { e.preventDefault(); mostrar(actual + 1, { enfocar: true }); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); mostrar(actual - 1, { enfocar: true }); }
+    const buscador = raiz.querySelector("[data-mu-buscar]");
+    let espera = null;
+    buscador.addEventListener("input", () => {
+      clearTimeout(espera);
+      espera = setTimeout(() => buscar(buscador.value), 150);
+    });
+    buscador.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const primero = raiz.querySelector(".mu-resultados-lista button");
+        if (primero) primero.click();
+      }
     });
 
-    const buscador = ventana.querySelector("[data-mu-buscar]");
-    if (buscador) {
-      buscador.addEventListener("input", () => filtrar(buscador.value));
-      buscador.addEventListener("keydown", (e) => {
-        // Enter abre el primer capítulo que coincide.
-        if (e.key !== "Enter") return;
-        e.preventDefault();
-        const primero = Array.from(ventana.querySelectorAll("[data-ir]")).find((b) => !b.hidden);
-        if (primero) irA(primero.dataset.ir);
-      });
-    }
+    window.addEventListener("resize", () => {
+      if (ventana.open && seccionActual) seccionActual.querySelectorAll(".mu-demo.mu-en-vista").forEach(apuntarCursor);
+    });
 
-    window.addEventListener("resize", () => { if (ventana.open) apuntarCursores(); });
-
-    const guardado = leerGuardado();
-    const inicial = capitulos.findIndex((c) => c.dataset.capitulo === guardado);
-    mostrar(inicial > -1 ? inicial : 0);
+    irAPortada();
   }
 
-  async function cargar() {
-    if (cargado || cargando) return cargado;
-    cargando = true;
-    try {
-      const resp = await fetch(boton.dataset.url, {
-        credentials: "same-origin",
-        headers: { "X-Requested-With": "fetch" },
-      });
-      if (!resp.ok || resp.redirected) throw new Error("sin permiso o sin sesión");
-      ventana.innerHTML = await resp.text();
-      cargado = true;
-      preparar();
-    } catch (e) {
-      ventana.close();
-      if (window.notificar) {
-        window.notificar("No se pudo abrir el manual. Recarga la página e intenta de nuevo.", "error", { titulo: "Manual de usuario" });
-      }
-    } finally {
-      cargando = false;
+  async function cargar(url) {
+    if (cargado) return true;
+    if (!cargando) {
+      cargando = (async () => {
+        try {
+          const resp = await fetch(url, { credentials: "same-origin", headers: { "X-Requested-With": "fetch" } });
+          if (!resp.ok || resp.redirected) throw new Error("sin permiso o sin sesión");
+          ventana.innerHTML = await resp.text();
+          cargado = true;
+          preparar();
+        } catch (e) {
+          ventana.close();
+          if (window.notificar) {
+            window.notificar("No se pudo abrir el manual. Recarga la página e intenta de nuevo.", "error", { titulo: "Manual de usuario" });
+          }
+        } finally {
+          cargando = null;
+        }
+        return cargado;
+      })();
     }
-    return cargado;
+    return cargando;
   }
 
-  async function abrir() {
-    // Cierra el panel de opciones de la burbuja antes de abrir el manual.
-    const widget = document.getElementById("jmWidget");
-    const toggle = document.getElementById("jmWidgetToggle");
-    if (widget) widget.classList.remove("is-open");
-    if (toggle) toggle.setAttribute("aria-expanded", "false");
-
+  async function abrir(boton) {
+    cerrarBurbuja();
     if (!ventana.open) ventana.showModal();
-    if (await cargar()) {
-      const contenido = ventana.querySelector(".mu-contenido");
-      if (contenido) contenido.focus({ preventScroll: true });
-      requestAnimationFrame(apuntarCursores);
+    if (await cargar(boton.dataset.url)) {
+      if (boton.dataset.seccion) irASeccion(boton.dataset.seccion, boton.dataset.modulo);
+      else if (raiz.dataset.vista === "portada") prepararContinuar();
     }
   }
 
-  boton.addEventListener("click", (e) => {
-    e.stopPropagation();
-    abrir();
+  botones.forEach((boton) => {
+    boton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      abrir(boton);
+    });
   });
 
-  // Al cerrar, el foco vuelve al botón "JM".
+  // Desde el recorrido en vivo: "Volver al manual" abre el tema que se estaba viendo.
+  window.PremiumManual = {
+    abrir(seccion, modulo) {
+      const boton = botones[0];
+      abrir({ dataset: { url: boton.dataset.url, seccion: seccion || "", modulo: modulo || "" } });
+    },
+  };
+
+  // Al cerrar, el foco vuelve al botón con el que se abrió.
   ventana.addEventListener("close", () => {
-    const toggle = document.getElementById("jmWidgetToggle");
-    if (toggle) toggle.focus({ preventScroll: true });
+    const origen = document.getElementById("jmWidgetToggle") || botones[0];
+    if (origen) origen.focus({ preventScroll: true });
   });
 })();

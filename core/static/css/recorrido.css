@@ -1,0 +1,254 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Recorrido guiado en vivo del panel (core/static/js/recorrido.js)
+
+   - .rc-capa: cubre la pantalla y bloquea los clics mientras dura.
+   - .rc-foco: el "hueco" iluminado sobre el elemento real; la sombra
+     enorme oscurece todo lo demás. Se desliza de un elemento al otro.
+   - .rc-globo: la explicación de cada paso, con flecha hacia el elemento.
+   Todo se desactiva con "reducir movimiento" del sistema operativo.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.rc-capa {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;               /* por encima de la barra del panel y de sus ventanas */
+    animation: rc-aparece 0.3s ease;
+}
+
+.rc-capa.rc-saliendo {
+    opacity: 0;
+    transition: opacity 0.22s ease;
+}
+
+@keyframes rc-aparece { from { opacity: 0; } }
+
+.rc-foco {
+    position: fixed;
+    border-radius: 12px;
+    box-shadow:
+        0 0 0 3px #e8b23d,
+        0 0 0 9999px rgba(24, 14, 10, 0.68);
+    pointer-events: none;
+    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                top 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 0.3s ease;
+}
+
+/* Aro dorado que late alrededor del elemento */
+.rc-foco::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 2px solid #ffd98a;
+    animation: rc-latido 1.6s ease-out infinite;
+}
+
+@keyframes rc-latido {
+    from { opacity: 0.9; transform: scale(1); }
+    to   { opacity: 0; transform: scale(1.08); }
+}
+
+/* Sin elemento (bienvenida / final): todo oscuro, globo al centro */
+.rc-foco.rc-foco-centro {
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    box-shadow: 0 0 0 9999px rgba(24, 14, 10, 0.68);
+}
+
+.rc-foco.rc-foco-centro::after { display: none; }
+
+.rc-globo {
+    --flecha: 50%;
+    position: fixed;
+    width: min(340px, calc(100vw - 20px));
+    padding: 1rem 1.1rem 0.9rem;
+    border-radius: 16px;
+    background: #fffdf9;
+    color: #4a3a2c;
+    box-shadow: 0 20px 45px rgba(20, 10, 6, 0.45);
+    font-family: inherit;
+    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), top 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Flecha que apunta al elemento */
+.rc-globo::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--flecha) - 8px);
+    width: 16px;
+    height: 16px;
+    background: #fffdf9;
+    transform: rotate(45deg);
+    border-radius: 3px;
+}
+
+.rc-globo[data-lado="abajo"]::before  { top: -7px; }
+.rc-globo[data-lado="arriba"]::before { bottom: -7px; }
+.rc-globo[data-lado="lado"]::before,
+.rc-globo.rc-globo-centro::before { display: none; }
+
+.rc-globo.rc-globo-centro {
+    left: 50% !important;
+    top: 50% !important;
+    translate: -50% -50%;
+    width: min(400px, calc(100vw - 20px));
+    text-align: center;
+}
+
+.rc-globo.rc-entra.rc-adelante { animation: rc-globo-adelante 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.rc-globo.rc-entra.rc-atras    { animation: rc-globo-atras 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.rc-globo.rc-final.rc-entra    { animation: rc-globo-final 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes rc-globo-adelante { from { opacity: 0; transform: translateX(18px) scale(0.97); } }
+@keyframes rc-globo-atras    { from { opacity: 0; transform: translateX(-18px) scale(0.97); } }
+@keyframes rc-globo-final    { from { opacity: 0; transform: scale(0.7); } }
+
+.rc-globo-cabeza {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+}
+
+.rc-globo-centro .rc-globo-cabeza { justify-content: center; }
+
+.rc-en-vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+    background: #fdecea;
+    color: #c0392b;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.rc-punto {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff5a4e;
+}
+
+.rc-punto::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #ff5a4e;
+    animation: rc-onda 1.6s ease-out infinite;
+}
+
+@keyframes rc-onda {
+    from { transform: scale(1); opacity: 0.7; }
+    to   { transform: scale(2.8); opacity: 0; }
+}
+
+.rc-modulo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #c17b3c;
+}
+
+.rc-salir {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: #f5ede4;
+    color: #5c2029;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.rc-salir:hover { transform: rotate(90deg); }
+.rc-globo-centro .rc-salir { position: absolute; top: 0.8rem; right: 0.8rem; }
+
+.rc-titulo {
+    margin: 0 0 0.3rem;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: #5c2029;
+}
+
+.rc-texto {
+    margin: 0 0 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #6a5848;
+}
+
+.rc-puntos {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 0.7rem;
+}
+
+.rc-globo-centro .rc-puntos { justify-content: center; }
+
+.rc-puntos span {
+    width: 7px;
+    height: 7px;
+    border-radius: 7px;
+    background: #eadcc7;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.rc-puntos span.hecho  { background: #d6a15f; }
+.rc-puntos span.activo { width: 20px; background: #c17b3c; }
+
+.rc-botones {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.rc-globo-centro .rc-botones { justify-content: center; }
+
+.rc-paso {
+    margin-right: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9a8a7a;
+}
+
+.rc-globo-centro .rc-paso:empty { display: none; }
+
+.rc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.42rem 0.95rem;
+    border: 0;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #771f1f, #c17b3c);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.rc-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.rc-btn:disabled { opacity: 0.35; cursor: default; }
+.rc-btn-sec { background: #f5ede4; color: #5c2029; }
+
+.rc-btn:focus-visible,
+.rc-salir:focus-visible { outline: 2px solid #e8b23d; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .rc-capa, .rc-foco, .rc-foco::after, .rc-globo, .rc-punto::after, .rc-puntos span {
+        animation: none !important;
+        transition: none !important;
+    }
+}

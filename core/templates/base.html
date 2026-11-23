@@ -477,7 +477,7 @@
 
     {# Manual de usuario del panel: solo para administrador y empleado (ver core/static/js/manual.js) #}
     {% if request.session.usuario_rol == 'admin' or request.session.usuario_rol == 'empleado' %}
-    <button type="button" class="jm-widget-option" id="jmManualBtn" data-url="{% url 'panel_admin:manual_usuario' %}" aria-haspopup="dialog">
+    <button type="button" class="jm-widget-option" id="jmManualBtn" data-abrir-manual data-url="{% url 'panel_admin:manual_usuario' %}" aria-haspopup="dialog">
       <span class="jm-widget-option-icon jm-widget-icon-manual">
         <i class="fas fa-book-open"></i>
       </span>
