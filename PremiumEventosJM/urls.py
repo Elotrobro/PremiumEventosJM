@@ -1,10 +1,8 @@
 import re
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.views.static import serve
 from core import views
 from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que sí tocan la base de datos (login/cotización)
 from Bd_PremiumEventos import recuperacion
@@ -12,6 +10,7 @@ from Bd_PremiumEventos import recordatorios
 from Bd_PremiumEventos import chatbot
 from Bd_PremiumEventos import verificacion
 from Bd_PremiumEventos import google_login
+from Bd_PremiumEventos.media import servir_media
 
 # ═══════════════════════════════════════════════════════════════════════
 # Tabla de rutas del proyecto (URLconf principal).
@@ -65,17 +64,14 @@ urlpatterns = [
     path('panel-admin/', include('panel_admin.urls')),
 ]
 
-# Sirve /media/ (fotos subidas desde el panel). En local lo hace el helper
-# static() de Django; en Railway (DEBUG=False) ese helper no hace nada, así
-# que se sirve con la vista serve() de Django. Para un sitio de este tamaño
-# es suficiente; WhiteNoise solo sirve los estáticos, no lo que se sube.
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    urlpatterns += [
-        re_path(
-            r'^%s(?P<path>.*)$' % re.escape(settings.MEDIA_URL.lstrip('/')),
-            serve,
-            {'document_root': settings.MEDIA_ROOT},
-        ),
-    ]
+# Sirve /media/ (fotos subidas desde el panel), en local y en Railway
+# (DEBUG=False, donde el helper static() de Django no hace nada). Para un
+# sitio de este tamaño es suficiente; WhiteNoise solo sirve los estáticos,
+# no lo que se sube. Si el archivo no está en MEDIA_ROOT, servir_media
+# entrega la copia original de core/static/images/ (ver Bd_PremiumEventos/media.py).
+urlpatterns += [
+    re_path(
+        r'^%s(?P<path>.*)$' % re.escape(settings.MEDIA_URL.lstrip('/')),
+        servir_media,
+    ),
+]
