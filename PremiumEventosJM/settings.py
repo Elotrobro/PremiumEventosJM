@@ -95,6 +95,7 @@ WSGI_APPLICATION = 'PremiumEventosJM.wsgi.application'
 # corriendo en 127.0.0.1:3306 con una base de datos llamada
 # `premium_eventos_jm` ya creada.
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -102,14 +103,23 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-        'OPTIONS': {
-            # Hace que MySQL sea más estricto validando datos (rechaza
-            # inserciones/actualizaciones inválidas en vez de "arreglarlas"
-            # silenciosamente, como recortar un texto muy largo).
+        'PORT': config('DB_PORT', default='3306'),
 
+        'OPTIONS': {
+            # Conexión segura mediante SSL
+            'ssl': {
+                'ca': config('MYSQL_SSL_CA'),
+            },
+
+            # Validación estricta de datos
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
+        },
+
+        # Mantener conexiones durante 60 segundos
+        'CONN_MAX_AGE': 60,
+
+        # Comprobar conexiones antes de reutilizarlas
+        'CONN_HEALTH_CHECKS': True,
     }
 }
 
