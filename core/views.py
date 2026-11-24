@@ -87,7 +87,16 @@ def convenios(request):
     # Salones y espacios aliados con los que trabaja la empresa. Se
     # administran desde el panel (panel_admin → Salones); aquí solo se
     # muestran los visibles, con sus fotos para la ventana de detalle.
-    salones = Salon.objects.filter(activo=True).prefetch_related('fotos')
+    salones = list(Salon.objects.filter(activo=True).prefetch_related('fotos'))
+    for salon in salones:
+        # Solo las fotos cuyo archivo sí está en el servidor: en Railway, sin
+        # Volume, /media se borra en cada despliegue y la base de datos queda
+        # apuntando a archivos que ya no existen (se verían como imagen rota).
+        # Si no queda ninguna, la tarjeta muestra el ícono de "sin fotos".
+        salon.fotos_visibles = [
+            foto for foto in salon.fotos.all()
+            if foto.imagen and foto.imagen.storage.exists(foto.imagen.name)
+        ]
     return render(request, 'convenios.html', {'salones': salones})
 
 

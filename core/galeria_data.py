@@ -12,7 +12,13 @@ muestra del sitio y lo advierte en pantalla (ver `es_demo` en
 import os
 
 from django.templatetags.static import static
+from django.conf import settings
 from PIL import Image
+
+# Carpeta con las fotos originales de la galería (las que se copiaron a
+# /media con `migrar_fotos_galeria`). Sirve de respaldo si el archivo de
+# /media no está en el servidor (ver _foto_subida).
+CARPETA_GALERIA_ESTATICA = os.path.join(settings.BASE_DIR, 'core', 'static', 'images', 'galeria')
 
 # Extensiones que se consideran fotos al leer la carpeta de una categoría
 EXTENSIONES_VALIDAS = {'.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif'}
@@ -142,6 +148,37 @@ def _proporcion(ruta_absoluta):
     return _cache_proporciones[clave]
 
 
+def _foto_subida(foto, slug):
+    """
+    {url, proporcion} de una foto subida desde el panel, o None si su
+    archivo no está en el servidor.
+
+    En Railway el disco se borra en cada despliegue (salvo que /media esté
+    en un Volume), así que la base de datos puede tener fotos cuyo archivo
+    ya no existe. Antes eso tumbaba toda la galería con un error 500; ahora:
+      1. si el archivo está en MEDIA_ROOT, se usa ese;
+      2. si no, pero es una de las fotos que se migraron desde
+         core/static/images/galeria/<categoria>/, se usa la copia estática;
+      3. si no está en ningún lado, la foto se omite.
+    """
+    try:
+        return {'url': foto.imagen.url, 'proporcion': _proporcion(foto.imagen.path)}
+    except (OSError, ValueError):
+        pass
+
+    nombre = os.path.basename(foto.imagen.name or '')
+    ruta_estatica = os.path.join(CARPETA_GALERIA_ESTATICA, slug, nombre)
+    if nombre and os.path.isfile(ruta_estatica):
+        try:
+            return {
+                'url': static(f'images/galeria/{slug}/{nombre}'),
+                'proporcion': _proporcion(ruta_estatica),
+            }
+        except (OSError, ValueError):
+            pass
+    return None
+
+
 def categorias_por_grupo():
     """Agrupa las categorías en el orden en que se muestran en el acordeón."""
     grupos = {}
@@ -170,15 +207,12 @@ def fotos_de_categoria(slug):
     # todas las apps ya están listas, así que aquí es seguro.
     from Bd_PremiumEventos.models import FotoGaleria
 
-    fotos_subidas = list(FotoGaleria.objects.filter(categoria=slug))
-    if fotos_subidas:
-        fotos = [
-            {
-                'url': foto.imagen.url,
-                'proporcion': _proporcion(foto.imagen.path),
-            }
-            for foto in fotos_subidas
-        ]
+    fotos = []
+    for foto in FotoGaleria.objects.filter(categoria=slug):
+        datos = _foto_subida(foto, slug)
+        if datos:
+            fotos.append(datos)
+    if fotos:
         return fotos, False
 
     # Sin fotos propias todavía: vista previa con imágenes del sitio. Cada
