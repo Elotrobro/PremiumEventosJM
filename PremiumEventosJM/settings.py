@@ -27,25 +27,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # variable de entorno (ej. con django-environ o python-decouple) y generar
 # una clave nueva, ya que esta quedó expuesta.
 SECRET_KEY = os.getenv("SECRET_KEY", "Jemani2224")
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1"
-    ).split(",")
-    if host.strip()
-]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG=True muestra tracebacks detallados de errores (útil en desarrollo,
-# pero es un riesgo de seguridad si se despliega así en producción).
-DEBUG = True
+# pero es un riesgo de seguridad en producción). Se lee de la variable de
+# entorno o del .env (config de decouple): en local pon DEBUG=True en tu
+# .env; en Railway, DEBUG=False (o no la pongas).
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Vacío porque DEBUG=True lo permite (Django solo exige ALLOWED_HOSTS
-# cuando DEBUG=False). Antes de desplegar en producción hay que llenarlo
-# con el dominio real, ej. ['premiumeventosjm.com'].
-ALLOWED_HOSTS = []
+# Dominios desde los que se puede abrir el sitio, separados por comas. En
+# Railway: el dominio que da Railway, ej. premiumeventosjm.up.railway.app
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -66,8 +62,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # Sirve los archivos estáticos en producción (va justo después de
+    # SecurityMiddleware, como pide la documentación de WhiteNoise).
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -171,6 +169,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# Carpeta donde `collectstatic` junta los estáticos para producción
+# (WhiteNoise los sirve desde aquí; ver STORAGES y railway.json).
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (contenido subido por usuarios, ej. fotos de la galería
 # cargadas desde el panel de administrador). A diferencia de STATIC_URL,
@@ -234,9 +235,10 @@ STORAGES = {
     },
 }
 
+# Con https y el dominio de Railway, ej. https://premiumeventosjm.up.railway.app
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
-    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    for origin in config('CSRF_TRUSTED_ORIGINS', default='').split(',')
     if origin.strip()
 ]
 
