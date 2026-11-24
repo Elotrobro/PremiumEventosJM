@@ -1143,3 +1143,23 @@ body.panel-admin-body {
 }
 
 .pa-manual-btn i { color: var(--pa-oro, #e8b23d); }
+
+/* Recuadro que reemplaza una foto de /media cuyo archivo no está en el
+   servidor (ver el script del <head> en base_admin.html). Conserva las
+   clases de la <img> original, así que ocupa el mismo espacio. */
+.pa-img-faltante {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: var(--pa-fondo-suave);
+    color: #b5aa9c;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.1;
+}
+.pa-img-faltante small { font-size: 0.65rem; font-weight: 600; }
+.pa-galeria-item .pa-img-faltante { width: 100%; height: 100%; }
+.pa-thumb.pa-img-faltante small { display: none; }
+.pa-form-preview.pa-img-faltante { width: 120px; height: 90px; }
