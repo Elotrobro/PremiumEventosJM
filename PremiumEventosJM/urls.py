@@ -1,7 +1,10 @@
+import re
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.static import serve
 from core import views
 from Bd_PremiumEventos import views as auth_views  # alias: son las vistas que sí tocan la base de datos (login/cotización)
 from Bd_PremiumEventos import recuperacion
@@ -62,7 +65,17 @@ urlpatterns = [
     path('panel-admin/', include('panel_admin.urls')),
 ]
 
+# Sirve /media/ (fotos subidas desde el panel). En local lo hace el helper
+# static() de Django; en Railway (DEBUG=False) ese helper no hace nada, así
+# que se sirve con la vista serve() de Django. Para un sitio de este tamaño
+# es suficiente; WhiteNoise solo sirve los estáticos, no lo que se sube.
 if settings.DEBUG:
-    # Sirve /media/ (fotos de la galería subidas desde el panel) en
-    # desarrollo. En producción esto lo debe servir el servidor web, no Django.
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns += [
+        re_path(
+            r'^%s(?P<path>.*)$' % re.escape(settings.MEDIA_URL.lstrip('/')),
+            serve,
+            {'document_root': settings.MEDIA_ROOT},
+        ),
+    ]

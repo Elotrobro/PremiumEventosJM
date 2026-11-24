@@ -197,14 +197,15 @@ STATIC_URL = 'static/'
 # (WhiteNoise los sirve desde aquí; ver STORAGES y railway.json).
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (contenido subido por usuarios, ej. fotos de la galería
-# cargadas desde el panel de administrador). A diferencia de STATIC_URL,
-# esto no son archivos del código sino datos: por eso /media/ está en
-# .gitignore y se sirve aparte (ver PremiumEventosJM/urls.py, solo en
-# desarrollo con DEBUG=True; en producción lo debe servir el propio
-# servidor web, ej. Nginx).
+# Media files (contenido subido por usuarios: fotos de la galería, de los
+# salones y del catálogo, cargadas desde el panel). No son código sino
+# datos: por eso /media/ está en .gitignore.
+#
+# ⚠️ Railway borra el disco del contenedor en cada despliegue. Para que las
+# fotos no se pierdan hay que crear un Volume en el servicio y montarlo en
+# /app/media (o poner MEDIA_ROOT con la ruta donde se montó el Volume).
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(config('MEDIA_ROOT', default=str(BASE_DIR / 'media')))
 
 
 # Correo (recuperación de contraseña, ver Bd_PremiumEventos/recuperacion.py).

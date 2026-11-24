@@ -41,11 +41,11 @@
         <div class="col-md-4">
             <div class="card salon-card h-100 shadow-sm border-0" data-salon="{{ salon.pk }}">
                 <div class="salon-card-top bg-secondary text-white text-center">
-                    {% with portada=salon.fotos.all|first %}
+                    {% with portada=salon.fotos_visibles|first %}
                         {% if portada %}
                             <img src="{{ portada.imagen.url }}" alt="{{ salon.nombre }}" class="salon-card-foto" loading="lazy">
-                            {% if salon.fotos.all|length > 1 %}
-                                <span class="salon-card-contador"><i class="fas fa-images"></i> {{ salon.fotos.all|length }}</span>
+                            {% if salon.fotos_visibles|length > 1 %}
+                                <span class="salon-card-contador"><i class="fas fa-images"></i> {{ salon.fotos_visibles|length }}</span>
                             {% endif %}
                         {% else %}
                             <i class="fas {{ salon.icono }}"></i>
@@ -94,20 +94,20 @@
 <template id="salonDetalle-{{ salon.pk }}" data-nombre="{{ salon.nombre }}">
     <div class="modal-salon-layout">
         <div class="salon-galeria">
-            {% if salon.fotos.all %}
+            {% if salon.fotos_visibles %}
                 <div class="salon-galeria-principal">
-                    {% for foto in salon.fotos.all %}
+                    {% for foto in salon.fotos_visibles %}
                         <img src="{{ foto.imagen.url }}" alt="{{ salon.nombre }} — foto {{ forloop.counter }}" class="salon-galeria-foto{% if forloop.first %} activa{% endif %}">
                     {% endfor %}
-                    {% if salon.fotos.all|length > 1 %}
+                    {% if salon.fotos_visibles|length > 1 %}
                         <button type="button" class="salon-galeria-flecha anterior" data-paso="-1" aria-label="Foto anterior"><i class="fas fa-chevron-left"></i></button>
                         <button type="button" class="salon-galeria-flecha siguiente" data-paso="1" aria-label="Foto siguiente"><i class="fas fa-chevron-right"></i></button>
-                        <span class="salon-galeria-contador"><span data-actual>1</span> / {{ salon.fotos.all|length }}</span>
+                        <span class="salon-galeria-contador"><span data-actual>1</span> / {{ salon.fotos_visibles|length }}</span>
                     {% endif %}
                 </div>
-                {% if salon.fotos.all|length > 1 %}
+                {% if salon.fotos_visibles|length > 1 %}
                 <div class="salon-galeria-miniaturas">
-                    {% for foto in salon.fotos.all %}
+                    {% for foto in salon.fotos_visibles %}
                         <button type="button" class="salon-miniatura{% if forloop.first %} activa{% endif %}" data-indice="{{ forloop.counter0 }}" aria-label="Ver foto {{ forloop.counter }}">
                             <img src="{{ foto.imagen.url }}" alt="">
                         </button>
