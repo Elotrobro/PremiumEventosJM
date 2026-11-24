@@ -13,6 +13,7 @@ from decouple import config
 from pathlib import Path
 from decouple import config
 import os
+import tempfile
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,6 +106,29 @@ WSGI_APPLICATION = 'PremiumEventosJM.wsgi.application'
 # `premium_eventos_jm` ya creada.
 
 
+def _certificado_ssl():
+    """
+    Ruta del certificado CA de Aiven para la conexión segura con MySQL.
+
+    MYSQL_SSL_CA (entorno o .env) puede ser:
+      - una ruta: relativa a la carpeta de manage.py (ej. "ca_premium.pem")
+        o absoluta. Se ignoran espacios, saltos de línea y comillas
+        sobrantes, que suelen colarse al pegar el valor en Railway;
+      - el contenido del certificado (-----BEGIN CERTIFICATE----- …): se
+        guarda en un archivo temporal y se usa esa ruta.
+    Si no está definida, se usa ca_premium.pem de la raíz del proyecto.
+    """
+    valor = config('MYSQL_SSL_CA', default='ca_premium.pem').strip().strip('"\'').strip()
+    if valor.startswith('-----BEGIN'):
+        ruta = Path(tempfile.gettempdir()) / 'premium_mysql_ca.pem'
+        ruta.write_text(valor.replace('\\n', '\n') + '\n', encoding='utf-8')
+        return str(ruta)
+    ruta = Path(valor)
+    if not ruta.is_absolute():
+        ruta = BASE_DIR / ruta
+    return str(ruta)
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -117,7 +141,7 @@ DATABASES = {
         'OPTIONS': {
             # Conexión segura mediante SSL
             'ssl': {
-                'ca': config('MYSQL_SSL_CA'),
+                'ca': _certificado_ssl(),
             },
 
             # Validación estricta de datos
