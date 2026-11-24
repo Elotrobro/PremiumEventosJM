@@ -12,6 +12,21 @@
   <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
   <link rel="stylesheet" href="{% static 'css/manual.css' %}">
   <link rel="stylesheet" href="{% static 'css/recorrido.css' %}">
+  <script>
+  // Fotos subidas (/media/) cuyo archivo no está en el servidor: en vez del
+  // ícono de imagen rota, un recuadro que avisa que hay que volver a subirla.
+  // Va en el <head> y escucha en fase de captura para alcanzar también los
+  // errores de las imágenes que fallan antes de que cargue el resto del JS.
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (img.tagName !== 'IMG' || (img.getAttribute('src') || '').indexOf('/media/') !== 0) return;
+    var aviso = document.createElement('span');
+    aviso.className = (img.className + ' pa-img-faltante').trim();
+    aviso.title = 'No se encontró el archivo de esta foto en el servidor. Súbela de nuevo.';
+    aviso.innerHTML = '<i class="fas fa-image"></i><small>Sin archivo</small>';
+    img.replaceWith(aviso);
+  }, true);
+  </script>
 </head>
 <body class="panel-admin-body">
 
