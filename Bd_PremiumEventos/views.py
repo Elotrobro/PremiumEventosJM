@@ -291,6 +291,12 @@ def _notificar_cotizacion(
         )
 
 
+def _base_en_aiven():
+    """True si la base de datos configurada (DB_HOST del .env) es de Aiven."""
+    host = settings.DATABASES['default'].get('HOST') or ''
+    return 'aivencloud.com' in host.lower()
+
+
 def cotizacion_view(request):
     """
     Procesa el formulario de cotización y guarda los datos
@@ -530,9 +536,11 @@ def cotizacion_view(request):
         f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} '
         '— consérvalo para futuras consultas.',
         # Para admin y empleado, la notificación muestra abajo, en pequeño,
-        # "Guardado 38 ms" (_notificaciones.html → notificaciones.js).
+        # "Guardado 38 ms", o "Guardado en Aiven 120 ms" si la base está en
+        # Aiven (_notificaciones.html → notificaciones.js).
         extra_tags=(
             f'latencia-bd={ms_guardado:.1f}'
+            + (' latencia-bd-origen=aiven' if _base_en_aiven() else '')
             if request.session.get('usuario_rol') in ('admin', 'empleado')
             else ''
         ),
