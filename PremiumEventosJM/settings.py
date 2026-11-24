@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from decouple import config
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # proyecto a un repositorio público o a producción, se debe mover a una
 # variable de entorno (ej. con django-environ o python-decouple) y generar
 # una clave nueva, ya que esta quedó expuesta.
-SECRET_KEY = 'django-insecure--&d2_@*%u)x5r_-tp22_eb_pa3yyc+z@g)y6xm@@x_551aehiu'
+SECRET_KEY = os.getenv("SECRET_KEY", "Jemani2224")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
+]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG=True muestra tracebacks detallados de errores (útil en desarrollo,
@@ -56,6 +66,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -213,3 +224,23 @@ GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='')
 # abrió. Con el valor por defecto de Django ('same-origin') el navegador corta
 # esa comunicación y el botón de Google no termina el inicio de sesión.
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
+SECURE_PROXY_SSL_HEADER = (
+    'HTTP_X_FORWARDED_PROTO',
+    'https'
+)
