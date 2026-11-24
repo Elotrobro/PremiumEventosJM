@@ -418,13 +418,44 @@
           >
         </div>
 
+        {% comment %}
+          Autorización obligatoria para crear la cuenta (Ley 1581 de 2012).
+          Las valida registro_view y, para Google, google_login.py; ver
+          Bd_PremiumEventos/terminos.py. Los textos abren en otra pestaña
+          para no perder lo escrito en el formulario.
+        {% endcomment %}
+        <fieldset class="auth-legal" id="registroLegal">
+          <legend class="auth-legal-titulo">Antes de crear tu cuenta</legend>
+          <label class="auth-check" for="registroTerminos">
+            <input type="checkbox" id="registroTerminos" name="acepta_terminos"
+                   {% if request.session.registro_prefill.terminos %}checked{% endif %} required>
+            <span class="auth-check-caja" aria-hidden="true"></span>
+            <span class="auth-check-texto">Acepto los <a href="{% url 'terminos' %}" target="_blank" rel="noopener">Términos y condiciones</a></span>
+          </label>
+          <label class="auth-check" for="registroPrivacidad">
+            <input type="checkbox" id="registroPrivacidad" name="acepta_privacidad"
+                   {% if request.session.registro_prefill.terminos %}checked{% endif %} required>
+            <span class="auth-check-caja" aria-hidden="true"></span>
+            <span class="auth-check-texto">Acepto la <a href="{% url 'privacidad' %}" target="_blank" rel="noopener">Política de privacidad</a> y el tratamiento de datos</span>
+          </label>
+          <p class="auth-legal-nota">
+            Ambas son obligatorias. Autorizas a Premium Eventos JM a tratar tus datos para gestionar tu
+            cuenta y tus cotizaciones (Ley 1581 de 2012). Puedes consultarlos, corregirlos o pedir
+            que se borren cuando quieras.
+          </p>
+        </fieldset>
+
         <button type="submit" class="btn-login">Crear mi cuenta</button>
       </form>
 
       {% if google_client_id %}
         <div class="auth-separador"><span>o</span></div>
-        <div class="google-login" data-google-boton data-texto="signup_with">
-          <span class="google-login-cargando">Cargando acceso con Google…</span>
+        {# Se habilita al marcar las dos casillas de arriba (google-login.js). #}
+        <div class="google-login-registro" id="googleRegistro">
+          <div class="google-login" data-google-boton data-texto="signup_with">
+            <span class="google-login-cargando">Cargando acceso con Google…</span>
+          </div>
+          <p class="google-login-aviso">Marca las dos casillas para continuar con Google.</p>
         </div>
       {% endif %}
 
@@ -442,6 +473,9 @@
   {% csrf_token %}
   <input type="hidden" name="credential">
   <input type="hidden" name="origen">
+  {# Copia de las casillas de términos y privacidad del registro (google-login.js) #}
+  <input type="hidden" name="acepta_terminos">
+  <input type="hidden" name="acepta_privacidad">
 </form>
 {% endif %}
 

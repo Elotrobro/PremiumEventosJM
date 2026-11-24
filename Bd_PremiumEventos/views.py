@@ -29,7 +29,8 @@ from .models import (
 from .forms import TestimonioForm
 from .n8n import enviar_a_n8n
 from .precios import calcular_total_cotizacion
-from . import limpieza, verificacion
+from . import limpieza, terminos, verificacion
+from .latencia import Cronometro, etiqueta_latencia
 from .validaciones import (
     errores_contrasena,
     errores_nombre,
@@ -150,9 +151,12 @@ def registro_view(request):
         '',
     )
 
+    acepto_terminos = terminos.acepto_todo(request.POST)
+
     request.session['registro_prefill'] = {
         'nombre': nombre,
         'correo': correo,
+        'terminos': acepto_terminos,
     }
 
     errores = []
@@ -186,6 +190,10 @@ def registro_view(request):
 
         if contrasena != confirmacion:
             errores.append('Las contraseñas no coinciden.')
+
+    # Autorización obligatoria para crear la cuenta (Ley 1581 de 2012).
+    if not acepto_terminos:
+        errores.append(terminos.MENSAJE_FALTA_ACEPTAR)
 
     if errores:
         for error in errores:
@@ -289,12 +297,6 @@ def _notificar_cotizacion(
             'de la cotización %s.',
             cotizacion.codigo_seguimiento,
         )
-
-
-def _base_en_aiven():
-    """True si la base de datos configurada (DB_HOST del .env) es de Aiven."""
-    host = settings.DATABASES['default'].get('HOST') or ''
-    return 'aivencloud.com' in host.lower()
 
 
 def cotizacion_view(request):
@@ -536,14 +538,8 @@ def cotizacion_view(request):
         f'Tu código de seguimiento es {cotizacion.codigo_seguimiento} '
         '— consérvalo para futuras consultas.',
         # Para admin y empleado, la notificación muestra abajo, en pequeño,
-        # "Guardado 38 ms", o "Guardado en Aiven 120 ms" si la base está en
-        # Aiven (_notificaciones.html → notificaciones.js).
-        extra_tags=(
-            f'latencia-bd={ms_guardado:.1f}'
-            + (' latencia-bd-origen=aiven' if _base_en_aiven() else '')
-            if request.session.get('usuario_rol') in ('admin', 'empleado')
-            else ''
-        ),
+        # "Guardado 38 ms" (ver Bd_PremiumEventos/latencia.py).
+        extra_tags=etiqueta_latencia(request, ms_guardado),
     )
 
     return redirect('inicio')
@@ -596,18 +592,20 @@ def guardar_contacto(request):
 
         return redirect('contacto')
 
-    ContactoSimple.objects.create(
-        nombre=nombre,
-        apellidos=apellidos,
-        email=email,
-        telefono=telefono,
-        mensaje=mensaje,
-    )
+    with Cronometro() as crono:
+        ContactoSimple.objects.create(
+            nombre=nombre,
+            apellidos=apellidos,
+            email=email,
+            telefono=telefono,
+            mensaje=mensaje,
+        )
 
     messages.success(
         request,
         f'¡Gracias, {nombre}! Hemos recibido tu mensaje '
         'y te contactaremos pronto.',
+        extra_tags=crono.etiqueta(request),
     )
 
     return redirect('contacto')
@@ -639,12 +637,14 @@ def testimonios(request):
             testimonio = form.save(commit=False)
             testimonio.usuario_id = usuario_id
             testimonio.aprobado = False
-            testimonio.save()
+            with Cronometro() as crono:
+                testimonio.save()
 
             messages.success(
                 request,
                 '¡Gracias por compartir tu experiencia! '
                 'Tu opinión fue enviada y será revisada antes de publicarse.',
+                extra_tags=crono.etiqueta(request),
             )
 
             return redirect('testimonios')

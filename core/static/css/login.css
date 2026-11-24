@@ -500,3 +500,151 @@
     line-height: 1.35;
     padding: 0.5rem 1rem;
 }
+
+/* ── Términos y privacidad en "Crear cuenta" (checklist obligatorio) ──
+   Casillas propias con el dorado del sitio; el <input> real sigue ahí
+   (invisible pero enfocable con el teclado) para que funcionen "required"
+   y el aviso de notificaciones.js. Ver base.html y Bd_PremiumEventos/terminos.py. */
+.auth-legal {
+    border: 1px solid #eadfd3;
+    border-radius: 16px;
+    background: #fcf8f4;
+    padding: 0.85rem 0.95rem 0.75rem;
+    margin: 0.2rem 0 1rem;
+}
+
+.auth-legal-titulo {
+    float: left;               /* el <legend> queda dentro del recuadro */
+    width: 100%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #a5632a;
+    margin: 0 0 0.5rem;
+}
+
+.auth-check {
+    clear: both;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #2c2a29;
+    cursor: pointer;
+}
+
+.auth-check input {
+    position: absolute;
+    left: 0;
+    top: 0.35rem;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.auth-check-caja {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border: 1.5px solid #d3c2b0;
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Palomita dibujada con bordes (no depende de Font Awesome) */
+.auth-check-caja::after {
+    content: "";
+    width: 5px;
+    height: 10px;
+    margin-top: -2px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    opacity: 0;
+    transform: rotate(45deg) scale(0.4);
+    transition: opacity 0.15s ease, transform 0.2s ease;
+}
+
+.auth-check input:checked + .auth-check-caja {
+    background: #c17b3c;
+    border-color: #c17b3c;
+}
+
+.auth-check input:checked + .auth-check-caja::after {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+}
+
+.auth-check input:focus-visible + .auth-check-caja {
+    box-shadow: 0 0 0 3px rgba(193, 123, 60, 0.25);
+}
+
+/* Sin marcar al enviar (lo pone notificaciones.js) */
+.auth-check input.notif-campo-invalido + .auth-check-caja {
+    border-color: #c0433f;
+    box-shadow: 0 0 0 3px rgba(192, 67, 63, 0.18);
+}
+
+.auth-check-texto a {
+    color: #a5632a;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.auth-check-texto a:hover {
+    color: #c17b3c;
+}
+
+.auth-legal-nota {
+    clear: both;
+    margin: 0.45rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: #8a7868;
+}
+
+/* "Continuar con Google" del registro: bloqueado hasta marcar las casillas */
+.google-login-registro .google-login {
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.google-login-registro.is-bloqueado {
+    cursor: not-allowed;
+}
+
+.google-login-registro.is-bloqueado .google-login {
+    opacity: 0.45;
+    filter: grayscale(1);
+    pointer-events: none;      /* el clic llega al contenedor, que avisa */
+}
+
+.google-login-aviso {
+    display: none;
+    margin: 0.45rem 0 0;
+    font-size: 0.75rem;
+    text-align: center;
+    color: #8a7868;
+}
+
+.google-login-registro.is-bloqueado .google-login-aviso {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-check-caja,
+    .auth-check-caja::after,
+    .google-login-registro .google-login {
+        transition: none;
+    }
+}

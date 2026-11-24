@@ -24,6 +24,7 @@ import hmac
 import logging
 import secrets
 import time
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -34,6 +35,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from . import terminos
 from .models import Usuario
 from .n8n import enviar_a_n8n
 
@@ -85,8 +87,15 @@ def _enviar_codigo(nombre, correo, codigo):
 
 
 def iniciar_verificacion(request, nombre, correo, contrasena_hash):
-    """Lo llama registro_view cuando los datos del formulario son válidos."""
-    pendiente = {'nombre': nombre, 'correo': correo, 'contrasena': contrasena_hash, 'reenvios': 0}
+    """
+    Lo llama registro_view cuando los datos del formulario son válidos (ya
+    con las casillas de términos y privacidad marcadas). Se guarda cuándo
+    las aceptó: es la fecha que queda como prueba en la cuenta.
+    """
+    pendiente = {
+        'nombre': nombre, 'correo': correo, 'contrasena': contrasena_hash, 'reenvios': 0,
+        'terminos_aceptados': timezone.now().isoformat(),
+    }
     codigo = _nuevo_codigo(pendiente)
     request.session[CLAVE_SESION] = pendiente
     _enviar_codigo(nombre, correo, codigo)
@@ -96,6 +105,14 @@ def _correo_oculto(correo):
     """jeanpaul446688@gmail.com → je***********@gmail.com"""
     usuario, _, dominio = correo.partition('@')
     return usuario[:2] + '*' * max(len(usuario) - 2, 3) + '@' + dominio
+
+
+def _fecha_aceptacion(pendiente):
+    """Cuándo marcó las casillas en el registro (o ahora, si no se sabe)."""
+    try:
+        return datetime.fromisoformat(pendiente['terminos_aceptados'])
+    except (KeyError, TypeError, ValueError):
+        return timezone.now()
 
 
 def verificar_correo(request):
@@ -130,6 +147,8 @@ def verificar_correo(request):
                 contrasena=pendiente['contrasena'],
                 rol='cliente',
                 ultimo_acceso=timezone.now(),
+                terminos_aceptados=_fecha_aceptacion(pendiente),
+                version_terminos=terminos.VERSION,
             )
             request.session.pop(CLAVE_SESION, None)
             request.session.pop('registro_prefill', None)

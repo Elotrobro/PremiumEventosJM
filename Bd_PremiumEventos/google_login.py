@@ -12,9 +12,11 @@ Cómo funciona:
   4. Con el correo:
        - si ya hay una cuenta (aunque se haya creado con contraseña), entra
          a esa misma cuenta;
-       - si no hay, crea una cuenta de cliente al instante. No se pide el
-         código de 6 dígitos de verificacion.py porque Google ya confirmó
-         que el correo es de esa persona.
+       - si no hay, crea una cuenta de cliente al instante, siempre que haya
+         marcado las casillas de Términos y Política de privacidad de la
+         pestaña "Crear cuenta" (si no, se le pide que las marque; ver
+         terminos.py). No se pide el código de 6 dígitos de verificacion.py
+         porque Google ya confirmó que el correo es de esa persona.
      Las cuentas creadas así no tienen contraseña (contraseña "inutilizable"
      de Django). Si después quieren una, usan "¿Olvidaste tu contraseña?".
 
@@ -35,7 +37,7 @@ from google.auth import exceptions as google_exceptions
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 
-from . import limpieza, verificacion
+from . import limpieza, terminos, verificacion
 from .models import Usuario
 from .validaciones import SIGNOS_PERMITIDOS_NOMBRE, errores_nombre, limpiar_nombre
 
@@ -132,11 +134,25 @@ def google_login_view(request):
         messages.success(request, f'¡Bienvenido, {usuario.nombre_completo}!')
         return redirect('inicio')
 
+    # Cuenta nueva: hace falta la autorización (Ley 1581 de 2012). Si usó el
+    # botón de "Iniciar sesión" o no marcó las casillas, se abre "Crear
+    # cuenta" para que las marque y vuelva a continuar con Google.
+    if not terminos.acepto_todo(request.POST):
+        messages.error(
+            request,
+            'Aún no tienes una cuenta con ese correo. ' + terminos.MENSAJE_FALTA_ACEPTAR
+            + ' Márcalas aquí y vuelve a continuar con Google.',
+            extra_tags='registro-error',
+        )
+        return redirect(f"{reverse('inicio')}?registro=1")
+
     usuario = Usuario.objects.create(
         nombre_completo=_nombre_desde_google(datos, correo),
         correo_electronico=correo,
         contrasena=make_password(None),  # sin contraseña: solo entra con Google (o la crea con "¿Olvidaste tu contraseña?")
         rol=Usuario.ROL_CLIENTE,
+        terminos_aceptados=timezone.now(),
+        version_terminos=terminos.VERSION,
     )
     _iniciar_sesion(request, usuario)
     messages.success(

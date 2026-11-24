@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Páginas legales: Términos y condiciones y Política de privacidad
+   (core/templates/legal/). Tarjeta de lectura cómoda, con los colores
+   del sitio (dorado #c17b3c y marrón).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.legal-header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    background: #ffffff;
+}
+
+.legal-eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #a5632a;
+    margin-bottom: 0.6rem;
+}
+
+.legal-header h1 {
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    font-weight: 700;
+    color: #c17b3c;
+    margin: 0 0 0.4rem;
+}
+
+.legal-sub {
+    color: #5e4f43;
+    margin: 0 0 0.3rem;
+}
+
+.legal-fecha {
+    color: #7a6856;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.legal-section {
+    padding: 1.5rem 0 4rem;
+    background: #f5ede4;
+}
+
+.legal-card {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    color: #3d342d;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.legal-card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #a5632a;
+    margin: 2rem 0 0.6rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid #f0e6db;
+    scroll-margin-top: 110px;      /* que el título no quede tapado por el menú fijo */
+}
+
+.legal-card p,
+.legal-card ul,
+.legal-card ol {
+    margin: 0 0 0.9rem;
+}
+
+.legal-card ul,
+.legal-card ol {
+    padding-left: 1.3rem;
+}
+
+.legal-card li {
+    margin-bottom: 0.35rem;
+}
+
+.legal-card a {
+    color: #a5632a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.legal-card a:hover {
+    color: #c17b3c;
+}
+
+/* Índice con enlaces a cada sección */
+.legal-indice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0 0 1.2rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid #f0e6db;
+}
+
+.legal-card .legal-indice a {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid #ead9c6;
+    border-radius: 20px;
+    background: #fbf6f0;
+    color: #6b4a2c;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.legal-card .legal-indice a:hover {
+    background: #f3e4d2;
+    border-color: #c17b3c;
+}
+
+.legal-contacto {
+    list-style: none;
+    padding-left: 0 !important;
+}
+
+.legal-contacto i {
+    width: 1.3rem;
+    color: #c17b3c;
+}
+
+.legal-nota {
+    margin-top: 1.5rem !important;
+    font-size: 0.88rem;
+    color: #7a6856;
+}
