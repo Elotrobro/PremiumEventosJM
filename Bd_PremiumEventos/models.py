@@ -43,6 +43,13 @@ class Usuario(models.Model):
     rol = models.CharField(max_length=50, choices=ROL_CHOICES, default=ROL_CLIENTE)
     ultimo_acceso = models.DateTimeField(null=True, blank=True)  # se actualiza cada vez que el login es exitoso (ver login_view)
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # se llena automáticamente al crear el registro, no editable después
+    # Prueba de la autorización para el tratamiento de datos (Ley 1581 de
+    # 2012, arts. 9 y 17 lit. b; Decreto 1074 de 2015): cuándo aceptó los
+    # Términos y la Política de privacidad al crear la cuenta y qué versión
+    # (ver Bd_PremiumEventos/terminos.py). Vacíos en cuentas anteriores a
+    # las casillas o creadas desde el panel.
+    terminos_aceptados = models.DateTimeField(null=True, blank=True)
+    version_terminos = models.CharField(max_length=20, blank=True, default='')
 
     def __str__(self):
         # Texto que se muestra en el admin y en cualquier <select> relacionado con este modelo

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Términos y condiciones{% endblock %}
+{% block content %}
+{# Se enlaza desde la casilla "Acepto los Términos y condiciones" del registro (base.html). #}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+
+<div class="legal-header">
+    <div class="container">
+        <span class="legal-eyebrow">Premium Eventos JM</span>
+        <h1>Términos y condiciones</h1>
+        <p class="legal-fecha">Última actualización: {{ actualizado }}</p>
+    </div>
+</div>
+
+<div class="legal-section">
+    <div class="container">
+        <article class="legal-card">
+            <nav class="legal-indice" aria-label="Contenido">
+                <a href="#t1">1. Aceptación</a>
+                <a href="#t2">2. Cuenta</a>
+                <a href="#t3">3. Cotizaciones</a>
+                <a href="#t4">4. Reservas y pagos</a>
+                <a href="#t5">5. Cambios y cancelaciones</a>
+                <a href="#t6">6. Testimonios</a>
+                <a href="#t7">7. Contenido del sitio</a>
+                <a href="#t8">8. Responsabilidad</a>
+                <a href="#t9">9. Cambios a estos términos</a>
+                <a href="#t10">10. Ley aplicable, quejas y contacto</a>
+            </nav>
+
+            {# PENDIENTE (lo debe completar Premium Eventos JM): NIT y dirección física (Ley 1480 de 2011, art. 50). #}
+            <p>
+                Estos términos regulan el uso del sitio web de <strong>Premium Eventos JM</strong>
+                (en adelante, "Premium Eventos JM" o "nosotros"), empresa de decoración, alquiler
+                de mobiliario y organización de eventos sociales y empresariales con domicilio en
+                Antioquia, Colombia, y de los servicios que se solicitan a través de él. Nuestros datos
+                de contacto están al final de esta página.
+            </p>
+
+            <h2 id="t1">1. Aceptación</h2>
+            <p>
+                Para crear una cuenta, ya sea con correo y contraseña o con Google, debes marcar las
+                casillas en las que declaras que leíste y aceptas estos términos y la
+                <a href="{% url 'privacidad' %}">Política de privacidad</a>. Esa aceptación electrónica
+                tiene plena validez según la Ley 527 de 1999 (comercio electrónico), y guardamos la fecha y
+                la versión que aceptaste. Si no estás de acuerdo, no crees una cuenta. Las cuentas solo
+                pueden crearlas personas mayores de 18 años.
+            </p>
+
+            <h2 id="t2">2. Tu cuenta</h2>
+            <ul>
+                <li>Los datos que registres deben ser verdaderos y estar actualizados.</li>
+                <li>Eres responsable de guardar tu contraseña y de lo que se haga con tu cuenta.
+                    Si crees que alguien más la usa, cámbiala con "¿Olvidaste tu contraseña?" y avísanos.</li>
+                <li>Las cuentas de cliente que no realicen ninguna cotización en 60 días se eliminan
+                    automáticamente junto con sus datos.</li>
+                <li>Podemos suspender o eliminar cuentas que se usen para fines fraudulentos,
+                    ofensivos o contrarios a la ley.</li>
+            </ul>
+
+            <h2 id="t3">3. Cotizaciones</h2>
+            <ul>
+                <li>El valor que muestra el sitio al cotizar es un <strong>estimado aproximado</strong>
+                    calculado con el número de invitados y los servicios elegidos. No es una oferta
+                    definitiva ni reserva la fecha.</li>
+                <li>Nuestro equipo revisa cada solicitud y te contacta (por WhatsApp, teléfono o correo)
+                    para confirmar los detalles y el valor final, que puede cambiar según la decoración,
+                    el lugar, la disponibilidad y los requerimientos específicos del evento.</li>
+                <li>Con el código de seguimiento que recibes puedes consultar el estado de tu cotización.</li>
+            </ul>
+
+            <h2 id="t4">4. Reservas y pagos</h2>
+            <p>
+                La fecha del evento solo queda reservada cuando la cotización es aprobada, se acuerdan
+                las condiciones finales y se realiza el pago acordado con Premium Eventos JM. Los medios
+                de pago, valores, anticipos y plazos se informan en la cotización final o en el contrato
+                del evento.
+            </p>
+
+            <h2 id="t5">5. Cambios y cancelaciones</h2>
+            <p>
+                Los cambios de fecha, hora, número de invitados o servicios, así como las cancelaciones,
+                deben solicitarse lo antes posible por nuestros canales de contacto. Sus condiciones
+                (incluidos posibles costos o devoluciones) son las pactadas en la cotización final o en el
+                contrato del evento, respetando los derechos que te da la Ley 1480 de 2011 (Estatuto del
+                Consumidor).
+            </p>
+            <p>
+                Si contratas a distancia (por este sitio, WhatsApp o teléfono) tienes el
+                <strong>derecho de retracto</strong> dentro de los 5 días hábiles siguientes a la
+                celebración del contrato, en los casos y con las excepciones del art. 47 de la Ley 1480 de
+                2011; por ejemplo, no aplica cuando el servicio ya empezó a prestarse con tu acuerdo ni a
+                decoraciones o elementos hechos a la medida según tus especificaciones. Si te retractas, te
+                devolvemos el dinero pagado en un plazo máximo de 30 días calendario.
+            </p>
+
+            <h2 id="t6">6. Testimonios</h2>
+            <p>
+                Al enviar un testimonio nos autorizas a publicarlo en el sitio junto con tu nombre y
+                calificación. Todos los testimonios se revisan antes de publicarse y podemos no publicar
+                los que tengan contenido ofensivo, falso o ajeno al servicio.
+            </p>
+
+            <h2 id="t7">7. Contenido del sitio</h2>
+            <p>
+                Las fotografías, textos, logotipos y diseños del sitio pertenecen a Premium Eventos JM o se
+                usan con autorización. No pueden copiarse ni usarse con fines comerciales sin nuestro
+                permiso por escrito.
+            </p>
+
+            <h2 id="t8">8. Responsabilidad</h2>
+            <p>
+                Trabajamos para que el sitio esté disponible y la información sea correcta, pero puede
+                haber interrupciones o errores. Los precios, fotos y descripciones son de referencia: lo
+                que se presta en cada evento es lo acordado en la cotización final. No respondemos por
+                el mal uso del sitio ni por sitios de terceros enlazados desde él (redes sociales,
+                Google, WhatsApp).
+            </p>
+
+            <h2 id="t9">9. Cambios a estos términos</h2>
+            <p>
+                Podemos actualizar estos términos. La fecha de la última actualización aparece al inicio
+                de esta página, y los cambios importantes se informarán en el sitio. Si sigues usando tu
+                cuenta después de un cambio, se entiende que lo aceptas.
+            </p>
+
+            <h2 id="t10">10. Ley aplicable, quejas y contacto</h2>
+            <p>
+                Estos términos se rigen por las leyes de la República de Colombia, en especial la Ley 1480
+                de 2011 (Estatuto del Consumidor), la Ley 527 de 1999 y la Ley 1581 de 2012. Puedes
+                enviarnos peticiones, quejas, reclamos o solicitudes de garantía por los canales de abajo;
+                si no quedas conforme con nuestra respuesta, puedes acudir a la Superintendencia de
+                Industria y Comercio (SIC), autoridad de protección al consumidor.
+            </p>
+            <ul class="legal-contacto">
+                <li><i class="fas fa-user-circle" aria-hidden="true"></i> Margoth Sanmartín Calle, Gerente</li>
+                <li><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:info@premiumeventosjm.com">info@premiumeventosjm.com</a></li>
+                <li><i class="fas fa-mobile-alt" aria-hidden="true"></i> Celular / WhatsApp: 311 775 81 62</li>
+            </ul>
+        </article>
+    </div>
+</div>
+{% endblock %}

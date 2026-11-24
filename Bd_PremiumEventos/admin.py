@@ -48,7 +48,9 @@ class UsuarioAdmin(admin.ModelAdmin):
     list_display = ('id_usuario', 'nombre_completo', 'correo_electronico', 'rol', 'ultimo_acceso', 'fecha_creacion')
     search_fields = ('nombre_completo', 'correo_electronico')
     list_filter = ('rol',)
-    readonly_fields = ('ultimo_acceso', 'fecha_creacion')  # se llenan automáticamente por el sistema, no se editan a mano
+    # Se llenan automáticamente por el sistema, no se editan a mano (la
+    # aceptación de términos es la prueba de la autorización: Ley 1581).
+    readonly_fields = ('ultimo_acceso', 'fecha_creacion', 'terminos_aceptados', 'version_terminos')
 
     def save_model(self, request, obj, form, change):
         # Se sobreescribe el guardado por defecto del admin para decidir

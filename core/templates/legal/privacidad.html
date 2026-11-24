@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Política de privacidad{% endblock %}
+{% block content %}
+{% comment %}
+  Política de Tratamiento de Datos Personales (Ley 1581 de 2012 y Decreto 1074 de 2015, Cap. 25).
+  Se enlaza desde la casilla de privacidad del registro (base.html).
+  PENDIENTE (lo debe completar Premium Eventos JM): NIT y dirección física del Responsable.
+{% endcomment %}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+
+<div class="legal-header">
+    <div class="container">
+        <span class="legal-eyebrow">Premium Eventos JM</span>
+        <h1>Política de privacidad</h1>
+        <p class="legal-sub">Política de Tratamiento de Datos Personales</p>
+        <p class="legal-fecha">Vigente desde: {{ actualizado }}</p>
+    </div>
+</div>
+
+<div class="legal-section">
+    <div class="container">
+        <article class="legal-card">
+            <nav class="legal-indice" aria-label="Contenido">
+                <a href="#p1">1. Responsable</a>
+                <a href="#p2">2. Marco legal</a>
+                <a href="#p3">3. Datos que tratamos</a>
+                <a href="#p4">4. Finalidades</a>
+                <a href="#p5">5. Autorización</a>
+                <a href="#p6">6. Datos sensibles y de menores</a>
+                <a href="#p7">7. Encargados y transferencias</a>
+                <a href="#p8">8. Tus derechos</a>
+                <a href="#p9">9. Consultas y reclamos</a>
+                <a href="#p10">10. Seguridad</a>
+                <a href="#p11">11. Conservación</a>
+                <a href="#p12">12. Cookies</a>
+                <a href="#p13">13. Asistente virtual</a>
+                <a href="#p14">14. Vigencia y cambios</a>
+            </nav>
+
+            <h2 id="p1">1. Responsable del tratamiento</h2>
+            <ul class="legal-contacto">
+                <li><i class="fas fa-building" aria-hidden="true"></i> <strong>Premium Eventos JM</strong>, domiciliada en Antioquia, Colombia.</li>
+                <li><i class="fas fa-user-circle" aria-hidden="true"></i> Representante: Margoth Sanmartín Calle, Gerente.</li>
+                <li><i class="fas fa-envelope" aria-hidden="true"></i> Correo para temas de datos personales: <a href="mailto:info@premiumeventosjm.com">info@premiumeventosjm.com</a></li>
+                <li><i class="fas fa-mobile-alt" aria-hidden="true"></i> Celular / WhatsApp: 311 775 81 62</li>
+            </ul>
+
+            <h2 id="p2">2. Marco legal</h2>
+            <p>
+                Esta política cumple la Constitución Política de Colombia (art. 15, derecho al habeas data),
+                la <strong>Ley Estatutaria 1581 de 2012</strong> de protección de datos personales, el
+                <strong>Decreto Único Reglamentario 1074 de 2015</strong> (que recoge el Decreto 1377 de 2013),
+                y las instrucciones de la Superintendencia de Industria y Comercio (SIC), autoridad de
+                protección de datos en Colombia.
+            </p>
+
+            <h2 id="p3">3. Datos que tratamos</h2>
+            <ul>
+                <li><strong>Cuenta:</strong> nombre completo, correo electrónico y contraseña (se guarda cifrada; nadie puede leerla). Si entras con Google, recibimos tu nombre y tu correo verificado.</li>
+                <li><strong>Cotizaciones:</strong> nombre, correo, teléfono o WhatsApp, tipo y fecha del evento, hora, número de invitados, lugar, tema, servicios de interés, presupuesto aproximado y observaciones.</li>
+                <li><strong>Contacto:</strong> nombre, apellidos, correo, teléfono y el mensaje que nos escribas.</li>
+                <li><strong>Testimonios:</strong> tu calificación, tu comentario y tu nombre.</li>
+                <li><strong>Datos técnicos:</strong> cookies de sesión y de seguridad necesarias para que el sitio funcione (ver punto 12).</li>
+            </ul>
+            <p>No pedimos datos sensibles ni datos financieros a través del sitio.</p>
+
+            <h2 id="p4">4. Finalidades</h2>
+            <p>Usamos tus datos solo para:</p>
+            <ol>
+                <li>Crear y administrar tu cuenta, y verificar tu correo.</li>
+                <li>Recibir, calcular, gestionar y hacer seguimiento a tus cotizaciones, y prestar los servicios de decoración, alquiler y organización de eventos que contrates.</li>
+                <li>Contactarte por correo, teléfono o WhatsApp sobre tu solicitud o tu evento: confirmaciones, cambios de estado de la cotización y recordatorios antes del evento.</li>
+                <li>Responder tus mensajes, preguntas, peticiones, quejas y reclamos.</li>
+                <li>Publicar en el sitio los testimonios que nos envíes, una vez revisados.</li>
+                <li>Recuperar el acceso a tu cuenta cuando lo pidas.</li>
+                <li>Cumplir obligaciones legales, contables y tributarias, y atender requerimientos de autoridades competentes.</li>
+                <li>Mantener la seguridad del sitio y prevenir fraudes.</li>
+            </ol>
+            <p>
+                <strong>No vendemos ni alquilamos tus datos.</strong> No te enviaremos publicidad ni
+                ofertas comerciales sin una autorización aparte, que puedes negar o retirar cuando quieras.
+                Cuando te contactemos lo haremos por los canales que nos diste y en los horarios que
+                permite la Ley 2300 de 2023: de lunes a viernes de 7:00 a.m. a 7:00 p.m. y los sábados de
+                8:00 a.m. a 3:00 p.m., nunca domingos ni festivos.
+            </p>
+
+            <h2 id="p5">5. Autorización</h2>
+            <p>
+                Al crear tu cuenta marcas la casilla en la que aceptas esta política. Esa es tu
+                autorización <strong>previa, expresa e informada</strong> para tratar tus datos con las
+                finalidades anteriores (art. 9 de la Ley 1581 de 2012). Guardamos la fecha en que la diste
+                y la versión de la política que aceptaste, como prueba de la autorización. Darnos tus datos
+                es voluntario, pero sin ellos no podemos crear tu cuenta ni atender tu cotización.
+            </p>
+
+            <h2 id="p6">6. Datos sensibles y datos de menores de edad</h2>
+            <p>
+                No solicitamos datos sensibles (salud, origen racial o étnico, orientación política,
+                convicciones religiosas, vida sexual, datos biométricos, entre otros). Si decides
+                escribirlos en una observación o mensaje, no estás obligado a hacerlo. Las cuentas solo
+                pueden crearlas personas mayores de 18 años. Si una cotización incluye información de
+                niños, niñas o adolescentes (por ejemplo, en un bautizo, unos 15 años o una primera
+                comunión), solo la usamos para organizar ese evento, respetando su interés superior y sus
+                derechos fundamentales (art. 7 de la Ley 1581 de 2012).
+            </p>
+
+            <h2 id="p7">7. Encargados del tratamiento y transferencias</h2>
+            <p>
+                Para funcionar, el sitio usa proveedores tecnológicos que tratan los datos por cuenta de
+                Premium Eventos JM y solo siguiendo nuestras instrucciones (encargados): alojamiento de la
+                base de datos en la nube, envío de correos automáticos, el inicio de sesión con Google y el
+                asistente virtual (ver punto 13). Algunos tienen servidores fuera de Colombia, por lo que
+                puede haber una <strong>transmisión internacional</strong> de datos, que se hace con
+                proveedores que ofrecen niveles adecuados de protección, conforme al art. 26 de la Ley 1581
+                de 2012 y al Decreto 1074 de 2015. No compartimos tus datos con terceros para fines
+                distintos a los de esta política.
+            </p>
+
+            <h2 id="p8">8. Tus derechos como titular</h2>
+            <p>Según el art. 8 de la Ley 1581 de 2012, puedes en cualquier momento:</p>
+            <ul>
+                <li>Conocer, actualizar y rectificar tus datos personales.</li>
+                <li>Pedir prueba de la autorización que nos diste.</li>
+                <li>Ser informado sobre el uso que les hemos dado.</li>
+                <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC), después de haber hecho tu consulta o reclamo ante nosotros.</li>
+                <li>Revocar la autorización y pedir que borremos tus datos, cuando no exista un deber legal o contractual que nos obligue a conservarlos.</li>
+                <li>Acceder gratis a tus datos personales.</li>
+            </ul>
+
+            <h2 id="p9">9. Cómo hacer consultas y reclamos</h2>
+            <p>
+                Escríbenos a <a href="mailto:info@premiumeventosjm.com">info@premiumeventosjm.com</a> o por
+                WhatsApp al 311 775 81 62, con tu nombre completo, el correo de tu cuenta, lo que pides y,
+                si quieres, los documentos que lo respalden.
+            </p>
+            <ul>
+                <li><strong>Consultas</strong> (saber qué datos tenemos y cómo los usamos): respondemos en máximo <strong>10 días hábiles</strong>. Si no alcanzamos, te avisamos el motivo y respondemos en máximo 5 días hábiles más (art. 14).</li>
+                <li><strong>Reclamos</strong> (corregir, actualizar, borrar datos o revocar la autorización, o avisar que no cumplimos esta política): respondemos en máximo <strong>15 días hábiles</strong>, prorrogables hasta 8 días hábiles más con aviso. Si al reclamo le falta información, te la pedimos dentro de los 5 días siguientes; si pasan 2 meses sin que la envíes, se entiende que desististe (art. 15).</li>
+            </ul>
+            <p>
+                También puedes borrar tus datos de cuenta pidiéndonos su eliminación. Las cuentas de
+                cliente que no realicen ninguna cotización en 60 días se eliminan automáticamente.
+            </p>
+
+            <h2 id="p10">10. Seguridad</h2>
+            <p>
+                Protegemos tus datos con medidas técnicas y administrativas: conexión cifrada con la base de
+                datos, contraseñas cifradas que nadie puede leer, verificación del correo con un código,
+                acceso al panel solo para personal autorizado y con permisos según su rol. Si ocurre un
+                incidente de seguridad que afecte tus datos, lo informaremos a la SIC como exige la ley.
+            </p>
+
+            <h2 id="p11">11. Cuánto tiempo conservamos tus datos</h2>
+            <p>
+                Los conservamos mientras tengas una cuenta o una relación comercial con nosotros y el tiempo
+                adicional que exijan las normas contables, tributarias y comerciales. Las cuentas sin
+                cotizaciones se eliminan a los 60 días. Cuando ya no los necesitemos, los eliminamos.
+            </p>
+
+            <h2 id="p12">12. Cookies</h2>
+            <p>
+                El sitio usa solo cookies técnicas necesarias: la de sesión (para mantenerte conectado y
+                recordar tu conversación con el asistente) y la de seguridad contra envíos falsos de
+                formularios (CSRF). No usamos cookies de publicidad. Algunos recursos visuales (tipografías
+                e íconos) se cargan desde servicios externos, que pueden registrar tu dirección IP.
+            </p>
+
+            <h2 id="p13">13. Asistente virtual (chat "JM")</h2>
+            <p>
+                El chat de la burbuja "JM" es un asistente automático con inteligencia artificial, no una
+                persona. Los mensajes que le escribes se procesan con un proveedor externo de inteligencia
+                artificial solo para responderte. La conversación se guarda únicamente en tu sesión y se
+                borra al reiniciar el chat, al cerrar sesión o cuando la sesión vence; las herramientas que
+                la procesan pueden conservar registros técnicos por un tiempo limitado.
+                <strong>No escribas en el chat datos sensibles, contraseñas ni datos bancarios.</strong>
+                Seguimos los lineamientos de la SIC sobre el tratamiento de datos personales en sistemas de
+                inteligencia artificial (Circular Externa 002 de 2024).
+            </p>
+
+            <h2 id="p14">14. Vigencia y cambios</h2>
+            <p>
+                Esta política rige desde la fecha indicada al inicio. Si hacemos cambios importantes,
+                especialmente en las finalidades, te avisaremos por el sitio o por correo antes de
+                aplicarlos y, cuando la ley lo exija, te pediremos una nueva autorización. Tus datos se
+                tratarán mientras sean necesarios para las finalidades descritas.
+            </p>
+            <p class="legal-nota">
+                Consulta también los <a href="{% url 'terminos' %}">Términos y condiciones</a> del sitio.
+            </p>
+        </article>
+    </div>
+</div>
+{% endblock %}

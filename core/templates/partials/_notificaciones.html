@@ -3,8 +3,8 @@ Mensajes de Django (messages.success / error / …) como notificaciones
 flotantes. No se ven aquí: core/static/js/notificaciones.js lee cada
 elemento con data-notificacion y lo muestra como tarjeta arriba a la
 derecha. data-extra lleva los extra_tags del mensaje (ej.
-"latencia-bd=38.2": tiempo de guardado de una cotización, que la tarjeta
-muestra abajo en pequeño; "latencia-bd-origen=aiven" añade "en Aiven"). Se incluye en base.html y en panel_admin/base_admin.html.
+"latencia-bd=38.2": tiempo de guardado, edición o eliminación en la base de
+datos, que la tarjeta muestra abajo en pequeño; ver Bd_PremiumEventos/latencia.py). Se incluye en base.html y en panel_admin/base_admin.html.
 {% endcomment %}
 {% if messages %}
   <div hidden>

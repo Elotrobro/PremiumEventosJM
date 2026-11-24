@@ -28,6 +28,8 @@ urlpatterns = [
     path('convenios/', views.convenios, name='convenios'),
     path('catalogo/', views.catalogo, name='catalogo'),
     path('contacto/', views.contacto, name='contacto'),
+    path('terminos/', views.terminos, name='terminos'),        # Términos y condiciones
+    path('privacidad/', views.privacidad, name='privacidad'),  # Política de tratamiento de datos (Ley 1581)
 
     # ---- Rutas que sí acceden a la base de datos (app Bd_PremiumEventos) ----
     path('cotizacion/', auth_views.cotizacion_view, name='cotizacion'),  # procesa el formulario modal de inicio.html (requiere sesión)

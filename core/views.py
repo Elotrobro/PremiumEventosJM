@@ -7,6 +7,7 @@ from .galeria_data import (
 )
 from Bd_PremiumEventos.models import Salon, Usuario
 from Bd_PremiumEventos.precios import tabla_para_js
+from Bd_PremiumEventos import terminos as textos_legales
 
 # ═══════════════════════════════════════════════════════════════════════
 # Vistas de la app `core`
@@ -104,3 +105,15 @@ def contacto(request):
 # La vista de login/logout también vive en Bd_PremiumEventos.views,
 # porque es la que necesita consultar la tabla `usuario` de la base de datos.
 # Ver PremiumEventosJM/urls.py para el enrutamiento.
+
+
+# ---- Páginas legales (enlazadas desde las casillas del registro en base.html) ----
+
+def terminos(request):
+    """Términos y condiciones del sitio."""
+    return render(request, 'legal/terminos.html', {'actualizado': textos_legales.FECHA_TEXTO})
+
+
+def privacidad(request):
+    """Política de privacidad / tratamiento de datos personales (Ley 1581 de 2012)."""
+    return render(request, 'legal/privacidad.html', {'actualizado': textos_legales.FECHA_TEXTO})

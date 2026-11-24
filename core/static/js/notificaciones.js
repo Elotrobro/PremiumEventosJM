@@ -417,8 +417,8 @@
     // ── Avisos que vienen en el HTML (mensajes de Django) ───────────────
 
     // "latencia-bd=38.2" (extra_tags del mensaje, ver cotizacion_view) →
-    // "Guardado 38 ms"; con "latencia-bd-origen=aiven" →
-    // "Guardado en Aiven 38 ms". Solo llega para admin y empleado.
+    // "Guardado 38 ms" (también al editar o eliminar; ver
+    // Bd_PremiumEventos/latencia.py). Solo llega para admin y empleado.
     function detalleDesdeEtiquetas(etiquetas) {
         const latencia = /(?:^|\s)latencia-bd=(\d+(?:\.\d+)?)/.exec(etiquetas || '');
         if (!latencia) return '';
@@ -428,8 +428,7 @@
         else if (ms < 10) tiempo = ms.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' ms';
         else if (ms < 1000) tiempo = Math.round(ms) + ' ms';
         else tiempo = (ms / 1000).toLocaleString('es-CO', { maximumFractionDigits: 2 }) + ' s';
-        const enAiven = /(?:^|\s)latencia-bd-origen=aiven(?:\s|$)/.test(etiquetas);
-        return (enAiven ? 'Guardado en Aiven ' : 'Guardado ') + tiempo;
+        return 'Guardado ' + tiempo;
     }
 
     function mostrarAvisosDeLaPagina() {

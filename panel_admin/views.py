@@ -26,6 +26,7 @@ from Bd_PremiumEventos.models import (
     FotoSalon,
 )
 from Bd_PremiumEventos import limpieza
+from Bd_PremiumEventos.latencia import Cronometro
 from Bd_PremiumEventos.recordatorios import enviar_correo_estado
 from Bd_PremiumEventos.precios import calcular_precio_estimado, tabla_precios
 from core.galeria_data import CATEGORIAS
@@ -178,8 +179,9 @@ def usuario_create(request):
     if request.method == 'POST':
         form = UsuarioAdminForm(request.POST, actor_rol=actor_rol)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Usuario creado correctamente.')
+            with Cronometro() as crono:
+                form.save()
+            messages.success(request, 'Usuario creado correctamente.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:usuarios_list')
     else:
         form = UsuarioAdminForm(actor_rol=actor_rol)
@@ -197,8 +199,9 @@ def usuario_edit(request, pk):
     if request.method == 'POST':
         form = UsuarioAdminForm(request.POST, instance=usuario, actor_rol='admin')
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Usuario actualizado correctamente.')
+            with Cronometro() as crono:
+                form.save()
+            messages.success(request, 'Usuario actualizado correctamente.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:usuarios_list')
     else:
         form = UsuarioAdminForm(instance=usuario, actor_rol='admin')
@@ -223,8 +226,9 @@ def usuario_delete(request, pk):
         if usuario.pk == request.session.get('usuario_id'):
             messages.error(request, 'No puedes eliminar tu propio usuario mientras tienes la sesión activa.')
             return redirect('panel_admin:usuarios_list')
-        usuario.delete()
-        messages.success(request, 'Usuario eliminado correctamente.')
+        with Cronometro() as crono:
+            usuario.delete()
+        messages.success(request, 'Usuario eliminado correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:usuarios_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': usuario, 'titulo': 'usuario', 'cancelar_url': 'panel_admin:usuarios_list',
@@ -254,8 +258,9 @@ def catalogo_create(request):
     if request.method == 'POST':
         form = ItemDecoracionForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Ítem de decoración creado correctamente.')
+            with Cronometro() as crono:
+                form.save()
+            messages.success(request, 'Ítem de decoración creado correctamente.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:catalogo_list')
     else:
         form = ItemDecoracionForm()
@@ -268,8 +273,9 @@ def catalogo_edit(request, pk):
     if request.method == 'POST':
         form = ItemDecoracionForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Ítem de decoración actualizado correctamente.')
+            with Cronometro() as crono:
+                form.save()
+            messages.success(request, 'Ítem de decoración actualizado correctamente.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:catalogo_list')
     else:
         form = ItemDecoracionForm(instance=item)
@@ -282,8 +288,9 @@ def catalogo_delete(request, pk):
     if request.method == 'POST':
         if item.imagen:
             item.imagen.delete(save=False)  # borra también el archivo en /media, no solo el registro
-        item.delete()
-        messages.success(request, 'Ítem de decoración eliminado correctamente.')
+        with Cronometro() as crono:
+            item.delete()
+        messages.success(request, 'Ítem de decoración eliminado correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:catalogo_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': item, 'titulo': 'ítem de decoración', 'cancelar_url': 'panel_admin:catalogo_list',
@@ -317,10 +324,12 @@ def galeria_upload(request):
         form = SubirFotosGaleriaForm(request.POST, request.FILES)
         if form.is_valid():
             categoria = form.cleaned_data['categoria']
-            for imagen in form.cleaned_data['imagenes']:
-                FotoGaleria.objects.create(categoria=categoria, imagen=imagen)
+            with Cronometro() as crono:
+                for imagen in form.cleaned_data['imagenes']:
+                    FotoGaleria.objects.create(categoria=categoria, imagen=imagen)
             total = len(form.cleaned_data['imagenes'])
-            messages.success(request, f'{total} foto{"s" if total != 1 else ""} subida{"s" if total != 1 else ""} correctamente.')
+            messages.success(request, f'{total} foto{"s" if total != 1 else ""} subida{"s" if total != 1 else ""} correctamente.',
+                             extra_tags=crono.etiqueta(request))
         else:
             errores = ' '.join(e for lista in form.errors.values() for e in lista)
             messages.error(request, f'No se subió ninguna foto. {errores}')
@@ -332,8 +341,9 @@ def galeria_delete(request, pk):
     foto = get_object_or_404(FotoGaleria, pk=pk)
     if request.method == 'POST':
         foto.imagen.delete(save=False)  # borra también el archivo en /media, no solo el registro
-        foto.delete()
-        messages.success(request, 'Foto eliminada correctamente.')
+        with Cronometro() as crono:
+            foto.delete()
+        messages.success(request, 'Foto eliminada correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:galeria_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': foto, 'titulo': 'foto de la galería', 'cancelar_url': 'panel_admin:galeria_list',
@@ -356,32 +366,38 @@ SALONES_FILTROS_ESTADO = (
 )
 
 
-def _borrar_fotos_salon(fotos):
-    """Borra las fotos y sus archivos en /media (no solo el registro)."""
+def _borrar_fotos_salon(fotos, crono=None):
+    """
+    Borra las fotos y sus archivos en /media (no solo el registro). Si se
+    pasa un Cronometro, suma solo el tiempo de la base de datos.
+    """
+    crono = crono or Cronometro()
     total = 0
     for foto in fotos:
         foto.imagen.delete(save=False)
-        foto.delete()
+        with crono:
+            foto.delete()
         total += 1
     return total
 
 
-def _guardar_salon(request, form):
+def _guardar_salon(request, form, crono):
     """
     Guarda el salón del formulario, sus fotos nuevas y, si es admin, quita
     las fotos que marcó en "Quitar". Devuelve el texto para el mensaje.
+    `crono` (Cronometro) suma el tiempo que tarda la base de datos.
     """
-    salon = form.save()
-
     nuevas = form.cleaned_data.get('imagenes') or []
-    for imagen in nuevas:
-        FotoSalon.objects.create(salon=salon, imagen=imagen)
+    with crono:
+        salon = form.save()
+        for imagen in nuevas:
+            FotoSalon.objects.create(salon=salon, imagen=imagen)
 
     quitadas = 0
     if es_admin(request):
         ids = [int(v) for v in request.POST.getlist('fotos_eliminar') if v.isdigit()]
         if ids:
-            quitadas = _borrar_fotos_salon(salon.fotos.filter(pk__in=ids))
+            quitadas = _borrar_fotos_salon(salon.fotos.filter(pk__in=ids), crono)
 
     partes = []
     if nuevas:
@@ -427,8 +443,9 @@ def salon_create(request):
     if request.method == 'POST':
         form = SalonForm(request.POST, request.FILES)
         if form.is_valid():
-            detalle = _guardar_salon(request, form)
-            messages.success(request, f'Salón creado correctamente{detalle}.')
+            crono = Cronometro()
+            detalle = _guardar_salon(request, form, crono)
+            messages.success(request, f'Salón creado correctamente{detalle}.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:salones_list')
     else:
         form = SalonForm()
@@ -441,8 +458,9 @@ def salon_edit(request, pk):
     if request.method == 'POST':
         form = SalonForm(request.POST, request.FILES, instance=salon)
         if form.is_valid():
-            detalle = _guardar_salon(request, form)
-            messages.success(request, f'Salón actualizado correctamente{detalle}.')
+            crono = Cronometro()
+            detalle = _guardar_salon(request, form, crono)
+            messages.success(request, f'Salón actualizado correctamente{detalle}.', extra_tags=crono.etiqueta(request))
             return redirect('panel_admin:salones_list')
     else:
         form = SalonForm(instance=salon)
@@ -455,9 +473,11 @@ def salon_edit(request, pk):
 def salon_delete(request, pk):
     salon = get_object_or_404(Salon, pk=pk)
     if request.method == 'POST':
-        _borrar_fotos_salon(salon.fotos.all())  # los archivos en /media no se borran solos
-        salon.delete()
-        messages.success(request, 'Salón eliminado correctamente.')
+        crono = Cronometro()
+        _borrar_fotos_salon(salon.fotos.all(), crono)  # los archivos en /media no se borran solos
+        with crono:
+            salon.delete()
+        messages.success(request, 'Salón eliminado correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:salones_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': salon, 'titulo': 'salón (y sus fotos)', 'cancelar_url': 'panel_admin:salones_list',
@@ -486,8 +506,9 @@ def mensajes_list(request):
 def mensaje_delete(request, pk):
     mensaje = get_object_or_404(ContactoSimple, pk=pk)
     if request.method == 'POST':
-        mensaje.delete()
-        messages.success(request, 'Mensaje eliminado correctamente.')
+        with Cronometro() as crono:
+            mensaje.delete()
+        messages.success(request, 'Mensaje eliminado correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:mensajes_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': mensaje, 'titulo': 'mensaje de contacto', 'cancelar_url': 'panel_admin:mensajes_list',
@@ -530,9 +551,11 @@ def testimonio_aprobar(request, pk):
     testimonio = get_object_or_404(Testimonio, pk=pk)
     if request.method == 'POST':
         testimonio.aprobado = request.POST.get('aprobado') == 'on'
-        testimonio.save(update_fields=['aprobado'])
+        with Cronometro() as crono:
+            testimonio.save(update_fields=['aprobado'])
         estado = 'aprobado y publicado' if testimonio.aprobado else 'marcado como no aprobado (ya no se publica)'
-        messages.success(request, f'Testimonio de {testimonio.usuario.nombre_completo} {estado}.')
+        messages.success(request, f'Testimonio de {testimonio.usuario.nombre_completo} {estado}.',
+                         extra_tags=crono.etiqueta(request))
 
     # Se vuelve al listado con los mismos parámetros (vista, página y
     # registros por página) que tenía, enviados por el formulario en
@@ -550,11 +573,13 @@ def testimonio_delete(request, pk):
     )
 
     if request.method == 'POST':
-        testimonio.delete()
+        with Cronometro() as crono:
+            testimonio.delete()
 
         messages.success(
             request,
-            'Testimonio eliminado correctamente.'
+            'Testimonio eliminado correctamente.',
+            extra_tags=crono.etiqueta(request),
         )
 
         return redirect('panel_admin:testimonios_list')
@@ -629,8 +654,9 @@ def cotizacion_edit(request, pk):
         estado_anterior = cotizacion.estado
         form = CotizacionEstadoForm(request.POST, instance=cotizacion)
         if form.is_valid():
-            cotizacion = form.save()
-            messages.success(request, 'Cotización validada correctamente.')
+            with Cronometro() as crono:
+                cotizacion = form.save()
+            messages.success(request, 'Cotización validada correctamente.', extra_tags=crono.etiqueta(request))
 
             # Si pasó a aprobada o rechazada, se le avisa al cliente por
             # correo (n8n). Solo cuando el estado cambia, para no repetir el
@@ -673,8 +699,9 @@ def cotizacion_delete(request, pk):
         return redirect('panel_admin:cotizaciones_list')
 
     if request.method == 'POST':
-        cotizacion.delete()
-        messages.success(request, 'Cotización eliminada correctamente.')
+        with Cronometro() as crono:
+            cotizacion.delete()
+        messages.success(request, 'Cotización eliminada correctamente.', extra_tags=crono.etiqueta(request))
         return redirect('panel_admin:cotizaciones_list')
     return render_panel(request, 'panel_admin/confirmar_eliminar.html', {
         'objeto': cotizacion, 'titulo': 'cotización', 'cancelar_url': 'panel_admin:cotizaciones_list',
@@ -777,6 +804,7 @@ def usuarios_seleccion(request):
         tiene_cotizacion=Exists(Cotizacion.objects.filter(cliente__usuario=OuterRef('pk')))
     )
     propio = request.session.get('usuario_id')
+    crono = Cronometro()
     eliminados = 0
     omitidos = []
     for usuario in usuarios:
@@ -787,11 +815,13 @@ def usuarios_seleccion(request):
         if not es_admin(request) and (usuario.rol != Usuario.ROL_CLIENTE or usuario.tiene_cotizacion):
             omitidos.append(usuario.nombre_completo)
             continue
-        usuario.delete()
+        with crono:
+            usuario.delete()
         eliminados += 1
 
     if eliminados:
-        messages.success(request, f'{_plural(eliminados, "usuario eliminado", "usuarios eliminados")} correctamente.')
+        messages.success(request, f'{_plural(eliminados, "usuario eliminado", "usuarios eliminados")} correctamente.',
+                         extra_tags=crono.etiqueta(request))
     if omitidos:
         motivo = ('no puedes eliminar tu propia cuenta mientras tienes la sesión activa'
                   if omitidos == ['tu propia cuenta'] else
@@ -808,18 +838,23 @@ def catalogo_seleccion(request):
     if accion is None:
         return items
 
+    crono = Cronometro()
     if accion in ('disponible', 'no_disponible'):
-        total = items.update(estado=(accion == 'disponible'))
+        with crono:
+            total = items.update(estado=(accion == 'disponible'))
         estado = 'disponible' if accion == 'disponible' else 'no disponible'
-        messages.success(request, f'{_plural(total, "ítem marcado", "ítems marcados")} como {estado}.')
+        messages.success(request, f'{_plural(total, "ítem marcado", "ítems marcados")} como {estado}.',
+                         extra_tags=crono.etiqueta(request))
     elif accion == 'eliminar' and es_admin(request):
         total = 0
         for item in items:
             if item.imagen:
                 item.imagen.delete(save=False)  # igual que catalogo_delete: borra el archivo en /media
-            item.delete()
+            with crono:
+                item.delete()
             total += 1
-        messages.success(request, f'{_plural(total, "ítem de decoración eliminado", "ítems de decoración eliminados")} correctamente.')
+        messages.success(request, f'{_plural(total, "ítem de decoración eliminado", "ítems de decoración eliminados")} correctamente.',
+                         extra_tags=crono.etiqueta(request))
     else:
         return _accion_no_permitida(request, url)
     return _volver_al_listado(request, url)
@@ -833,12 +868,15 @@ def galeria_seleccion(request):
         return fotos
     if accion != 'eliminar':
         return _accion_no_permitida(request, url)
+    crono = Cronometro()
     total = 0
     for foto in fotos:
         foto.imagen.delete(save=False)  # borra también el archivo en /media
-        foto.delete()
+        with crono:
+            foto.delete()
         total += 1
-    messages.success(request, f'{_plural(total, "foto eliminada", "fotos eliminadas")} correctamente.')
+    messages.success(request, f'{_plural(total, "foto eliminada", "fotos eliminadas")} correctamente.',
+                     extra_tags=crono.etiqueta(request))
     return _volver_al_listado(request, url)
 
 
@@ -849,17 +887,22 @@ def salones_seleccion(request):
     if accion is None:
         return salones
 
+    crono = Cronometro()
     if accion in ('publicar', 'ocultar'):
-        total = salones.update(activo=(accion == 'publicar'))
+        with crono:
+            total = salones.update(activo=(accion == 'publicar'))
         estado = 'visible' if accion == 'publicar' else 'oculto'
-        messages.success(request, f'{_plural(total, "salón marcado", "salones marcados")} como {estado}{"s" if total != 1 else ""} en la página.')
+        messages.success(request, f'{_plural(total, "salón marcado", "salones marcados")} como {estado}{"s" if total != 1 else ""} en la página.',
+                         extra_tags=crono.etiqueta(request))
     elif accion == 'eliminar' and es_admin(request):
         total = 0
         for salon in salones:
-            _borrar_fotos_salon(salon.fotos.all())  # igual que salon_delete
-            salon.delete()
+            _borrar_fotos_salon(salon.fotos.all(), crono)  # igual que salon_delete
+            with crono:
+                salon.delete()
             total += 1
-        messages.success(request, f'{_plural(total, "salón eliminado", "salones eliminados")} correctamente.')
+        messages.success(request, f'{_plural(total, "salón eliminado", "salones eliminados")} correctamente.',
+                         extra_tags=crono.etiqueta(request))
     else:
         return _accion_no_permitida(request, url)
     return _volver_al_listado(request, url)
@@ -874,8 +917,10 @@ def mensajes_seleccion(request):
     if accion != 'eliminar':
         return _accion_no_permitida(request, url)
     total = mensajes_sel.count()
-    mensajes_sel.delete()
-    messages.success(request, f'{_plural(total, "mensaje eliminado", "mensajes eliminados")} correctamente.')
+    with Cronometro() as crono:
+        mensajes_sel.delete()
+    messages.success(request, f'{_plural(total, "mensaje eliminado", "mensajes eliminados")} correctamente.',
+                     extra_tags=crono.etiqueta(request))
     return _volver_al_listado(request, url)
 
 
@@ -886,16 +931,21 @@ def testimonios_seleccion(request):
     if accion is None:
         return testimonios
 
+    crono = Cronometro()
     if accion in ('publicar', 'ocultar'):
-        total = testimonios.update(aprobado=(accion == 'publicar'))
+        with crono:
+            total = testimonios.update(aprobado=(accion == 'publicar'))
         estado = 'aprobados y publicados' if accion == 'publicar' else 'ocultos (ya no se publican)'
         if total == 1:
             estado = 'aprobado y publicado' if accion == 'publicar' else 'oculto (ya no se publica)'
-        messages.success(request, f'{_plural(total, "testimonio", "testimonios")} {estado}.')
+        messages.success(request, f'{_plural(total, "testimonio", "testimonios")} {estado}.',
+                         extra_tags=crono.etiqueta(request))
     elif accion == 'eliminar' and es_admin(request):
         total = testimonios.count()
-        testimonios.delete()
-        messages.success(request, f'{_plural(total, "testimonio eliminado", "testimonios eliminados")} correctamente.')
+        with crono:
+            testimonios.delete()
+        messages.success(request, f'{_plural(total, "testimonio eliminado", "testimonios eliminados")} correctamente.',
+                         extra_tags=crono.etiqueta(request))
     else:
         return _accion_no_permitida(request, url)
     return _volver_al_listado(request, url)
@@ -913,12 +963,15 @@ def cotizaciones_seleccion(request):
     # Misma regla que cotizacion_delete: las pagadas no se eliminan.
     pagadas = cotizaciones.filter(estado=Cotizacion.ESTADO_PAGADO).count()
     borrables = cotizaciones.exclude(estado=Cotizacion.ESTADO_PAGADO)
+    crono = Cronometro()
     total = 0
     for cotizacion in borrables:
-        cotizacion.delete()
+        with crono:
+            cotizacion.delete()
         total += 1
     if total:
-        messages.success(request, f'{_plural(total, "cotización eliminada", "cotizaciones eliminadas")} correctamente.')
+        messages.success(request, f'{_plural(total, "cotización eliminada", "cotizaciones eliminadas")} correctamente.',
+                         extra_tags=crono.etiqueta(request))
     if pagadas:
         messages.error(request, f'{_plural(pagadas, "cotización no se eliminó porque está", "cotizaciones no se eliminaron porque están")} '
                                 'en estado "Pagado".')
@@ -1240,14 +1293,16 @@ def precios_edit(request):
             and formset_servicios.is_valid()
         ):
 
-            formset.save()
-            form_config.save()
-            formset_servicios.save()
+            with Cronometro() as crono:
+                formset.save()
+                form_config.save()
+                formset_servicios.save()
 
             messages.success(
                 request,
                 'Precios actualizados correctamente. '
-                'Las nuevas cotizaciones utilizarán estos valores.'
+                'Las nuevas cotizaciones utilizarán estos valores.',
+                extra_tags=crono.etiqueta(request),
             )
 
             return redirect(

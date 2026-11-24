@@ -5,6 +5,9 @@
 //   solo la primera vez que se abre la modal, no en cada página.
 // - Pinta el botón oficial en las pestañas "Iniciar sesión" y "Crear
 //   cuenta" (los <div data-google-boton>).
+// - En "Crear cuenta" el botón queda bloqueado hasta marcar las casillas de
+//   Términos y Política de privacidad, y su valor viaja con el formulario
+//   (google_login.py no crea cuentas nuevas sin esa autorización).
 // - Cuando la persona elige su cuenta, Google entrega un token firmado; se
 //   envía con el formulario oculto #googleLoginForm a /login/google/, donde
 //   Django lo verifica (Bd_PremiumEventos/google_login.py).
@@ -46,6 +49,35 @@
         return registro && registro.classList.contains('is-active') ? 'registro' : 'login';
     }
 
+    // ── Términos y privacidad (casillas de "Crear cuenta") ──────────────
+    const casillas = ['registroTerminos', 'registroPrivacidad']
+        .map(function (id) { return document.getElementById(id); })
+        .filter(Boolean);
+    const googleRegistro = document.getElementById('googleRegistro');
+
+    function aceptoTodo() {
+        return casillas.length > 0 && casillas.every(function (c) { return c.checked; });
+    }
+
+    function actualizarBloqueo() {
+        if (!googleRegistro) return;
+        const bloqueado = !aceptoTodo();
+        googleRegistro.classList.toggle('is-bloqueado', bloqueado);
+        googleRegistro.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+    }
+
+    casillas.forEach(function (c) { c.addEventListener('change', actualizarBloqueo); });
+    actualizarBloqueo();
+
+    // Clic en el botón bloqueado: se avisa y se marca la primera casilla pendiente.
+    if (googleRegistro) {
+        googleRegistro.addEventListener('click', function () {
+            if (aceptoTodo()) return;
+            const pendiente = casillas.find(function (c) { return !c.checked; });
+            if (pendiente) pendiente.reportValidity();   // notificaciones.js muestra el aviso
+        });
+    }
+
     function recibirCredencial(respuesta) {
         if (!respuesta || !respuesta.credential) {
             avisar('Google no devolvió tu cuenta. Intenta de nuevo.');
@@ -53,6 +85,11 @@
         }
         form.elements.credential.value = respuesta.credential;
         form.elements.origen.value = pestanaActiva();
+        // Las casillas viajan siempre: así una cuenta nueva solo se crea con
+        // la autorización, aunque se haya usado el botón de "Iniciar sesión".
+        const acepto = aceptoTodo() ? 'on' : '';
+        form.elements.acepta_terminos.value = acepto;
+        form.elements.acepta_privacidad.value = acepto;
         contenedores.forEach(function (c) { c.classList.add('google-login-enviando'); });
         form.submit();
     }
