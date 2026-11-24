@@ -1,34 +1,11 @@
 import os
-import re
 import shutil
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from Bd_PremiumEventos.media import ruta_original
 from Bd_PremiumEventos.models import FotoGaleria, FotoSalon, ItemDecoracion
-
-
-# Carpetas del repositorio de donde salieron originalmente las fotos que
-# hoy están en /media (ver los comandos migrar_fotos_galeria y
-# migrar_catalogo). Como sí están en GitHub, sirven para reconstruir /media
-# en un servidor nuevo, donde la carpeta /media llega vacía.
-CARPETA_ESTATICA = os.path.join(settings.BASE_DIR, 'core', 'static', 'images')
-# Copia opcional de la carpeta /media de un PC, subida al repositorio con
-# este nombre (para recuperar también las fotos de los salones).
-CARPETA_RESPALDO = os.path.join(settings.BASE_DIR, 'media_respaldo')
-
-# Cuando ya existe un archivo con el mismo nombre, Django le agrega un
-# sufijo aleatorio de 7 caracteres (foto.png → foto_Ab12Cd3.png).
-SUFIJO_DJANGO = re.compile(r'_[A-Za-z0-9]{7}(?=\.[^.]+$)')
-
-
-def _candidatos(nombre_en_bd, carpeta_estatica):
-    """Rutas posibles del archivo original, en orden de preferencia."""
-    yield os.path.join(CARPETA_RESPALDO, nombre_en_bd)
-    if carpeta_estatica:
-        base = os.path.basename(nombre_en_bd)
-        yield os.path.join(carpeta_estatica, base)
-        yield os.path.join(carpeta_estatica, SUFIJO_DJANGO.sub('', base))
 
 
 class Command(BaseCommand):
@@ -52,15 +29,14 @@ class Command(BaseCommand):
     help = 'Recupera en /media las fotos registradas en la base de datos que faltan en el disco.'
 
     def handle(self, *args, **options):
+        # Los archivos de origen los busca ruta_original (Bd_PremiumEventos/media.py).
         grupos = [
-            ('galería', FotoGaleria.objects.all(),
-             lambda f: os.path.join(CARPETA_ESTATICA, 'galeria', f.categoria)),
-            ('catálogo', ItemDecoracion.objects.exclude(imagen=''),
-             lambda f: os.path.join(CARPETA_ESTATICA, 'catalogo_productos')),
-            ('salones', FotoSalon.objects.all(), lambda f: None),
+            ('galería', FotoGaleria.objects.all()),
+            ('catálogo', ItemDecoracion.objects.exclude(imagen='')),
+            ('salones', FotoSalon.objects.all()),
         ]
 
-        for etiqueta, registros, carpeta_de in grupos:
+        for etiqueta, registros in grupos:
             restauradas = 0
             faltantes = []
             for registro in registros:
@@ -70,10 +46,7 @@ class Command(BaseCommand):
                 destino = os.path.join(settings.MEDIA_ROOT, nombre)
                 if os.path.isfile(destino):
                     continue
-                origen = next(
-                    (r for r in _candidatos(nombre, carpeta_de(registro)) if os.path.isfile(r)),
-                    None,
-                )
+                origen = ruta_original(nombre)
                 if origen is None:
                     faltantes.append(nombre)
                     continue
